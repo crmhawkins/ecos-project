@@ -26,19 +26,12 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    {{-- @vite(['resources/sass/app.scss', 'resources/js/app.js']) --}}
-        {{-- @if ($isDarkMode)
-            @vite(['resources/sass/dark-mode.scss'])
-        @else
-            @vite(['resources/sass/light-mode.scss'])
-        @endif --}}
-        {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/choices.js/1.1.6/styles/css/base.css" integrity="sha512-Am/2bbv2qivU11QVLRLepSHQjZ98V1DWpWlwNyFF5XRYNlHLrKUusGYrVocdIko13v4Nl6AbvfJb87wQJyxyQA==" crossorigin="anonymous" referrerpolicy="no-referrer" /> --}}
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/choices.js/1.1.6/choices.min.js" integrity="sha512-7PQ3MLNFhvDn/IQy12+1+jKcc1A/Yx4KuL62Bn6+ztkiitRVW1T/7ikAh675pOs3I+8hyXuRknDpTteeptw4Bw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        @yield('css')
-        <link rel="stylesheet" href="{{ asset('build/assets/app-d2e38ed8.css') }}" crossorigin="anonymous" referrerpolicy="no-referrer">
-        <script src="{{ asset('build/assets/app-bf7e6802.js') }}"></script>
-        @laravelViewsStyles
-        {{-- @vite(['resources/sass/app.scss', 'resources/js/app.js']) --}}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/choices.js/1.1.6/choices.min.js" integrity="sha512-7PQ3MLNFhvDn/IQy12+1+jKcc1A/Yx4KuL62Bn6+ztkiitRVW1T/7ikAh675pOs3I+8hyXuRknDpTteeptw4Bw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    @yield('css')
+    <link rel="stylesheet" href="{{ asset('build/assets/app-d2e38ed8.css') }}" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <script src="{{ asset('build/assets/app-bf7e6802.js') }}"></script>
+    @laravelViewsStyles
 </head>
 <body class="" style="overflow-x: hidden">
     <div id="app">
@@ -51,10 +44,10 @@
         </div>
         <div class="css-96uzu9"></div>
 
-        @include('layouts.sidebar')
+        @include('crm.layouts.sidebar')
 
         <main id="main">
-            @include('layouts.topBar')
+            @include('crm.layouts.topBar')
             <div class="contenedor p-4">
                 @yield('content')
             </div>
@@ -88,50 +81,6 @@
             }
         });
 
-
-        // function saveThemePreference(isDark) {
-        //     $.ajax({
-        //         url: '{{ route("saveThemePreference") }}',
-        //         method: 'POST',
-        //         data: {
-        //             is_dark: isDark,
-        //             _token: '{{ csrf_token() }}'
-        //         },
-        //         success: function(response) {
-        //             console.log(response.message);
-        //             // Cambiar dinámicamente el tema
-        //             document.getElementById('body').classList.toggle('dark-mode', isDark);
-        //         },
-        //         error: function(error) {
-        //             console.error('Error guardando la preferencia de tema:', error);
-        //         }
-        //     });
-        // }
-
-        // Evento para cambiar el tema
-        // document.getElementById('toggleThemeButton').addEventListener('click', function() {
-        //     var isDark = document.getElementById('body').classList.toggle('dark-mode');
-        //     saveThemePreference(isDark);
-        // });
-
-        // function updateThemeIcon(isDark) {
-        //     const themeIcon = document.getElementById('theme-icon');
-        //     if (isDark) {
-        //         themeIcon.classList.remove('bi-moon');
-        //         themeIcon.classList.add('bi-brightness-high');
-        //     } else {
-        //         themeIcon.classList.remove('bi-brightness-high');
-        //         themeIcon.classList.add('bi-moon');
-        //     }
-        // }
-
-        // Evento para cambiar el tema
-        // document.getElementById('light-dark-mode').addEventListener('click', function() {
-        //     const body = document.getElementById('body');
-        //     const isDark = body.classList.toggle('dark-mode');
-        //     saveThemePreference(isDark);
-        //     console.log(isDark)
-        // });
         document.addEventListener("DOMContentLoaded", function() {
             const rows = document.querySelectorAll("tr.clickable-row");
 

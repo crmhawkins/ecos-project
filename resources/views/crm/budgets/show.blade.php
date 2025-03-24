@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('crm.layouts.app')
 
 @section('titulo', 'Ver Presupuesto')
 
@@ -162,7 +162,7 @@
     <!-- toastify -->
     <script src="{{asset('assets/vendors/toastify/toastify.js')}}"></script>
 
-    @include('partials.toast')
+    @include('crm.partials.toast')
 <script>
     $(document).ready(function() {
         $('#generatePdf').click(function(e){

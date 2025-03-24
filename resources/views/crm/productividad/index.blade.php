@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('crm.layouts.app')
 
 @section('titulo', 'Productividad de Usuarios')
 
@@ -90,5 +90,5 @@
     });
 </script>
 
-@include('partials.toast')
+@include('crm.partials.toast')
 @endsection

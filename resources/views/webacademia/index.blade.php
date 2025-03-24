@@ -3,6 +3,98 @@
 @section('title', 'Inicio')
 
 @section('css')
+<style>
+    .tp_feature .container-fluid {
+        display: flex;
+        justify-content: center;
+    }
+
+    .tp_feature .row {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .tp_feature .col-lg-2 {
+        flex: 1;
+        display: flex;
+        padding: 0;
+        min-width: 16.66%; /* 6 columnas en fila */
+    }
+
+    .tp_feature .single_tp {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+        padding: 20px;
+        background: #f8f8f8; /* Ajusta el color de fondo si es necesario */
+        border: 1px solid #ddd; /* Opcional, para separar visualmente */
+    }
+
+    .tp_feature .single_tp h3 {
+        margin-bottom: 15px;
+    }
+
+    .tp_feature .single_tp a.cta {
+        margin-top: auto;
+        text-decoration: none;
+        color: #007bff;
+        font-weight: bold;
+    }
+
+    .tp_feature .single_tp svg {
+        vertical-align: middle;
+    }
+
+</style>
+<style>
+    .marketing_content_area .container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .marketing_content_area .row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .marketing_content_area .col-lg-4 {
+        flex: 1 1 33.33%; /* Hace que cada columna tenga el mismo ancho */
+        display: flex;
+        padding: 15px;
+    }
+
+    .single_feature_one {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+        padding: 20px;
+        min-height: 200px; /* Asegura una altura mínima */
+        height: 100%; /* Hace que todos ocupen la misma altura */
+    }
+
+    .sf_top {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+
+    .single_feature_one p {
+        flex-grow: 1; /* Permite que el texto crezca sin afectar la altura */
+    }
+
+    .single_feature_one a.cta {
+        text-decoration: none;
+        color: #007bff;
+        font-weight: bold;
+        margin-top: auto; /* Empuja el botón al fondo */
+    }
+</style>
 @endsection
 
 @section('content')
@@ -12,11 +104,11 @@
 			<div class="row">
 				<div class="col-lg-6 col-sm-6 col-xs-12">
 					<div class="home_content">
-						<h1>Better <span>Learning Future</span> Starts With Ecos</h1>
-						<p>It is a long established fact that reader will be distracted readable content of a page when.</p>
+						<h1><span>I</span>mpulsa tu <span>F</span>uturo</h1>
+                        <p>Descubre cursos diseñados para llevarte al próximo nivel profesional.</p>
 					</div>
 					<div class="home_btn">
-						<a href="#" class="cta"><span>Explore Courses</span>
+						<a href="#" class="cta"><span>Nuestros Cursos</span>
 						  <svg width="13px" height="10px" viewBox="0 0 13 10">
 							<path d="M1,5 L11,5"></path>
 							<polyline points="8 1 12 5 8 9"></polyline>
@@ -27,16 +119,6 @@
 				<div class="col-lg-6 col-sm-6 col-xs-12">
 					<div class="home_me_img">
 						<img src="assets/images/all-img/home-image.png" class="img-fluid" alt="" />
-						<div class="home_ps">
-							<img src="assets/images/icon/user2.svg" alt="" />
-							<h2>7500+</h2>
-							<span>Active student</span>
-						</div>
-						<div class="home_ps2">
-							<img src="assets/images/icon/file2.svg" alt="" />
-							<h2>4500+</h2>
-							<span>Online Course</span>
-						</div>
 					</div>
 				</div><!-- END COL-->
 			</div><!--- END ROW -->
@@ -46,47 +128,66 @@
 
 	<!-- START TOP PROMO FEATURES -->
 	<section class="tp_feature">
-	   <div class="container-fluid">
-			<div class="row">
-				<div class="col-lg-4 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
-					<div class="single_tp">
-						<h3>Quality Education</h3>
-						<p>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit sed do eiusmod tempor incididunt ut labore.</p>
-						<a href="#" class="cta"><span>Explore</span>
-						  <svg width="13px" height="10px" viewBox="0 0 13 10">
-							<path d="M1,5 L11,5"></path>
-							<polyline points="8 1 12 5 8 9"></polyline>
-						  </svg>
-						</a>
-					</div>
-				</div><!-- END COL -->
-				<div class="col-lg-4 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
-					<div class="single_tp">
-						<h3>Experienced Teachers</h3>
-						<p>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit sed do eiusmod tempor incididunt ut labore.</p>
-						<a href="#" class="cta"><span>Explore</span>
-						  <svg width="13px" height="10px" viewBox="0 0 13 10">
-							<path d="M1,5 L11,5"></path>
-							<polyline points="8 1 12 5 8 9"></polyline>
-						  </svg>
-						</a>
-					</div>
-				</div><!-- END COL -->
-				<div class="col-lg-4 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
-					<div class="single_tp">
-						<h3>Delicious Food</h3>
-						<p>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit sed do eiusmod tempor incididunt ut labore.</p>
-						<a href="#" class="cta"><span>Explore</span>
-						  <svg width="13px" height="10px" viewBox="0 0 13 10">
-							<path d="M1,5 L11,5"></path>
-							<polyline points="8 1 12 5 8 9"></polyline>
-						  </svg>
-						</a>
-					</div>
-				</div><!-- END COL -->
-			</div><!-- END ROW -->
-		</div><!-- END CONTAINER -->
-	</section>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-2 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                    <div class="single_tp">
+                        <h3>Campus Virtual</h3>
+                        <a href="#" class="cta"><span>Ver mas</span>
+                            <svg width="13px" height="10px" viewBox="0 0 13 10">
+                                <path d="M1,5 L11,5"></path>
+                                <polyline points="8 1 12 5 8 9"></polyline>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                    <div class="single_tp">
+                        <h3>Formación Continua</h3>
+                        <a href="#" class="cta"><span>Ver mas</span>
+                            <svg width="13px" height="10px" viewBox="0 0 13 10">
+                                <path d="M1,5 L11,5"></path>
+                                <polyline points="8 1 12 5 8 9"></polyline>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                    <div class="single_tp">
+                        <h3>Oposiciones</h3>
+                        <a href="#" class="cta"><span>Ver mas</span>
+                            <svg width="13px" height="10px" viewBox="0 0 13 10">
+                                <path d="M1,5 L11,5"></path>
+                                <polyline points="8 1 12 5 8 9"></polyline>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                    <div class="single_tp">
+                        <h3>Certificados de Profesionalidad</h3>
+                        <a href="#" class="cta"><span>Ver mas</span>
+                            <svg width="13px" height="10px" viewBox="0 0 13 10">
+                                <path d="M1,5 L11,5"></path>
+                                <polyline points="8 1 12 5 8 9"></polyline>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                    <div class="single_tp">
+                        <h3>Seguridad Privada</h3>
+                        <a href="#" class="cta"><span>Ver mas</span>
+                            <svg width="13px" height="10px" viewBox="0 0 13 10">
+                                <path d="M1,5 L11,5"></path>
+                                <polyline points="8 1 12 5 8 9"></polyline>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 	<!-- END TOP PROMO FEATURES -->
 
 	<!-- START ABOUT US HOME ONE -->
@@ -173,7 +274,7 @@
 	<!-- END COUNTER -->
 
 	<!-- START COMPANY PARTNER LOGO  -->
-	<div class="partner-logo section-padding">
+	{{-- <div class="partner-logo section-padding">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-12 text-center">
@@ -194,78 +295,79 @@
 				</div><!-- END COL  -->
 			</div><!--END  ROW  -->
 		</div><!-- END CONTAINER  -->
-	</div>
+	</div> --}}
 	<!-- END COMPANY PARTNER LOGO -->
 
 	<!-- START WHY CHOOSE US-->
 	<section class="marketing_content_area section-padding">
-	   <div class="container">
-			<div class="section-title">
-				<h2>Why Choose Ecos</h2>
-				<p>Find the <span><u>best features</u></span> of Ecos.</p>
-			</div>
-			<div class="row">
-				<div class="col-lg-4 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="single_feature_one">
-						<div class="sf_top">
-							<span class="ti-book ss_one"></span>
-							<h2><a href="single-service" target="_blank">Learn More Anywhere</a></h2>
-						</div>
-						<p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor ut labore.</p>
-					</div>
-				</div><!-- END COL -->
-				<div class="col-lg-4 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
-					<div class="single_feature_one">
-						<div class="sf_top">
-							<span class="ti-heart ss_two"></span>
-							<h2><a href="single-service" target="_blank">Expert <br />Instructor</a></h2>
-						</div>
-						<p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor ut labore.</p>
-					</div>
-				</div><!-- END COL -->
-				<div class="col-lg-4 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
-					<div class="single_feature_one">
-						<div class="sf_top">
-							<span class="ti-user ss_three"></span>
-							<h2><a href="single-service" target="_blank">Team <br />Management</a></h2>
-						</div>
-						<p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor ut labore.</p>
-					</div>
-				</div><!-- END COL -->
-				<div class="col-lg-4 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
-					<div class="single_feature_one">
-						<div class="sf_top">
-							<span class="ti-eye ss_four"></span>
-							<h2><a href="single-service" target="_blank">Course <br /> Planing</a></h2>
-						</div>
-						<p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor ut labore.</p>
-					</div>
-				</div><!-- END COL -->
-				<div class="col-lg-4 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.5s" data-wow-offset="0">
-					<div class="single_feature_one">
-						<div class="sf_top">
-							<span class="ti-light-bulb ss_five"></span>
-							<h2><a href="single-service" target="_blank">Teacher Monitoring</a></h2>
-						</div>
-						<p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor ut labore.</p>
-					</div>
-				</div><!-- END COL -->
-				<div class="col-lg-4 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.6s" data-wow-offset="0">
-					<div class="single_feature_one">
-						<div class="sf_top">
-							<span class="ti-email ss_six"></span>
-							<h2><a href="single-service" target="_blank">24/7 Strong Support</a></h2>
-						</div>
-						<p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor ut labore.</p>
-					</div>
-				</div><!-- END COL -->
-			</div><!-- END ROW -->
-		</div><!-- END CONTAINER -->
-	</section>
+        <div class="container">
+           <div class="section-title">
+              <h2>¿Por qué elegir Ecos?</h2>
+              <p>Descubre las <span><u>mejores cualidades</u></span> de Ecos.</p>
+           </div>
+           <div class="row">
+              <div class="col-lg-4 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+                 <div class="single_feature_one">
+                    <div class="sf_top">
+                       <span class="ti-book ss_one"></span>
+                       <h2><a href="single-service" target="_blank">Aprende desde cualquier lugar</a></h2>
+                    </div>
+                    <p>Accede a nuestra formación de calidad sin importar dónde te encuentres, con recursos adaptados a tu ritmo y necesidades.</p>
+                 </div>
+              </div><!-- END COL -->
+              <div class="col-lg-4 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                 <div class="single_feature_one">
+                    <div class="sf_top">
+                       <span class="ti-heart ss_two"></span>
+                       <h2><a href="single-service" target="_blank">Instructores expertos</a></h2>
+                    </div>
+                    <p>Contamos con un equipo de profesionales altamente cualificados, dispuestos a guiarte en cada paso de tu formación.</p>
+                 </div>
+              </div><!-- END COL -->
+              <div class="col-lg-4 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                 <div class="single_feature_one">
+                    <div class="sf_top">
+                       <span class="ti-user ss_three"></span>
+                       <h2><a href="single-service" target="_blank">Gestión eficiente del equipo</a></h2>
+                    </div>
+                    <p>Una organización estructurada que garantiza la mejor experiencia de aprendizaje, con coordinación y apoyo constante.</p>
+                 </div>
+              </div><!-- END COL -->
+              <div class="col-lg-4 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+                 <div class="single_feature_one">
+                    <div class="sf_top">
+                       <span class="ti-eye ss_four"></span>
+                       <h2><a href="single-service" target="_blank">Planificación de cursos</a></h2>
+                    </div>
+                    <p>Diseñamos programas de estudio adaptados a las necesidades del mercado y las expectativas de nuestros alumnos.</p>
+                 </div>
+              </div><!-- END COL -->
+              <div class="col-lg-4 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.5s" data-wow-offset="0">
+                 <div class="single_feature_one">
+                    <div class="sf_top">
+                       <span class="ti-light-bulb ss_five"></span>
+                       <h2><a href="single-service" target="_blank">Seguimiento docente</a></h2>
+                    </div>
+                    <p>Monitoreamos el desempeño de nuestros profesores para garantizar la mejor calidad educativa y la satisfacción de los estudiantes.</p>
+                 </div>
+              </div><!-- END COL -->
+              <div class="col-lg-4 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.6s" data-wow-offset="0">
+                 <div class="single_feature_one">
+                    <div class="sf_top">
+                       <span class="ti-email ss_six"></span>
+                       <h2><a href="single-service" target="_blank">Soporte 24/7</a></h2>
+                    </div>
+                    <p>Atención constante para resolver tus dudas y acompañarte en cada etapa de tu formación.</p>
+                 </div>
+              </div><!-- END COL -->
+           </div><!-- END ROW -->
+        </div><!-- END CONTAINER -->
+     </section>
+
 	<!-- END WHY CHOOSE US -->
 
 	<!--START COURSE -->
-	<div class="best-cpurse section-padding">
+	{{-- <div class="best-cpurse section-padding">
 		<div class="container">
 			<div class="section-title">
 			  <h2>Popular Courses</h2>
@@ -387,11 +489,11 @@
 				</div><!--END COL -->
 			</div><!--END ROW -->
 		</div><!--END CONTAINER -->
-	</div>
+	</div> --}}
 	<!--END COURSE -->
 
 	<!-- START COURSE PROMOTION -->
-	<section class="course_promo section-padding">
+	{{-- <section class="course_promo section-padding">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
@@ -406,7 +508,7 @@
 						</ul>
 					</div>
 					<div class="cp_btn">
-						<a href="#" class="cta"><span>Explore Our Courses</span>
+						<a href="#" class="cta"><span>Ver mas Our Courses</span>
 						  <svg width="13px" height="10px" viewBox="0 0 13 10">
 							<path d="M1,5 L11,5"></path>
 							<polyline points="8 1 12 5 8 9"></polyline>
@@ -424,11 +526,11 @@
 				</div><!--- END COL -->
 			</div><!--- END ROW -->
 		</div><!--- END CONTAINER -->
-	</section>
+	</section> --}}
 	<!-- END COURSE PROMOTION -->
 
 	<!-- START NEWSLETTER -->
-	<section class="newsletter_area section-padding">
+	{{-- <section class="newsletter_area section-padding">
 		<div class="container">
 			<div class="row text-center">
 				<div class="col-lg-6 offset-lg-3 col-sm-12 col-xs-12">
@@ -443,11 +545,11 @@
 				</div><!-- END COL -->
 			</div><!-- END ROW -->
 		</div><!--- END CONTAINER -->
-	</section>
+	</section> --}}
 	<!-- END NEWSLETTER -->
 
 	<!-- START TOPIC-->
-	<section class="topic_content_area section-padding">
+	{{-- <section class="topic_content_area section-padding">
 	   <div class="container">
 			<div class="section-title">
 				<h2>Start Learning </h2>
@@ -498,11 +600,11 @@
 				</div><!-- END COL -->
 			</div><!-- END ROW -->
 		</div><!-- END CONTAINER -->
-	</section>
+	</section> --}}
 	<!-- END TOPIC -->
 
 	<!-- START EVENT -->
-	<section class="our-event section-padding">
+	{{-- <section class="our-event section-padding">
 		<div class="container">
 			<div class="section-title">
 				<h2>Upcoming Events</h2>
@@ -571,11 +673,11 @@
 				</div><!-- END COL -->
 			</div><!-- END ROW -->
 		</div><!-- END CONTAINER -->
-	</section>
+	</section> --}}
 	<!-- END EVENT -->
 
 	<!-- START TESTIMONIALS-->
-	<section class="testi_home_area section-padding">
+	{{-- <section class="testi_home_area section-padding">
 	   <div class="container">
 			<div class="section-title">
 				<h2>Testimonial</h2>
@@ -673,11 +775,11 @@
 				</div><!-- END COL  -->
 			</div><!-- END ROW -->
 		</div><!-- END CONTAINER -->
-	</section>
+	</section> --}}
 	<!-- END TESTIMONIALS -->
 
 	<!-- START TEAM-->
-	<section class="team_home_area section-padding">
+	{{-- <section class="team_home_area section-padding">
 	   <div class="container">
 			<div class="section-title">
 				<h2>Team Member</h2>
@@ -758,11 +860,11 @@
 				</div><!-- END COL -->
 			</div><!-- END ROW -->
 		</div><!-- END CONTAINER -->
-	</section>
+	</section> --}}
 	<!-- END TEAM -->
 
 	<!-- START BLOG -->
-	<section id="blog" class="blog_area section-padding">
+	{{-- <section id="blog" class="blog_area section-padding">
 		<div class="container">
 			<div class="section-title">
 				<h2>News</h2>
@@ -827,7 +929,7 @@
 				</div><!-- END COL-->
 			</div><!-- / END ROW -->
 		</div><!-- END CONTAINER  -->
-	</section>
+	</section> --}}
 	<!-- END BLOG -->
 
     @endsection

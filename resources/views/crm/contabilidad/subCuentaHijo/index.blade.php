@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('crm.layouts.app')
 
 @section('titulo', 'Sub Cuenta Hija Contable')
 
@@ -100,7 +100,7 @@
 @endsection
 
 @section('scripts')
-@include('partials.toast')
+@include('crm.partials.toast')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const deleteButtons = document.querySelectorAll('.delete-btn');

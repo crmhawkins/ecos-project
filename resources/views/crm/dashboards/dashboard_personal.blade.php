@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('crm.layouts.app')
 
 @section('titulo', 'Dashboard')
 
@@ -553,7 +553,7 @@
 @endsection
 
 @section('scripts')
-    @include('partials.toast')
+    @include('crm.partials.toast')
     <script src="{{asset('assets/vendors/choices.js/choices.min.js')}}"></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/locales-all.global.min.js"></script>

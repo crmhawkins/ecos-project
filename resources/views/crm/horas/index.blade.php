@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('crm.layouts.app')
 
 @section('titulo', 'Jornadas Por Fecha')
 
@@ -125,5 +125,5 @@
     });
 </script>
 
-@include('partials.toast')
+@include('crm.partials.toast')
 @endsection

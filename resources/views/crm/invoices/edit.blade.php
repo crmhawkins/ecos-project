@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('crm.layouts.app')
 
 @section('titulo', 'Editar factura')
 
@@ -290,7 +290,7 @@
         </section>
     </div>
 
-    @include('partials.toast')
+    @include('crm.partials.toast')
 
 @endsection
 

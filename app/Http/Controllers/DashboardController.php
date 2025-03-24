@@ -56,132 +56,125 @@ class DashboardController extends Controller
 
         switch($acceso){
             case(1):
-                return redirect()->route('horas.index');
+                 // Obtener las fechas de la solicitud, o asignar fechas predeterminadas si no están presentes
+                $fechaInicio = $request->input('fecha_inicio') ?? date('Y-m-01'); // Primer día del mes actual
+                $fechaFin = $request->input('fecha_fin') ?? date('Y-m-d'); // Día actual
 
-                //  // Obtener las fechas de la solicitud, o asignar fechas predeterminadas si no están presentes
-                // $fechaInicio = $request->input('fecha_inicio') ?? date('Y-m-01'); // Primer día del mes actual
-                // $fechaFin = $request->input('fecha_fin') ?? date('Y-m-d'); // Día actual
+                // Validar las fechas
+                if (!$fechaInicio || !$fechaFin) {
+                    return redirect()->back()->with('error', 'Por favor selecciona un rango de fechas válido.');
+                }
+                // Buscar los ingresos en el rango de fechas
+                $ingresos = Invoice::whereBetween('created_at', [$fechaInicio, $fechaFin])->get();
+                // Buscar los gastos en el rango de fechas
+                $gastos = Gasto::whereBetween('created_at', [$fechaInicio, $fechaFin])->get();
 
-                // // Validar las fechas
-                // if (!$fechaInicio || !$fechaFin) {
-                //     return redirect()->back()->with('error', 'Por favor selecciona un rango de fechas válido.');
-                // }
-                // // Buscar los ingresos en el rango de fechas
-                // $ingresos = Invoice::whereBetween('created_at', [$fechaInicio, $fechaFin])->get();
-                // // Buscar los gastos en el rango de fechas
-                // $gastos = Gasto::whereBetween('created_at', [$fechaInicio, $fechaFin])->where('transfer_movement', '!=', true)->get();
+                // Buscar los gastos asociados en el rango de fechas
+                $gastosAsociados = AssociatedExpenses::whereBetween('created_at', [$fechaInicio, $fechaFin])->get();
 
-                // // Buscar los gastos asociados en el rango de fechas
-                // $gastosAsociados = AssociatedExpenses::whereBetween('created_at', [$fechaInicio, $fechaFin])->get();
+                // Calcular la cantidad de cada tipo
+                $ingresosCount = $ingresos->count();
+                $gastosCount = $gastos->count();
+                $gastosAsociadosCount = $gastosAsociados->count();
 
-                // // Calcular la cantidad de cada tipo
-                // $ingresosCount = $ingresos->count();
-                // $gastosCount = $gastos->count();
-                // $gastosAsociadosCount = $gastosAsociados->count();
-
-                // // Calcular beneficios
-                // $totalIngresos = $ingresos->sum('total');
-                // $totalGastosComunes = $gastos->sum('quantity');
-                // $totalGastosSociados = $gastosAsociados->sum('quantity');
-                // $totalGastos = $totalGastosComunes + $totalGastosSociados;
-                // $beneficios = $totalIngresos - $totalGastos;
+                // Calcular beneficios
+                $totalIngresos = $ingresos->sum('total');
+                $totalGastosComunes = $gastos->sum('quantity');
+                $totalGastosSociados = $gastosAsociados->sum('quantity');
+                $totalGastos = $totalGastosComunes + $totalGastosSociados;
+                $beneficios = $totalIngresos - $totalGastos;
 
 
-                // $clientes = Client::where('is_client',true)->get();
-                // $budgets = Budget::where('admin_user_id',$id)->get();
-                // $projects = Project::where('admin_user_id',$id)->get();
-                // $tareas = Task::where('gestor_id',$id)->get();
-                // $ingresos = 0;
-                // $gastos = 0;
-                // $gastosAsociados = 0;
+                $clientes = Client::where('is_client',true)->get();
+                $budgets = Budget::where('admin_user_id',$id)->get();
+                $projects = Project::where('admin_user_id',$id)->get();
+                $tareas = Task::where('gestor_id',$id)->get();
+                $ingresos = 0;
+                $gastos = 0;
+                $gastosAsociados = 0;
 
 
-                // return view('crm.dashboards.dashboard', compact(
-                //     'user',
-                //     'tareas',
-                //     'to_dos',
-                //     'budgets',
-                //     'projects',
-                //     'clientes',
-                //     'users',
-                //     'events',
-                //     'timeWorkedToday',
-                //     'jornadaActiva',
-                //     'pausaActiva',
-                //     'llamadaActiva',
-                //     'totalIngresos',
-                //     'totalGastosComunes',
-                //     'totalGastosSociados',
-                //     'beneficios',
-                //     'to_dos_finalizados'
-                // ));
+                return view('crm.dashboards.dashboard', compact(
+                    'user',
+                    'tareas',
+                    'to_dos',
+                    'budgets',
+                    'projects',
+                    'clientes',
+                    'users',
+                    'events',
+                    'timeWorkedToday',
+                    'jornadaActiva',
+                    'pausaActiva',
+                    'llamadaActiva',
+                    'totalIngresos',
+                    'totalGastosComunes',
+                    'totalGastosSociados',
+                    'beneficios',
+                    'to_dos_finalizados'
+                ));
             case(2):
-                return redirect()->route('horas.index');
-
-                // $clientes = Client::where('is_client',true)->get();
-                // $budgets = Budget::where('admin_user_id',$id)->get();
-                // $projects = Project::where('admin_user_id',$id)->get();
-                // $tareas = Task::where('gestor_id',$id)->get();
-                // return view('crm.dashboards.dashboard_gestor', compact(
-                //     'user',
-                //     'tareas',
-                //     'to_dos',
-                //     'budgets',
-                //     'projects',
-                //     'clientes',
-                //     'users',
-                //     'events',
-                //     'timeWorkedToday',
-                //     'jornadaActiva',
-                //     'pausaActiva',
-                //     'llamadaActiva',
-                //     'to_dos_finalizados'
-                // ));
+                $clientes = Client::where('is_client',true)->get();
+                $budgets = Budget::where('admin_user_id',$id)->get();
+                $projects = Project::where('admin_user_id',$id)->get();
+                $tareas = Task::where('gestor_id',$id)->get();
+                return view('crm.dashboards.dashboard_gestor', compact(
+                    'user',
+                    'tareas',
+                    'to_dos',
+                    'budgets',
+                    'projects',
+                    'clientes',
+                    'users',
+                    'events',
+                    'timeWorkedToday',
+                    'jornadaActiva',
+                    'pausaActiva',
+                    'llamadaActiva',
+                    'to_dos_finalizados'
+                ));
             case(3):
-                return redirect()->route('horas.index');
-
-                // $clientes = Client::where('is_client',true)->get();
-                // $budgets = Budget::where('admin_user_id',$id)->get();
-                // $projects = Project::where('admin_user_id',$id)->get();
-                // $tareas = Task::where('gestor_id',$id)->get();
-                // return view('crm.dashboards.dashboard_gestor', compact(
-                //     'user',
-                //     'tareas',
-                //     'to_dos',
-                //     'budgets',
-                //     'projects',
-                //     'clientes',
-                //     'users',
-                //     'events',
-                //     'timeWorkedToday',
-                //     'jornadaActiva',
-                //     'pausaActiva',
-                //     'llamadaActiva',
-                //     'to_dos_finalizados'
-                // ));
+                $clientes = Client::where('is_client',true)->get();
+                $budgets = Budget::where('admin_user_id',$id)->get();
+                $projects = Project::where('admin_user_id',$id)->get();
+                $tareas = Task::where('gestor_id',$id)->get();
+                return view('crm.dashboards.dashboard_gestor', compact(
+                    'user',
+                    'tareas',
+                    'to_dos',
+                    'budgets',
+                    'projects',
+                    'clientes',
+                    'users',
+                    'events',
+                    'timeWorkedToday',
+                    'jornadaActiva',
+                    'pausaActiva',
+                    'llamadaActiva',
+                    'to_dos_finalizados'
+                ));
             case(4):
-                return redirect()->route('horas.index');
-                // $clientes = Client::where('is_client',true)->get();
-                // $budgets = Budget::where('admin_user_id',$id)->get();
-                // $projects = Project::where('admin_user_id',$id)->get();
-                // $tareas = Task::where('gestor_id',$id)->get();
-                // $v1 = count(Budget::where('admin_user_id',2)->whereYear('created_at',2202)->get())/12;
+                $clientes = Client::where('is_client',true)->get();
+                $budgets = Budget::where('admin_user_id',$id)->get();
+                $projects = Project::where('admin_user_id',$id)->get();
+                $tareas = Task::where('gestor_id',$id)->get();
+                $v1 = count(Budget::where('admin_user_id',2)->whereYear('created_at',2202)->get())/12;
 
-                // return view('crm.dashboards.dashboard_gestor', compact(
-                //     'user',
-                //     'tareas',
-                //     'to_dos',
-                //     'budgets',
-                //     'projects',
-                //     'clientes',
-                //     'users',
-                //     'events',
-                //     'timeWorkedToday',
-                //     'jornadaActiva',
-                //     'pausaActiva',
-                //     'llamadaActiva',
-                //     'to_dos_finalizados'
-                // ));
+                return view('crm.dashboards.dashboard_gestor', compact(
+                    'user',
+                    'tareas',
+                    'to_dos',
+                    'budgets',
+                    'projects',
+                    'clientes',
+                    'users',
+                    'events',
+                    'timeWorkedToday',
+                    'jornadaActiva',
+                    'pausaActiva',
+                    'llamadaActiva',
+                    'to_dos_finalizados'
+                ));
             case(5):
                 $tareas = $user->tareas->whereIn('task_status_id', [1, 2, 5]);
                 $tiempoProducidoHoy = $this->tiempoProducidoHoy();
@@ -240,9 +233,6 @@ class DashboardController extends Controller
 
                 $productividadIndividual = $totalTareas > 0 ? $totalProductividad : 0;
                 $horasMes = $this->tiempoProducidoMes($user->id);
-
-
-
 
                 return view('crm.dashboards.dashboard_personal', compact(
                     'user',

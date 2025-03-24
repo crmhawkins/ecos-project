@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('crm.layouts.app')
 
 @section('titulo', 'Crear Usuario')
 
@@ -426,7 +426,7 @@
         })
 
     </script>
-    @include('partials.toast')
+    @include('crm.partials.toast')
 
     <script>
         function addAvatar(frmdta){

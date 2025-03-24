@@ -145,7 +145,7 @@
 @section('scripts')
 
 
-    @include('partials.toast')
+    @include('crm.partials.toast')
 
     <script>
         $(document).ready(() => {

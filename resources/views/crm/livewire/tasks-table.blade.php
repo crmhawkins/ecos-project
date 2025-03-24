@@ -171,7 +171,7 @@
 
 
 
-    @include('partials.toast')
+    @include('crm.partials.toast')
 
     <script>
 

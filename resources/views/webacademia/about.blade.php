@@ -3,6 +3,26 @@
 @section('title', 'About')
 
 @section('css')
+<style>
+    .container-fluid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+.col-lg-3 {
+    flex: 1 1 25%; /* Asegura que cada caja toma exactamente el 25% del espacio y se ajusta según la pantalla */
+    display: flex;
+    padding: 0;
+}
+
+.single_tp {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Espaciado interno para alinear los elementos internos desde el principio hasta el final */
+    width: 100%;
+}
+</style>
 @endsection
 
 @section('content')
@@ -12,7 +32,7 @@
 		<div class="container">
 			<div class="col-lg-10 offset-lg-1 text-center">
 				<div class="section-top-title wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
-					<h1>About Us</h1>
+					<h1>Quiénes somos</h1>
 					<ul>
 						<li><a href="index">Home</a></li>
 						<li> / About</li>
@@ -23,52 +43,7 @@
 	</section>
 	<!-- END SECTION TOP -->
 
-	<!-- START TOP PROMO FEATURES -->
-	<section class="tp_feature">
-	   <div class="container-fluid">
-			<div class="row">
-				<div class="col-lg-4 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
-					<div class="single_tp">
-						<h3>Quality Education</h3>
-						<p>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit sed do eiusmod tempor incididunt ut labore. </p>
-						<a href="#" class="cta"><span>Explore</span>
-						  <svg width="13px" height="10px" viewBox="0 0 13 10">
-							<path d="M1,5 L11,5"></path>
-							<polyline points="8 1 12 5 8 9"></polyline>
-						  </svg>
-						</a>
-					</div>
-				</div><!-- END COL -->
-				<div class="col-lg-4 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
-					<div class="single_tp">
-						<h3>Experienced Teachers</h3>
-						<p>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit sed do eiusmod tempor incididunt ut labore.</p>
-						<a href="#" class="cta"><span>Explore</span>
-						  <svg width="13px" height="10px" viewBox="0 0 13 10">
-							<path d="M1,5 L11,5"></path>
-							<polyline points="8 1 12 5 8 9"></polyline>
-						  </svg>
-						</a>
-					</div>
-				</div><!-- END COL -->
-				<div class="col-lg-4 col-sm-4 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
-					<div class="single_tp">
-						<h3>Life Time Support</h3>
-						<p>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit sed do eiusmod tempor incididunt ut labore.</p>
-						<a href="#" class="cta"><span>Explore</span>
-						  <svg width="13px" height="10px" viewBox="0 0 13 10">
-							<path d="M1,5 L11,5"></path>
-							<polyline points="8 1 12 5 8 9"></polyline>
-						  </svg>
-						</a>
-					</div>
-				</div><!-- END COL -->
-			</div><!-- END ROW -->
-		</div><!-- END CONTAINER -->
-	</section>
-	<!-- END TOP PROMO FEATURES -->
-
-	<!-- START ABOUT US HOME ONE -->
+    	<!-- START ABOUT US HOME ONE -->
 	<section class="ab_one section-padding">
 		<div class="container">
 			<div class="row">
@@ -79,32 +54,163 @@
 				</div><!--- END COL -->
 				<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
 					<div class="ab_content">
-						<h2>Learn new skills to go <u><span>ahead for your </span></u> career.</h2>
-						<p>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit sed do eiusmod tempor incididunt ut labore et simply. From blogs to emails to ad copies, auto-generate catchy, original, and high-converting copies in popular tones languages.From blogs to emails to ad copies, auto-generate catchy, original and high-converting copies.</p>
-						<p><strong>Auto-generate catchy original and high-converting copies in popular tones languages. From blogs to emails to ad copies auto-generate catchy</strong></p>
-						<a class="btn_one" href="about">Read More us</a>
+                        <h4>Historia completa</h4>
+						<h2><span>Grupo</span> E<span>COS</span></h2>
+						<p>GRUPO ECOS nace en mayo de 1996, fruto de las inquietudes de profesionales de la enseñanza, dedicándose desde entonces al sector de la formación para todo tipo de clientes potenciales: desde personas desempleados, trabajadores en activo, pymes, etc.). Su ámbito de actuación se divide entre la Ciudad Autónoma de Ceuta (Sede Central), la Ciudad de Estepona (Málaga) y la Ciudad de Melilla, disponiendo de una amplia plantilla conformada por personal técnico de dilatada experiencia.</p>
+						<p>La sede central está situada en Poblado Marinero, balcón del Voraz nº 25, 44, 46 y 47 (Ceuta), en Estepona, se localiza en Calle Las Camelias nº2b (junto a la Policía Local) y en Melilla, se localiza en Calle Comandante García Morato, 17. Nuestras tres sedes disponen de medidas de accesibilidad universal.</p>
+                        <p>Desde hace más de 15 años es Entidad Organizadora de Formación Programada/Bonificada ante la Fundación Estatal para la Formación en el Empleo, estando igualmente registrada y acreditada ante el Servicio Público de Empleo Estatal y la Consejería Junta de Andalucía para la impartición de Certificados de Profesionalidad y Programas Formativos.</p>
+
+					</div>
+				</div><!--- END COL -->
+			</div><!--- END ROW -->
+		</div><!--- END CONTAINER -->
+	</section>
+
+	<!-- START TOP PROMO FEATURES -->
+	<section class="tp_feature">
+	   <div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-3 col-sm-3 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+					<div class="single_tp">
+						<h3>Excelencia </h3>
+						<p>Desde Grupo ECOS, apostamos por la excelencia de una formación para que se puedan recoger los frutos de un buen trabajo aportado por la simbiosis entre el profesor y sus alumnos.</p>
+						{{-- <a href="#" class="cta"><span>Explore</span>
+						  <svg width="13px" height="10px" viewBox="0 0 13 10">
+							<path d="M1,5 L11,5"></path>
+							<polyline points="8 1 12 5 8 9"></polyline>
+						  </svg>
+						</a> --}}
+					</div>
+				</div><!-- END COL -->
+				<div class="col-lg-3 col-sm-3 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+					<div class="single_tp">
+						<h3>Compromiso</h3>
+						<p>Nos comprometemos a maximizar la satisfacción y el entusiasmo de nuestros alumnos durante su formación, asegurando también que nuestros profesores se mantengan altamente motivados para ofrecer la mejor enseñanza posible.</p>
+						{{-- <a href="#" class="cta"><span>Explore</span>
+						  <svg width="13px" height="10px" viewBox="0 0 13 10">
+							<path d="M1,5 L11,5"></path>
+							<polyline points="8 1 12 5 8 9"></polyline>
+						  </svg>
+						</a> --}}
+					</div>
+				</div><!-- END COL -->
+				<div class="col-lg-3 col-sm-3 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+					<div class="single_tp">
+						<h3>Organización</h3>
+						<p>La buena organización de la entidad, con la correcta atribución de responsabilidades a cada uno de sus profesionales, nos permite ofrecer una mayor calidad de los servicios formativos, así como mayor rendimiento y satisfacción de nuestros alumnos.</p>
+						{{-- <a href="#" class="cta"><span>Explore</span>
+						  <svg width="13px" height="10px" viewBox="0 0 13 10">
+							<path d="M1,5 L11,5"></path>
+							<polyline points="8 1 12 5 8 9"></polyline>
+						  </svg>
+						</a> --}}
+					</div>
+				</div><!-- END COL -->
+				<div class="col-lg-3 col-sm-3 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+					<div class="single_tp">
+						<h3>Superación</h3>
+						<p>En Grupo ECOS, contamos con profesionales con alto afán de superación, con el objetivo de aportar lo mejor de sí mismos a todo el alumnado que confíe en nuestros servicios.</p>
+						{{-- <a href="#" class="cta"><span>Explore</span>
+						  <svg width="13px" height="10px" viewBox="0 0 13 10">
+							<path d="M1,5 L11,5"></path>
+							<polyline points="8 1 12 5 8 9"></polyline>
+						  </svg>
+						</a> --}}
+					</div>
+				</div><!-- END COL -->
+			</div><!-- END ROW -->
+		</div><!-- END CONTAINER -->
+	</section>
+	<!-- END TOP PROMO FEATURES -->
+
+
+	<!-- END ABOUT US HOME ONE -->
+	<section class="ab_one section-padding">
+		<div class="container">
+			<div class="row">
+                <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+					<div class="ab_content">
+						<h2>N<span>UESTRO</span> P<span>ROPÓSITO</span></h2>
+						<p>Contribuir al desarrollo y progreso de <br>
+
+                            nuestro alumnado a través de formaciones<br>
+
+                            de alta calidad y gran eficiencia,<br>
+
+                            con el objetivo de facilitar la inserción laboral<br>
+
+                            y/o mejorar la situación profesional.</p>
+					</div>
+				</div><!--- END COL -->
+				<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+					<div class="ab_img">
+						<img src="assets/images/all-img/about2.png" class="img-fluid" alt="image">
 					</div>
 				</div><!--- END COL -->
 			</div><!--- END ROW -->
 		</div><!--- END CONTAINER -->
 	</section>
 	<!-- END ABOUT US HOME ONE -->
+	<section class="ab_one section-padding">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+					<div class="ab_img">
+						<img src="assets/images/all-img/about2.png" class="img-fluid" alt="image">
+					</div>
+				</div><!--- END COL -->
+				<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+					<div class="ab_content">
+						<h2>V<span>ISIÓN</span></h2>
+						<p>Nuestra visión se enfoca en ofrecer acciones formativas competentes en adecuación a las necesidades reales de las personas que se quieren formar, así como las del mercado laboral.</p>
+						<p>Formarse es sinónimo de actualizarse y mantenerse al día respecto a la evolución del mercado laboral. Invertir en formación supone acrecentar el abanico de posibilidades para obtener una mayor valoración en el trabajo, mejorar las condiciones laborales, y por tanto disfrutar de una mayor calidad de vida.</p>
+                        <p>Desde Grupo ECOS, nos comprometemos con nuestro saber-hacer, respaldada por nuestra amplia experiencia de mas de 28 años, a aportar nuestro granito de arena a la sociedad para hacer crecer a las personas que quieran evolucionar y mejorarse.</p>
+
+					</div>
+				</div><!--- END COL -->
+			</div><!--- END ROW -->
+		</div><!--- END CONTAINER -->
+	</section>
+	<!-- END ABOUT US HOME ONE -->
+	<section class="ab_one section-padding">
+		<div class="container">
+			<div class="row">
+                <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+					<div class="ab_content">
+						<h2><span>MISIÓN</span></h2>
+						<p>Optimizar la formación de nuestros/as alumnos/as aportándoles nuevos conocimientos,
+                            potenciando su experiencia práctica,
+                            y contribuyendo a la mejora de sus habilidades
+                            profesionales, en aras de encontrar un empleo,
+                            promocionar o ampliar nichos de trabajo.</p>
+					</div>
+				</div><!--- END COL -->
+				<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+					<div class="ab_img">
+						<img src="assets/images/all-img/about2.png" class="img-fluid" alt="image">
+					</div>
+				</div><!--- END COL -->
+
+			</div><!--- END ROW -->
+		</div><!--- END CONTAINER -->
+	</section>
+	<!-- END ABOUT US HOME ONE -->
 
 	<!-- START WHY CHOOSE US-->
-	<section class="marketing_content_area section-padding">
+	{{-- <section class="marketing_content_area section-padding">
 	   <div class="container">
 			<div class="section-title">
-				<h2>Why Choose Ecos</h2>
-				<p>Find the <span><u>best features</u></span> of Ecos.</p>
+				<h2>Por qué nosotros</h2>
+				<p>encuentra las <span><u>mejores características</u></span> de Grupo ECOS.</p>
 			</div>
 			<div class="row">
 				<div class="col-lg-4 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
 					<div class="single_feature_one">
 						<div class="sf_top">
 							<span class="ti-book ss_one"></span>
-							<h2><a href="single-service" target="_blank">Learn More Anywhere</a></h2>
+							<h2><a href="single-service" target="_blank">Aprende más de cualquier lugar</a></h2>
 						</div>
-						<p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor ut labore.</p>
+						<p></p>
 					</div>
 				</div><!-- END COL -->
 				<div class="col-lg-4 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
@@ -154,11 +260,11 @@
 				</div><!-- END COL -->
 			</div><!-- END ROW -->
 		</div><!-- END CONTAINER -->
-	</section>
+	</section> --}}
 	<!-- END WHY CHOOSE US -->
 
 	<!-- START COUNTER -->
-    <section id="counts" class="counts section-padding">
+    {{-- <section id="counts" class="counts section-padding">
       <div class="container" data-aos="fade-up">
 		<div class="section-title">
 		  <h2>Some Fun Fact</h2>
@@ -203,11 +309,11 @@
           </div><!--- END COL -->
         </div><!--- END ROW -->
       </div><!--- END CONTAINER -->
-    </section>
+    </section> --}}
 	<!-- END COUNTER -->
 
 	<!-- START TEAM-->
-	<section class="team_member section-padding">
+	{{-- <section class="team_member section-padding">
 	   <div class="container">
 			<div class="section-title">
 				<h2>Team Member</h2>
@@ -344,11 +450,11 @@
 				</div><!--- END COL -->
 			</div><!-- END ROW -->
 		</div><!-- END CONTAINER -->
-	</section>
+	</section> --}}
 	<!-- END TEAM -->
 
 	<!-- START FAQ -->
-	<section class="faq_area section-padding">
+	{{-- <section class="faq_area section-padding">
 		<div class="container">
 			<div class="section-title">
 				<h2>Frequently Asked Question</h2>
@@ -426,11 +532,11 @@
 				</div><!-- END COL  -->
 			</div><!--END  ROW  -->
 		</div><!--- END CONTAINER -->
-	</section>
+	</section> --}}
 	<!-- END FAQ -->
 
 	<!-- START COMPANY PARTNER LOGO  -->
-	<div class="partner-logo section-padding">
+	{{-- <div class="partner-logo section-padding">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-12 text-center">
@@ -451,7 +557,7 @@
 				</div><!-- END COL  -->
 			</div><!--END  ROW  -->
 		</div><!-- END CONTAINER  -->
-	</div>
+	</div> --}}
 	<!-- END COMPANY PARTNER LOGO -->
 
 @endsection

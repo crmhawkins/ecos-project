@@ -83,7 +83,7 @@
 @section('scripts')
 
 
-    @include('partials.toast')
+    @include('crm.partials.toast')
     <script src="{{asset('assets/vendors/choices.js/choices.min.js')}}"></script>
 
     <script>

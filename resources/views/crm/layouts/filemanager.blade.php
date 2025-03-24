@@ -51,10 +51,10 @@
         </div>
         <div class="css-96uzu9"></div>
 
-        @include('layouts.sidebar')
+        @include('crm.layouts.sidebar')
 
         <main id="main">
-            @include('layouts.topBar')
+            @include('crm.layouts.topBar')
             <div class="contenedor p-4">
                 @yield('content')
             </div>

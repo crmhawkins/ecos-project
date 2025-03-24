@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('crm.layouts.app')
 
 @section('titulo', 'Categoria de Servicios')
 
@@ -86,7 +86,7 @@
 @section('scripts')
 
 
-    @include('partials.toast')
+    @include('crm.partials.toast')
 
 @endsection
 

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('crm.layouts.app')
 
 @section('titulo', 'Configuración de Correo')
 
@@ -221,7 +221,7 @@
 </div>
 @endsection
 @section('scripts')
-@include('partials.toast')
+@include('crm.partials.toast')
 
 <script>
      $('#Guardar').click(function(e){

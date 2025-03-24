@@ -12,11 +12,11 @@
 		<div class="container">
 			<div class="col-lg-10 offset-lg-1 text-center">
 				<div class="section-top-title wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
-					<h1>Get In Touch</h1>
-					<ul>
+					<h1>CONTACTA CON NOSOTROS</h1>
+					{{-- <ul>
 						<li><a href="index">Home</a></li>
 						<li> / Contact</li>
-					</ul>
+					</ul> --}}
 				</div><!-- //.HERO-TEXT -->
 			</div><!--- END COL -->
 		</div><!--- END CONTAINER -->
@@ -30,24 +30,24 @@
 					<div class="col-lg-4 col-sm-4 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
 						<div class="single_address">
 							<i class="ti-map"></i>
-							<h4>Our Location</h4>
-							<p>3481 Melrose Place, Beverly Hills <br /> CA 90210</p>
+							<h4>Ceuta</h4>
+							<p>Poblado Marinero, local 25, 44, 45 y 46</p>
 						</div>
 					</div><!-- END COL -->
 					<div class="col-lg-4 col-sm-4 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
 						<div class="single_address sabr">
 							<i class="ti-mobile"></i>
-							<h4>Telephone</h4>
-							<p>(+1) 517 397 7100</p>
-							<p>(+1) 411 315 8138</p>
+							<h4>Telefono</h4>
+							<p>956 52 50 68</p>
 						</div>
 					</div><!-- END COL -->
 					<div class="col-lg-4 col-sm-4 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
 						<div class="single_address">
 							<i class="ti-email"></i>
-							<h4>Send email</h4>
-							<p>Info@example.com</p>
-							<p>admin@example.com</p>
+							<h4>Email</h4>
+							<p>informacion@grupoecos.net</p>
+							<p>academia@grupoecos.net</p>
+							<p>comercial@grupoecos.net</p>
 						</div>
 					</div><!-- END COL -->
 				</div><!--- END ROW -->

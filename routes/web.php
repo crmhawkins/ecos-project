@@ -127,7 +127,7 @@ Route::get('index', function () {
 });
 
 Route::get('/login', function () {
-    return view('crm.login');
+    return view('webacademia.login');
 });
 
 Route::get('/register', function () {

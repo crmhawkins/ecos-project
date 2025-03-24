@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('crm.layouts.app')
 
 @section('titulo', 'Enviar Nuevo Correo')
 
@@ -103,7 +103,7 @@
 @endsection
 
 @section('scripts')
-@include('partials.toast')
+@include('crm.partials.toast')
 <script src="https://cdn.jsdelivr.net/npm/summernote/dist/summernote-bs4.min.js"></script>
 <script src="{{ asset('assets/vendors/choices.js/choices.min.js') }}"></script>
 <script>

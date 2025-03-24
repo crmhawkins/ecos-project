@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('crm.layouts.app')
 
 @section('titulo', 'Ver Cliente')
 
@@ -605,7 +605,7 @@
         })
 
     </script>
-    @include('partials.toast')
+    @include('crm.partials.toast')
 
     <script>
         function addAvatar(frmdta){

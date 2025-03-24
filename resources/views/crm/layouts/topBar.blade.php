@@ -7,23 +7,6 @@
         @endif
     </header>
     <ul class="topbar-menu d-flex align-items-center gap-3">
-        {{-- <li class="dropdown notification-list">
-            <a href="{{ route('admin.emailConfig.settings') }}" type="button" class="nav-link position-relative">
-                <i class="fas fa-cogs"></i>
-            </a>
-        </li> --}}
-        {{-- <li class="dropdown notification-list">
-            <a href="{{ route('admin.emails.index') }}" type="button" class="nav-link position-relative">
-                <i class="fa-regular fa-envelope"></i>
-                <span class="position-absolute top-10 start-80 translate-middle px-2 bg-info rounded-pill">
-                  <span class="text-white countCorreos" style="font-size: 0.85rem">0</span>
-                </span>
-            </a>
-
-
-        </li> --}}
-
-        <!-- Campana de notificaciones -->
 
         <li class="dropdown notification-list">
             <a href="#" type="button" class="nav-link position-relative" id="btnAbrirAlertas">
@@ -44,99 +27,7 @@
                 </form>
             </div>
         </li>
-{{--
-      <!-- Modal para seleccionar el stage -->
-        <div class="modal fade" id="alertsModal" tabindex="-1" aria-labelledby="alertsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="alertsModalLabel">Alertas por Etapa</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="alertsList" class="list-group">
-                            <!-- Aquí se mostrarán las alertas agrupadas por `stage_id` -->
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Segundo modal para mostrar las alertas específicas de un stage -->
-        <div class="modal fade" id="specificAlertsModal" tabindex="-1" aria-labelledby="specificAlertsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="specificAlertsModalLabel">Alertas Específicas</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <ul id="specificAlertsList" class="list-group">
-                            <!-- Aquí se mostrarán las alertas específicas del stage seleccionado -->
-                        </ul>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
-        {{-- <li class="d-none d-sm-inline-block">
-            <div class="nav-link" >
-                <i id="light-dark-mode" class="bi @if($isDarkMode) bi-brightness-high @else bi-moon @endif" style="cursor: pointer;"></i>
-            </div>
-        </li> --}}
-
-
-        {{-- <li class="dropdown">
-            <a class="nav-link dropdown-toggle arrow-none nav-user" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                <span class="account-user-avatar">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png" alt="user-image" width="32" class="rounded-circle">
-                </span>
-                <span class="d-lg-block d-none">
-                    <h5 class="my-0 fw-normal">Thomson <i class="ri-arrow-down-s-line d-none d-sm-inline-block align-middle"></i></h5>
-                </span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated profile-dropdown">
-                <!-- item-->
-                <div class="dropdown-header noti-title">
-                    <h6 class="text-overflow m-0">Welcome!</h6>
-                </div>
-
-                <!-- item-->
-                <a href="pages-profile.html" class="dropdown-item">
-                    <i class="ri-account-circle-line fs-18 align-middle me-1"></i>
-                    <span>My Account</span>
-                </a>
-
-                <!-- item-->
-                <a href="pages-profile.html" class="dropdown-item">
-                    <i class="ri-settings-4-line fs-18 align-middle me-1"></i>
-                    <span>Settings</span>
-                </a>
-
-                <!-- item-->
-                <a href="pages-faq.html" class="dropdown-item">
-                    <i class="ri-customer-service-2-line fs-18 align-middle me-1"></i>
-                    <span>Support</span>
-                </a>
-
-                <!-- item-->
-                <a href="auth-lock-screen.html" class="dropdown-item">
-                    <i class="ri-lock-password-line fs-18 align-middle me-1"></i>
-                    <span>Lock Screen</span>
-                </a>
-
-                <!-- item-->
-                <a href="auth-logout-2.html" class="dropdown-item">
-                    <i class="ri-logout-box-line fs-18 align-middle me-1"></i>
-                    <span>Logout</span>
-                </a>
-            </div>
-        </li> --}}
 
     </ul>
 

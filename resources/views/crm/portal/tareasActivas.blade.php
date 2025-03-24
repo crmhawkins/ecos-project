@@ -1,4 +1,4 @@
-@extends('layouts.appPortal')
+@extends('crm.layouts.appPortal')
 
 @section('content')
 <style>
@@ -67,7 +67,7 @@
 @endsection
 
 @section('scripts')
-@include('partials.toast')
+@include('crm.partials.toast')
 <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.1.6/b-3.1.2/b-colvis-3.1.2/r-3.0.3/datatables.min.js"></script>
 <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.1.6/b-3.1.2/b-colvis-3.1.2/r-3.0.3/datatables.min.css" rel="stylesheet">
 <script>

@@ -1,4 +1,4 @@
-@extends('layouts.appPortal')
+@extends('crm.layouts.appPortal')
 @section('content')
 
 <div class="content">
@@ -146,7 +146,7 @@
 
 @endsection
 @section('scripts')
-@include('partials.toast')
+@include('crm.partials.toast')
 <script>
 
 var options = {

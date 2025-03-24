@@ -1,4 +1,4 @@
-@extends('layouts.appPortal')
+@extends('crm.layouts.appPortal')
 
 @section('titulo', 'Detalle de Presupuesto')
 
@@ -143,7 +143,7 @@
 
 @section('scripts')
     <script src="{{ asset('assets/vendors/toastify/toastify.js') }}"></script>
-    @include('partials.toast')
+    @include('crm.partials.toast')
 
 <script>
     $(document).ready(function() {

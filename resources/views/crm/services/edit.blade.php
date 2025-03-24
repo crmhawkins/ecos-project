@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('crm.layouts.app')
 
 @section('titulo', 'Crear Cliente')
 
@@ -113,6 +113,6 @@
 
 @section('scripts')
 <script src="{{asset('assets/vendors/choices.js/choices.min.js')}}"></script>
-@include('partials.toast')
+@include('crm.partials.toast')
 
 @endsection
