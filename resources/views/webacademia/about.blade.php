@@ -49,9 +49,9 @@
 			<div class="row">
 				<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
 					<div class="ab_img">
-						<img src="assets/images/all-img/about2.png" class="img-fluid" alt="image">
+						<img src="assets/images/all-img/about2.png" class="img-fluid" style="max-height: 1084px;" alt="image">
 					</div>
-				</div><!--- END COL -->
+				</div><!--- ENAD COL -->
 				<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
 					<div class="ab_content">
                         <h4>Historia completa</h4>
@@ -126,74 +126,61 @@
 
 	<!-- END ABOUT US HOME ONE -->
 	<section class="ab_one section-padding">
-		<div class="container">
-			<div class="row">
-                <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="ab_content">
-						<h2>N<span>UESTRO</span> P<span>ROPÓSITO</span></h2>
-						<p>Contribuir al desarrollo y progreso de <br>
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s">
+                    <div class="ab_content pe-lg-5">
+                        <h2 class="mb-4"><span>Nuestro</span> Propósito</h2>
+                        <p class="lead">Contribuir al desarrollo y progreso de nuestro alumnado a través de formaciones de alta calidad y gran eficiencia, con el objetivo de facilitar la inserción laboral y/o mejorar su situación profesional.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s">
+                    <div class="ab_img">
+                        <img src="assets/images/all-img/about3.png" class="img-fluid rounded shadow-sm" alt="Propósito Ecos">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                            nuestro alumnado a través de formaciones<br>
+    <section class="ab_one section-padding bg-light">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s">
+                    <div class="ab_img">
+                        <img src="assets/images/all-img/about4.png" class="img-fluid rounded shadow-sm" alt="Visión Ecos">
+                    </div>
+                </div>
+                <div class="col-lg-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s">
+                    <div class="ab_content ps-lg-5">
+                        <h2 class="mb-4">Nuestra <span>Visión</span></h2>
+                        <p class="mb-3">Nuestra visión se enfoca en ofrecer acciones formativas competentes y alineadas con las necesidades reales de quienes desean formarse, así como del mercado laboral actual.</p>
+                        <p class="mb-3">Formarse es sinónimo de actualizarse y evolucionar profesionalmente. Apostar por la formación significa ampliar horizontes, mejorar condiciones laborales y alcanzar una mejor calidad de vida.</p>
+                        <p>En Grupo ECOS nos comprometemos, con más de 28 años de experiencia, a aportar nuestro saber-hacer para hacer crecer a quienes confían en nosotros.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                            de alta calidad y gran eficiencia,<br>
+    <section class="ab_one section-padding">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s">
+                    <div class="ab_content pe-lg-5">
+                        <h2 class="mb-4"><span>Misión</span></h2>
+                        <p class="lead">Optimizar la formación de nuestros/as alumnos/as, aportándoles nuevos conocimientos, experiencia práctica y habilidades profesionales que les permitan acceder a un empleo, promocionar o ampliar sus oportunidades laborales.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s">
+                    <div class="ab_img">
+                        <img src="assets/images/all-img/about5.png" class="img-fluid rounded shadow-sm" alt="Misión Ecos">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                            con el objetivo de facilitar la inserción laboral<br>
-
-                            y/o mejorar la situación profesional.</p>
-					</div>
-				</div><!--- END COL -->
-				<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
-					<div class="ab_img">
-						<img src="assets/images/all-img/about2.png" class="img-fluid" alt="image">
-					</div>
-				</div><!--- END COL -->
-			</div><!--- END ROW -->
-		</div><!--- END CONTAINER -->
-	</section>
-	<!-- END ABOUT US HOME ONE -->
-	<section class="ab_one section-padding">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
-					<div class="ab_img">
-						<img src="assets/images/all-img/about2.png" class="img-fluid" alt="image">
-					</div>
-				</div><!--- END COL -->
-				<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="ab_content">
-						<h2>V<span>ISIÓN</span></h2>
-						<p>Nuestra visión se enfoca en ofrecer acciones formativas competentes en adecuación a las necesidades reales de las personas que se quieren formar, así como las del mercado laboral.</p>
-						<p>Formarse es sinónimo de actualizarse y mantenerse al día respecto a la evolución del mercado laboral. Invertir en formación supone acrecentar el abanico de posibilidades para obtener una mayor valoración en el trabajo, mejorar las condiciones laborales, y por tanto disfrutar de una mayor calidad de vida.</p>
-                        <p>Desde Grupo ECOS, nos comprometemos con nuestro saber-hacer, respaldada por nuestra amplia experiencia de mas de 28 años, a aportar nuestro granito de arena a la sociedad para hacer crecer a las personas que quieran evolucionar y mejorarse.</p>
-
-					</div>
-				</div><!--- END COL -->
-			</div><!--- END ROW -->
-		</div><!--- END CONTAINER -->
-	</section>
-	<!-- END ABOUT US HOME ONE -->
-	<section class="ab_one section-padding">
-		<div class="container">
-			<div class="row">
-                <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="ab_content">
-						<h2><span>MISIÓN</span></h2>
-						<p>Optimizar la formación de nuestros/as alumnos/as aportándoles nuevos conocimientos,
-                            potenciando su experiencia práctica,
-                            y contribuyendo a la mejora de sus habilidades
-                            profesionales, en aras de encontrar un empleo,
-                            promocionar o ampliar nichos de trabajo.</p>
-					</div>
-				</div><!--- END COL -->
-				<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
-					<div class="ab_img">
-						<img src="assets/images/all-img/about2.png" class="img-fluid" alt="image">
-					</div>
-				</div><!--- END COL -->
-
-			</div><!--- END ROW -->
-		</div><!--- END CONTAINER -->
-	</section>
 	<!-- END ABOUT US HOME ONE -->
 
 	<!-- START WHY CHOOSE US-->

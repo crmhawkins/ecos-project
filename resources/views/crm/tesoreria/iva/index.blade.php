@@ -33,19 +33,7 @@
             <div class="card">
 
                 <div class="card-body">
-                    @php
-                        use Jenssegers\Agent\Agent;
-
-                        $agent = new Agent();
-                    @endphp
-                    @if ($agent->isMobile())
-
                         @livewire('ivas-table')
-
-                    @else
-
-                        @livewire('ivas-table')
-                    @endif
                 </div>
             </div>
 

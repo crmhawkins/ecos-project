@@ -19,7 +19,7 @@
 									<li><a class="nav-link" href="index_3">Home 03</a></li>
 								</ul> --}}
 							   </li>
-                               <li><a class="nav-link" href="about">¿QUIÉNES SOMOS?</a></li>
+
 							    {{-- <li><a class="nav-link" href="#">Pages <span class="ti-angle-down"></span></a>
 									<ul>
 										<li><a class="nav-link" href="team">Instructor</a></li>
@@ -55,6 +55,7 @@
 										<li><a class="nav-link" href="blog_single">Single Blog</a></li>
 									</ul>
 								</li> --}}
+                                <li><a class="nav-link" href="about">¿QUIÉNES SOMOS?</a></li>
 							    <li><a class="nav-link" href="contact">CONTACTA</a></li>
 							</ul>
 						</nav>

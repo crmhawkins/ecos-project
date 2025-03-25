@@ -33,19 +33,8 @@
             <div class="card">
 
                 <div class="card-body">
-                    @php
-                        use Jenssegers\Agent\Agent;
-
-                        $agent = new Agent();
-                    @endphp
-                    @if ($agent->isMobile())
-
+                 
                         @livewire('petitions-table')
-
-                    @else
-
-                        @livewire('petitions-table')
-                    @endif
                 </div>
             </div>
 

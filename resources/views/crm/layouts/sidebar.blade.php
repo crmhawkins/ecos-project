@@ -15,13 +15,12 @@
             <ul class="menu">
                 <li class="sidebar-title">Menu</li>
 
-                {{-- <li class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <li class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                     <a href="{{route('dashboard')}}" class='sidebar-link'>
                         <i class="bi bi-grid-fill fs-5"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
-                <li class="sidebar-title">Empresa</li> --}}
 
                 @php
                     $clientesActive = request()->routeIs('clientes.index') || request()->routeIs('clientes.create') || request()->routeIs('clientes.show') || request()->routeIs('cliente.createFromBudget') || request()->routeIs('clientes.edit');
@@ -52,6 +51,74 @@
                     $personal = (Auth::user()->access_level_id == 5);
                     $comercial = (Auth::user()->access_level_id == 6);
                     @endphp
+                <li class="sidebar-title">Academia</li>
+                <li class="sidebar-item has-sub {{ $clientesActive ? 'active' : '' }}">
+                    <a href="#" class='sidebar-link'>
+                        <i class="fa-solid fa-people-group fs-5"></i>
+                        <span>Alumnos</span>
+                    </a>
+                    <ul class="submenu" style="{{ $clientesActive ? 'display:block;' : 'display:none' }}">
+                        <li class="submenu-item {{ request()->routeIs('clientes.index') ? 'active' : '' }} ">
+                            <a href="{{route('clientes.index')}}">
+                                <i class="fa-solid fa-list"></i>
+                                <span>
+                                    Ver todos
+                                </span>
+                            </a>
+                        </li>
+                        <li class="submenu-item {{ request()->routeIs('clientes.create') ? 'active' : '' }} {{ request()->routeIs('cliente.createFromBudget') ? 'active' : ''}}">
+                            <a href="{{route('clientes.create')}}">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>
+                                    Crear Alunmo
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sidebar-item has-sub {{ $servicesActive ? 'active' : '' }}">
+                    <a href="#" class='sidebar-link'>
+                        <i class="fa-solid fa-book"></i>
+                        <span>Cursos</span>
+                    </a>
+                    <ul class="submenu" style="{{ $servicesActive ? 'display:block;' : 'display:none;' }}">
+                        <li class="submenu-item {{ request()->routeIs('cursos.index') ? 'active' : '' }}">
+                            <a href="{{route('cursos.index')}}">
+                                <i class="fa-solid fa-list"></i>
+                                <span>
+                                    Ver todos
+                                </span>
+                            </a>
+                        </li>
+                        <li class="submenu-item {{ request()->routeIs('servicios.create') ? 'active' : '' }}">
+                            <a href="{{route('cursos.create')}}">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>
+                                    Crear Cursos
+                                </span>
+                            </a>
+                        </li>
+                        <li class="submenu-item {{ request()->routeIs('cursosCategoria.index') ? 'active' : '' }}">
+                            <a href="{{route('cursosCategoria.index')}}">
+                                <i class="fa-solid fa-list"></i>
+                                <span>
+                                    Ver Categorias
+                                </span>
+                            </a>
+                        </li>
+                        <li class="submenu-item {{ request()->routeIs('cursosCategoria.create') ? 'active' : '' }}">
+                            <a href="{{route('cursosCategoria.create')}}">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>
+                                    Crear categoria de cursos
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="sidebar-title">Empresa</li>
+
                 <li class="sidebar-item has-sub {{ $clientesActive ? 'active' : '' }}">
                     <a href="#" class='sidebar-link'>
                         <i class="fa-solid fa-people-group fs-5"></i>
@@ -245,30 +312,7 @@
                         </li>
                     </ul>
                 </li>
-                {{-- <li class="sidebar-item has-sub {{ $dominiosActive ? 'active' : '' }}">
-                    <a href="#" class='sidebar-link'>
-                        <i class="fa-solid fa-globe fs-5"></i>
-                        <span>Dominios</span>
-                    </a>
-                    <ul class="submenu" style="{{ $dominiosActive ? 'display:block;' : 'display:none;' }}">
-                        <li class="submenu-item {{ request()->routeIs('dominios.index') ? 'active' : '' }}">
-                            <a href="{{route('dominios.index')}}">
-                                <i class="fa-solid fa-list"></i>
-                                <span>
-                                    Ver todos
-                                </span>
-                            </a>
-                        </li>
-                        <li class="submenu-item {{ request()->routeIs('dominios.create') ? 'active' : '' }}">
-                            <a href="{{route('dominios.create')}}">
-                                <i class="fa-solid fa-plus"></i>
-                                <span>
-                                    Crear domino
-                                </span>
-                            </a>
-                        </li>
-                    </ul>
-                </li> --}}
+
                 <li class="sidebar-item has-sub {{ $poveedoresActive ? 'active' : '' }}">
                     <a href="#" class='sidebar-link'>
                         <i class="fa-solid fa-user-tie fs-5"></i>

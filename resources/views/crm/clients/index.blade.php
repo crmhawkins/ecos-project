@@ -40,22 +40,7 @@
             <div class="card">
 
                 <div class="card-body">
-                    {{-- <livewire:users-table-view> --}}
-                    @php
-                        use Jenssegers\Agent\Agent;
-
-                        $agent = new Agent();
-                    @endphp
-                    @if ($agent->isMobile())
-                        {{-- Contenido para dispositivos móviles --}}
-                        <div>
-                            @livewire('clients-table')
-                        </div>
-                    @else
-                        {{-- Contenido para dispositivos de escritorio --}}
-                        {{-- <livewire:users-table-view> --}}
-                        @livewire('clients-table')
-                    @endif
+                    @livewire('clients-table')
                 </div>
             </div>
 

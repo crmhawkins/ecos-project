@@ -41,39 +41,8 @@
             <div class="card">
 
                 <div class="card-body">
-                    {{-- <livewire:services-table-view> --}}
-
-                    @php
-                        use Jenssegers\Agent\Agent;
-
-                        $agent = new Agent();
-                    @endphp
-
-                    @if ($agent->isMobile())
-                        {{-- Contenido para dispositivos móviles --}}
-                        <div>
-                            @if ($servicios->count() >= 0)
-                                @foreach ($servicios as $servicio)
-                                    <div class="card border-bottom">
-                                        <div class="card-body" href="{{route('serviciosCategoria.edit',$servicio->id)}}">
-                                            <h5 class="card-title">{{ $servicio->title }}</h5>
-                                            <p class="card-text">{{ $servicio->terms }}</p>
-                                            <p class="card-text">{{ $servicio->type }}</p>
-                                            <!-- Más contenido de la tarjeta -->
-                                        </div>
-                                    </div>
-                                @endforeach
-                                <div class="d-flex justify-content-center">
-                                    {{ $servicios->links() }}
-                                </div>
-                            @endif
-                        </div>
-                    @else
-                        {{-- Contenido para dispositivos de escritorio --}}
-                        {{-- <livewire:services-table-view> --}}
+                   
                         @livewire('services-categories-table')
-
-                    @endif
 
                 </div>
             </div>

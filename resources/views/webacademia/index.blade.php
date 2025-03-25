@@ -49,8 +49,6 @@
         vertical-align: middle;
     }
 
-</style>
-<style>
     .marketing_content_area .container {
         display: flex;
         flex-direction: column;
@@ -192,40 +190,41 @@
 
 	<!-- START ABOUT US HOME ONE -->
 	<section class="ab_one section-padding">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
-					<div class="ab_img">
-						<img src="assets/images/all-img/about1.png" class="img-fluid" alt="image">
-						<!-- <div class="wc_year">
-							<h3><span>6k+</span> <br />Happy Clients</h3>
-						</div> -->
-					</div>
-				</div><!--- END COL -->
-				<div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="ab_content">
-						<h2>Learn new skills to go <u><span>ahead for your </span></u> career.</h2>
-						<p>Lorem ipsum dolor sit amet, consectetur notted adipisicing elit sed do eiusmod tempor incididunt ut labore et simply.</p>
-					</div>
-					<div class="abmv">
-						<span class="ti-medall"></span>
-						<h4>Our Mission</h4>
-						<p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor ut labore.</p>
-					</div>
-					<div class="abmv">
-						<span class="ti-wand"></span>
-						<h4>Our Vision</h4>
-						<p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor ut labore.</p>
-					</div>
-						<a class="btn_one" href="about">Discover More</a>
-				</div><!--- END COL -->
-			</div><!--- END ROW -->
-		</div><!--- END CONTAINER -->
-	</section>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                    <div class="ab_img position-relative">
+                        <img src="assets/images/all-img/about1.png" class="img-fluid" alt="Grupo ECOS">
+                        <!-- Puedes agregar un pequeño distintivo si quieres destacar los años de experiencia -->
+                        {{-- <div class="wc_year position-absolute top-0 start-0 bg-primary text-white p-3 rounded">
+                            <h3><span>28+</span><br />Años de experiencia</h3>
+                        </div> --}}
+                    </div>
+                </div><!--- END COL -->
+                <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+                    <div class="ab_content">
+                        <h2><u><span>Impulsa tu futuro</span></u> con formación de calidad</h2>
+                        <p>En Grupo ECOS llevamos más de 28 años ayudando a personas como tú a alcanzar sus metas personales y profesionales a través de la formación. Con sedes en Ceuta, Estepona y Melilla, ofrecemos un amplio abanico de programas educativos adaptados a las demandas actuales del mercado laboral.</p>
+                    </div>
+                    <div class="abmv">
+                        <span class="ti-medall"></span>
+                        <h4>Nuestra Misión</h4>
+                        <p>Impulsar el desarrollo profesional y personal mediante una formación accesible, actualizada y alineada con las necesidades del mundo laboral.</p>
+                    </div>
+                    <div class="abmv">
+                        <span class="ti-wand"></span>
+                        <h4>Nuestra Visión</h4>
+                        <p>Ser referentes en formación para el empleo, contribuyendo al crecimiento de la sociedad a través del aprendizaje constante y la mejora continua.</p>
+                    </div>
+                    <a class="btn_one" href="about">Conócenos más</a>
+                </div><!--- END COL -->
+            </div><!--- END ROW -->
+        </div><!--- END CONTAINER -->
+    </section>
 	<!-- END ABOUT US HOME ONE -->
 
 	<!-- START COUNTER -->
-    <section id="counts" class="counts section-padding">
+    {{-- <section id="counts" class="counts section-padding">
       <div class="container" data-aos="fade-up">
 		<div class="section-title">
 		  <h2>Some Fun Fact</h2>
@@ -270,7 +269,7 @@
           </div><!--- END COL -->
         </div><!--- END ROW -->
       </div><!--- END CONTAINER -->
-    </section>
+    </section> --}}
 	<!-- END COUNTER -->
 
 	<!-- START COMPANY PARTNER LOGO  -->

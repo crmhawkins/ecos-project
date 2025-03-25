@@ -41,23 +41,9 @@
             <div class="card">
 
                 <div class="card-body">
-                    {{-- <livewire:services-table-view> --}}
-
-                    @php
-                        use Jenssegers\Agent\Agent;
-
-                        $agent = new Agent();
-                    @endphp
-
-                    @if ($agent->isMobile())
-                        {{-- Contenido para dispositivos móviles --}}
-                        @livewire('asociados-categories-table')
-                    @else
-                        {{-- Contenido para dispositivos de escritorio --}}
-                        {{-- <livewire:services-table-view> --}}
+                   
                         @livewire('asociados-categories-table')
 
-                    @endif
 
                 </div>
             </div>

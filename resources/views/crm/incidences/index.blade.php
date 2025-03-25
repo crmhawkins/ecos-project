@@ -34,22 +34,8 @@
             <div class="card">
 
                 <div class="card-body">
-                    {{-- <livewire:users-table-view> --}}
-                    @php
-                        use Jenssegers\Agent\Agent;
-
-                        $agent = new Agent();
-                    @endphp
-                    @if ($agent->isMobile())
-                        {{-- Contenido para dispositivos móviles --}}
-
+                  
                         @livewire('incidences-table')
-
-                    @else
-                        {{-- Contenido para dispositivos de escritorio --}}
-                        {{-- <livewire:users-table-view> --}}
-                        @livewire('incidences-table')
-                    @endif
                 </div>
             </div>
 

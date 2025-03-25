@@ -44,6 +44,10 @@ use App\Http\Controllers\Logs\LogActionsController;
 use App\Http\Controllers\Message\MessageController;
 use App\Http\Controllers\Nominas\NominasController;
 use App\Http\Controllers\Ordenes\OrdenesController;
+use App\Http\Controllers\Product\ProductsCategoriesController;
+use App\Http\Controllers\Product\ProductsController;
+use App\Http\Controllers\Cursos\CursosController;
+use App\Http\Controllers\Cursos\CursosCategoriesController;
 use App\Http\Controllers\Productividad\ProductividadController;
 use App\Http\Controllers\Settings\UserSettingsController;
 use App\Http\Controllers\Statistics\StatisticsController;
@@ -189,7 +193,41 @@ Route::prefix('crm')->group(function () {
         Route::post('/alert/update', [AlertController::class, 'updateStatusAlert'])->name('alert.update');
         Route::post('/alert/postpone', [AlertController::class, 'postpone'])->name('alert.postpone');
 
+        // Products (PRODUCTOS)
+        Route::get('/products', [ProductsController::class, 'index'])->name('productos.index');
+        Route::get('/products/create', [ProductsController::class, 'create'])->name('productos.create');
+        Route::get('/products-show/{id}', [ProductsController::class, 'show'])->name('productos.show');
+        Route::get('/products/edit/{id}', [ProductsController::class, 'edit'])->name('productos.edit');
+        Route::post('/products/store', [ProductsController::class, 'store'])->name('productos.store');
+        Route::post('/products/update/{id}', [ProductsController::class, 'update'])->name('productos.update');
+        Route::get('/products/show/{id}', [ProductsController::class, 'show'])->name('productos.show');
+        Route::post('/products/destroy', [ProductsController::class, 'destroy'])->name('productos.delete');
 
+        // products Categories (CATEGORIA DE PRODUCTOS)
+        Route::get('/products-categories', [ProductsCategoriesController::class, 'index'])->name('productosCategoria.index');
+        Route::get('/products-categories/create', [ProductsCategoriesController::class, 'create'])->name('productosCategoria.create');
+        Route::post('/products-categories/store', [ProductsCategoriesController::class, 'store'])->name('productosCategoria.store');
+        Route::get('/products-categories/edit/{id}', [ProductsCategoriesController::class, 'edit'])->name('productosCategoria.edit');
+        Route::post('/products-categories/update/{id}', [ProductsCategoriesController::class, 'update'])->name('productosCategoria.update');
+        Route::post('/products-categories/destroy', [ProductsCategoriesController::class, 'destroy'])->name('productosCategoria.delete');
+
+        // Crusos (CURSOS)
+        Route::get('/cursos', [CursosController::class, 'index'])->name('cursos.index');
+        Route::get('/cursos/create', [CursosController::class, 'create'])->name('cursos.create');
+        Route::get('/cursos-show/{id}', [CursosController::class, 'show'])->name('cursos.show');
+        Route::get('/cursos/edit/{id}', [CursosController::class, 'edit'])->name('cursos.edit');
+        Route::post('/cursos/store', [CursosController::class, 'store'])->name('cursos.store');
+        Route::post('/cursos/update/{id}', [CursosController::class, 'update'])->name('cursos.update');
+        Route::get('/cursos/show/{id}', [CursosController::class, 'show'])->name('cursos.show');
+        Route::post('/cursos/destroy', [CursosController::class, 'destroy'])->name('cursos.delete');
+
+        // Cursos Categories (CATEGORIA DE Cursos)
+        Route::get('/cursos-categories', [CursosCategoriesController::class, 'index'])->name('cursosCategoria.index');
+        Route::get('/cursos-categories/create', [CursosCategoriesController::class, 'create'])->name('cursosCategoria.create');
+        Route::post('/cursos-categories/store', [CursosCategoriesController::class, 'store'])->name('cursosCategoria.store');
+        Route::get('/cursos-categories/edit/{id}', [CursosCategoriesController::class, 'edit'])->name('cursosCategoria.edit');
+        Route::post('/cursos-categories/update/{id}', [CursosCategoriesController::class, 'update'])->name('cursosCategoria.update');
+        Route::post('/cursos-categories/destroy', [CursosCategoriesController::class, 'destroy'])->name('cursosCategoria.delete');
         //Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('/dashboard/getDataTask', [DashboardController::class, 'getDataTask'])->name('dashboard.getDataTask');

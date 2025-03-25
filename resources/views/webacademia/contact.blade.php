@@ -25,73 +25,84 @@
 
 		<!-- START ADDRESS -->
 		<section class="address_area section-padding">
-			<div class="container">
-				<div class="row text-center">
-					<div class="col-lg-4 col-sm-4 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-						<div class="single_address">
-							<i class="ti-map"></i>
-							<h4>Ceuta</h4>
-							<p>Poblado Marinero, local 25, 44, 45 y 46</p>
-						</div>
-					</div><!-- END COL -->
-					<div class="col-lg-4 col-sm-4 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
-						<div class="single_address sabr">
-							<i class="ti-mobile"></i>
-							<h4>Telefono</h4>
-							<p>956 52 50 68</p>
-						</div>
-					</div><!-- END COL -->
-					<div class="col-lg-4 col-sm-4 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
-						<div class="single_address">
-							<i class="ti-email"></i>
-							<h4>Email</h4>
-							<p>informacion@grupoecos.net</p>
-							<p>academia@grupoecos.net</p>
-							<p>comercial@grupoecos.net</p>
-						</div>
-					</div><!-- END COL -->
-				</div><!--- END ROW -->
-			</div><!--- END CONTAINER -->
-		</section>
+            <div class="container">
+                <div class="row text-center">
+                    <div class="col-lg-4 col-sm-4 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+                        <div class="single_address">
+                            <i class="ti-map"></i>
+                            <h4>Ceuta</h4>
+                            <p>Poblado Marinero, locales 25, 44, 45 y 46</p>
+                            <p><strong>Tel.:</strong> 956 52 50 68</p>
+                            <p><strong>Email:</strong></p>
+                            <p><a href="mailto:academia@grupoecos.net">academia@grupoecos.net</a></p>
+                            <p><a href="mailto:comercial@grupoecos.net">comercial@grupoecos.net</a></p>
+                            <p><a href="mailto:informacion@grupoecos.net">informacion@grupoecos.net</a></p>
+                        </div>
+                    </div><!-- END COL -->
+
+                    <div class="col-lg-4 col-sm-4 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                        <div class="single_address">
+                            <i class="ti-map"></i>
+                            <h4>Estepona</h4>
+                            <p>Calle Las Camelias, 2B<br>(junto a la Policía Local)</p>
+                            <p><strong>Tel.:</strong> 952 80 51 64</p>
+                            <p><strong>Email:</strong></p>
+                            <p><a href="mailto:estepona@grupoecos.net">estepona@grupoecos.net</a></p>
+                        </div>
+                    </div><!-- END COL -->
+
+                    <div class="col-lg-4 col-sm-4 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                        <div class="single_address">
+                            <i class="ti-map"></i>
+                            <h4>Melilla</h4>
+                            <p>Calle Comandante García Morato, 17</p>
+                            <p><strong>Tel.:</strong> 951 53 23 10</p>
+                            <p><strong>Email:</strong></p>
+                            <p><a href="mailto:melilla@grupoecos.net">melilla@grupoecos.net</a></p>
+                        </div>
+                    </div><!-- END COL -->
+                </div><!-- END ROW -->
+            </div><!-- END CONTAINER -->
+        </section>
 		<!-- END ADDRESS -->
 
 		<!-- CONTACT -->
 		<div id="contact" class="contact_area section-padding">
-			<div class="container">
-				<div class="section-title-two">
-					<h2>Send your message.</h2>
-				</div>
-				<div class="row">
-					<div class="offset-lg-1 col-lg-10 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
-						<div class="contact">
-							<form class="form" name="enq" method="post" action="contact.php" onsubmit="return validation();">
-								<div class="row">
-									<div class="form-group col-md-6">
-										<label for="">Name</label>
-										<input type="text" name="name" class="form-control" required="required">
-									</div>
-									<div class="form-group col-md-6">
-										<label for="">Your Email</label>
-										<input type="email" name="email" class="form-control" required="required">
-									</div>
-									<div class="form-group col-md-12">
-										<label for="">Your Subject</label>
-										<input type="text" name="subject" class="form-control" required="required">
-									</div>
-									<div class="form-group col-md-12">
-										<label for="">Your Message</label>
-										<textarea rows="6" name="message" class="form-control" required="required"></textarea>
-									</div>
-									<div class="col-md-12 text-center">
-										<button type="submit" value="Send message" name="submit" id="submitButton" class="btn_one" title="Submit Your Message!">Send Message</button>
-									</div>
-								</div>
-							</form>
-						</div>
-					</div><!-- END COL  -->
-				</div><!-- END ROW -->
-			</div><!--- END CONTAINER -->
-		</div>
+            <div class="container">
+                <div class="section-title-two">
+                    <h2>Envíanos tu mensaje</h2>
+                </div>
+                <div class="row">
+                    <div class="offset-lg-1 col-lg-10 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+                        <div class="contact">
+                            <form class="form" name="enq" method="post" action="contact.php" onsubmit="return validation();">
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label for="">Nombre</label>
+                                        <input type="text" name="name" class="form-control" required="required">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="">Tu correo electrónico</label>
+                                        <input type="email" name="email" class="form-control" required="required">
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <label for="">Asunto</label>
+                                        <input type="text" name="subject" class="form-control" required="required">
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <label for="">Mensaje</label>
+                                        <textarea rows="6" name="message" class="form-control" required="required"></textarea>
+                                    </div>
+                                    <div class="col-md-12 text-center">
+                                        <button type="submit" value="Enviar mensaje" name="submit" id="submitButton" class="btn_one" title="¡Enviar tu mensaje!">Enviar mensaje</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div><!-- END COL -->
+                </div><!-- END ROW -->
+            </div><!-- END CONTAINER -->
+        </div>
 		<!-- END CONTACT -->
 
 @endsection

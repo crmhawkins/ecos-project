@@ -87,22 +87,8 @@
         <section class="section pt-4">
             <div class="card">
                 <div class="card-body">
-                    {{-- <livewire:users-table-view> --}}
-                    @php
-                        use Jenssegers\Agent\Agent;
-
-                        $agent = new Agent();
-                    @endphp
-                    @if ($agent->isMobile())
-                        {{-- Contenido para dispositivos móviles --}}
-
+                   
                         @livewire('myholidays-table')
-
-                    @else
-                        {{-- Contenido para dispositivos de escritorio --}}
-                        {{-- <livewire:users-table-view> --}}
-                        @livewire('myholidays-table')
-                    @endif
                 </div>
             </div>
         </section>

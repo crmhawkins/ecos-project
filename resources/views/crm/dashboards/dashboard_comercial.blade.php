@@ -264,7 +264,7 @@
     let timerState = '{{ $jornadaActiva ? "running" : "stopped" }}'
     let timerTime = {{ $timeWorkedToday }}; // In seconds, initialized with the time worked today
     function getTime() {
-        fetch('/dashboard/timeworked', {
+        fetch('/crm/dashboard/timeworked', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -308,7 +308,7 @@
     }
 
     function startJornada() {
-        fetch('/start-jornada', {
+        fetch('/crm/start-jornada', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -375,7 +375,7 @@
 }
 
     function finalizarJornada() {
-        fetch('/end-jornada', {
+        fetch('/crm/end-jornada', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -396,7 +396,7 @@
     }
 
     function startPause() {
-        fetch('/start-pause', {
+        fetch('/crm/start-pause', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -415,7 +415,7 @@
     }
 
     function endPause() {
-        fetch('/end-pause', {
+        fetch('/crm/end-pause', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
