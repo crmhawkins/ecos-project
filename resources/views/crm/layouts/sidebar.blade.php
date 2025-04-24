@@ -52,7 +52,7 @@
                     $comercial = (Auth::user()->access_level_id == 6);
                     @endphp
                 <li class="sidebar-title">Academia</li>
-                <li class="sidebar-item has-sub {{ $clientesActive ? 'active' : '' }}">
+                {{-- <li class="sidebar-item has-sub {{ $clientesActive ? 'active' : '' }}">
                     <a href="#" class='sidebar-link'>
                         <i class="fa-solid fa-people-group fs-5"></i>
                         <span>Alumnos</span>
@@ -115,6 +115,12 @@
                             </a>
                         </li>
                     </ul>
+                </li> --}}
+                <li class="sidebar-item {{ request()->routeIs('moodle.admin.dashboard') ? 'active' : '' }}">
+                    <a href="{{route('moodle.admin.dashboard')}}" class='sidebar-link'>
+                        <i class="fa-solid fa-school-flag fs-5"></i>
+                        <span>Academia</span>
+                    </a>
                 </li>
 
                 <li class="sidebar-title">Empresa</li>
@@ -362,6 +368,7 @@
                     </ul>
                 </li>
                 @if ($admin || $gerente || $contable)
+
                     <li class="sidebar-item {{ request()->routeIs('facturas.index') ? 'active' : '' }}">
                         <a href="{{route('facturas.index')}}" class='sidebar-link'>
                             <i class="fa-solid fa-file-invoice-dollar fs-5"></i>
