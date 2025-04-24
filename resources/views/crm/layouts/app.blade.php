@@ -19,7 +19,6 @@
     <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
     <!-- CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Scripts -->
@@ -31,9 +30,10 @@
     @yield('css')
     <link rel="stylesheet" href="{{ asset('build/assets/app-d2e38ed8.css') }}" crossorigin="anonymous" referrerpolicy="no-referrer">
     <script src="{{ asset('build/assets/app-bf7e6802.js') }}"></script>
-    @laravelViewsStyles
-</head>
-<body class="" style="overflow-x: hidden">
+    @livewireStyles
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body class="" style="overflow-x: hidden">
     <div id="app">
         <div id="loadingOverlay" style="display: block; position: fixed; width: 100%; height: 100%; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.5); z-index: 50000; cursor: pointer;">
             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
@@ -64,7 +64,8 @@
 
     <script src="{{ asset('assets/js/main.js') }}"></script>
     @yield('scripts')
-    @laravelViewsScripts
+    @livewireScripts
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
          document.addEventListener('DOMContentLoaded', function() {
             let accessLevel = {{ auth()->user()->access_level_id}};
