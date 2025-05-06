@@ -107,11 +107,11 @@ namespace App\Modules\Moodle\Resources\views\admin;
                     </div>
 
                     <!-- Pagination if needed -->
-                    {{-- @if(isset($enrolledUsers) && method_exists($enrolledUsers, 'links'))
+                    @if(isset($enrolledUsers) && method_exists($enrolledUsers, 'links'))
                         <div class="d-flex justify-content-center mt-4">
-                            {{ $enrolledUsers->links() }}
+                            {{ $enrolledUsers->links('vendor.pagination.bootstrap-5') }}
                         </div>
-                    @endif --}}
+                    @endif
                 @else
                     <p class="text-muted">No hay usuarios matriculados en este curso.</p>
                 @endif

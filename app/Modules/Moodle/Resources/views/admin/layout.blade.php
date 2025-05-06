@@ -137,7 +137,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
             <ul>
                 <li>
                     <a href="{{ route('moodle.admin.dashboard') }}" class="{{ request()->routeIs('moodle.admin.dashboard') ? 'active' : '' }}">
-                        <i class="fas fa-tachometer-alt"></i> Dashboard moodle
+                        <i class="fas fa-tachometer-alt"></i>  Dashboard moodle
                     </a>
                 </li>
                 <li>

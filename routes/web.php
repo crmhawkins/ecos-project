@@ -162,12 +162,7 @@ Route::get('/thank_you', function () {
     return view('webacademia.thank-you');
 });
 
-Route::prefix('crm')->group(function () {
-
-});
-
-
-
+Auth::routes();
 //crm
 Route::prefix('crm')->group(function () {
     Route::name('inicio')->get('/', function () {
@@ -176,7 +171,7 @@ Route::prefix('crm')->group(function () {
     Route::get('/budget/cliente/{budget}', [BudgetController::class, 'getBudget'])->name('presupuestos.cliente');
     Route::post('/budget/acceptance', [BudgetController::class, 'setAcceptance'])->name('presupuestos.cliente.accept');
 
-    Auth::routes();
+
 
     //pdf
     Route::post('/invoice/generate-pdf', [InvoiceController::class, 'generatePDF'])->name('factura.generarPDF');

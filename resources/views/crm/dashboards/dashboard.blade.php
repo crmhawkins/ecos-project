@@ -130,47 +130,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row row-cols-1 row-cols-md-1 g-4">
-                            <div class="col">
-                                <div class="card2">
-                                    <div class="mb-3 card-body">
-                                        <h5 class="card-title fw-bold">Balance</h5>
-                                        <form action="dashboard" method="GET" class="row align-items-end">
-                                            <div class="col-4">
-                                                <label for="fecha_inicio">Fecha Inicio:</label>
-                                                <input type="date" name="fecha_inicio" class="form-control" value="{{ request('fecha_inicio') }}">
-                                            </div>
 
-                                            <div class="col-4">
-                                                <label for="fecha_fin" class="mt-2">Fecha Fin:</label>
-                                                <input type="date" name="fecha_fin" class="form-control" value="{{ request('fecha_fin') }}">
-                                            </div>
-
-                                            <div class="col-4">
-                                                <button class="btn btn-outline-secondary mt-3">Ver Balance</button>
-                                            </div>
-                                        </form>
-                                        <div class="card-body p-3">
-                                            <h5 class="card-title m-0 text-color-4 fw-bold">Ingresos</h5>
-                                            <span class="display-6 m-0"><b>{{ $totalIngresos }} €</b></span>
-
-                                            <h5 class="card-title m-0 text-color-4 fw-bold mt-2">Gastos</h5>
-                                            <span class="display-6 m-0"><b>{{ $totalGastosComunes }} €</b></span>
-
-                                            <h5 class="card-title m-0 text-color-4 fw-bold mt-2">Gastos Asociados</h5>
-                                            <span class="display-6 m-0"><b>{{ $totalGastosSociados }} €</b></span>
-
-                                            <h5 class="card-title m-0 text-color-4 fw-bold mt-2">Resultado IVA</h5>
-                                            <span class="display-6 m-0"><b>{{ $totalGastosSociados }} €</b></span>
-
-                                            <hr class="mb-2 mt-2">
-                                            <h5 class="card-title m-0 text-color-4 fw-bold mt-2">Beneficios</h5>
-                                            <span class="display-6 m-0"><b>{{ $beneficios }} €</b></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -547,7 +507,7 @@
     function updateTime() {
         let hours = Math.floor(timerTime / 3600);
         let minutes = Math.floor((timerTime % 3600) / 60);
-        let seconds = timerTime % 60;
+        let seconds = Math.floor(timerTime % 60);
 
         hours = hours < 10 ? '0' + hours : hours;
         minutes = minutes < 10 ? '0' + minutes : minutes;

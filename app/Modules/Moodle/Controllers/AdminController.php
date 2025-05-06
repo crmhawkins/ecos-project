@@ -7,48 +7,24 @@ use App\Modules\Moodle\Services\MoodleApiService;
 use App\Modules\Moodle\Services\MoodleUserService;
 use App\Modules\Moodle\Services\MoodleCourseService;
 use App\Modules\Moodle\Services\MoodleEnrollmentService;
+use App\Modules\Moodle\Models\MoodleCertificate; // Added for certificate admin
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log; // Added for logging
+use Illuminate\Support\Facades\Artisan; // Added for cache clearing
+use Illuminate\Support\Facades\File; // Added for file operations
+use Illuminate\Support\Facades\Config; // Added for config management
+use Illuminate\Support\Facades\Storage; // Added for file storage
 use Exception;
 
 class AdminController extends Controller
 {
-    /**
-     * The MoodleApiService instance
-     *
-     * @var \App\Modules\Moodle\Services\MoodleApiService
-     */
     protected $apiService;
-
-    /**
-     * The MoodleUserService instance
-     *
-     * @var \App\Modules\Moodle\Services\MoodleUserService
-     */
     protected $userService;
-
-    /**
-     * The MoodleCourseService instance
-     *
-     * @var \App\Modules\Moodle\Services\MoodleCourseService
-     */
     protected $courseService;
-
-    /**
-     * The MoodleEnrollmentService instance
-     *
-     * @var \App\Modules\Moodle\Services\MoodleEnrollmentService
-     */
     protected $enrollmentService;
 
-    /**
-     * Create a new AdminController instance.
-     *
-     * @param \App\Modules\Moodle\Services\MoodleApiService $apiService
-     * @param \App\Modules\Moodle\Services\MoodleUserService $userService
-     * @param \App\Modules\Moodle\Services\MoodleCourseService $courseService
-     * @param \App\Modules\Moodle\Services\MoodleEnrollmentService $enrollmentService
-     * @return void
-     */
     public function __construct(
         MoodleApiService $apiService,
         MoodleUserService $userService,
@@ -60,33 +36,24 @@ class AdminController extends Controller
         $this->courseService = $courseService;
         $this->enrollmentService = $enrollmentService;
 
-        // Apply admin middleware
-        $this->middleware(['auth']);
+        // Middleware should be applied in routes/web.php or a RouteServiceProvider
     }
 
     /**
      * Display the admin dashboard.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View
      */
     public function dashboard()
     {
         try {
-            // Test connection to Moodle API
             $connectionStatus = $this->apiService->testConnection();
-
-            // Get Moodle site info if connection is successful
             $siteInfo = $connectionStatus ? $this->apiService->getSiteInfo() : null;
 
-            return view('moodle::admin.dashboard', [
-                'connectionStatus' => $connectionStatus,
-                'siteInfo' => $siteInfo
-            ]);
+            return view("moodle::admin.dashboard", compact("connectionStatus", "siteInfo"));
         } catch (Exception $e) {
-            return view('moodle::admin.dashboard', [
-                'connectionStatus' => false,
-                'error' => $e->getMessage()
-            ]);
+            Log::error("Admin Dashboard Error: {" . $e->getMessage() . "}");
+            return view("moodle::admin.dashboard", ["connectionStatus" => false, "error" => "Error al conectar con Moodle: " . $e->getMessage()]);
         }
     }
 
@@ -94,26 +61,182 @@ class AdminController extends Controller
      * Display the users management page.
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View
      */
     public function users(Request $request)
     {
         try {
-            // Get search parameters
-            $search = $request->input('search');
+            $search = $request->input("search");
+            $role = $request->input("role"); // Moodle role shortname
+            $status = $request->input("status"); // active, suspended
+            $page = $request->input("page", 1);
+            $perPage = 15;
 
-            // Get users from Moodle
-            // In a real implementation, this would include pagination and more search options
-            $users = [];
+            $criteria = [];
+            if ($search) {
+                $criteria[] = ["key" => "fullname", "value" => "%" . $search . "%"];
+            }
 
-            return view('moodle::admin.users', [
-                'users' => $users,
-                'search' => $search
+            $moodleUsers = $this->userService->searchUsers($criteria);
+
+            // --- Local Filtering ---
+            if ($status === "suspended") {
+                $moodleUsers = array_filter($moodleUsers, fn($user) => isset($user["suspended"]) && $user["suspended"]);
+            } elseif ($status === "active") {
+                $moodleUsers = array_filter($moodleUsers, fn($user) => !isset($user["suspended"]) || !$user["suspended"]);
+            }
+            if ($role) {
+                Log::warning("Role filtering in AdminController::users is not fully implemented due to API limitations/complexity.");
+            }
+            // --- End Local Filtering ---
+
+            $usersCollection = new Collection(array_values($moodleUsers));
+            $paginatedUsers = new LengthAwarePaginator(
+                $usersCollection->forPage($page, $perPage),
+                $usersCollection->count(),
+                $perPage,
+                $page,
+                ["path" => $request->url(), "query" => $request->query()]
+            );
+
+            // Fetch Moodle roles for filter dropdown
+            $moodleRoles = [];
+            try {
+                $rolesData = $this->apiService->call("core_role_get_roles");
+                if (is_array($rolesData)) {
+                    $moodleRoles = $rolesData;
+                }
+            } catch (Exception $roleEx) {
+                Log::error("Failed to fetch Moodle roles: {" . $roleEx->getMessage() . "}");
+            }
+
+            return view("moodle::admin.users", [
+                "users" => $paginatedUsers,
+                "search" => $search,
+                "selectedRole" => $role,
+                "selectedStatus" => $status,
+                "roles" => $moodleRoles
             ]);
         } catch (Exception $e) {
-            return view('moodle::admin.users', [
-                'error' => $e->getMessage()
-            ]);
+            Log::error("Admin Users Error: {" . $e->getMessage() . "}");
+            return view("moodle::admin.users", ["error" => "Error al obtener usuarios: " . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Search users via AJAX for modals/autocomplete.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function searchUsersAjax(Request $request)
+    {
+        try {
+            $search = $request->input("search");
+            if (empty($search) || strlen($search) < 3) {
+                return response()->json(["success" => false, "message" => "Término de búsqueda debe tener al menos 3 caracteres"], 400);
+            }
+
+            $criteria = [
+                ["key" => "fullname", "value" => "%" . $search . "%"]
+            ];
+
+            $users = $this->userService->searchUsers($criteria);
+
+            $formattedUsers = array_map(function($user) {
+                return ["id" => $user["id"], "text" => $user["fullname"] . " (" . $user["email"] . ")"];
+            }, array_slice($users, 0, 20));
+
+            return response()->json(["success" => true, "results" => $formattedUsers]);
+        } catch (Exception $e) {
+            Log::error("AJAX User Search Error: {" . $e->getMessage() . "}", ["search" => $request->input("search")]);
+            return response()->json(["success" => false, "message" => "Error buscando usuarios: " . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Store a newly created user in Moodle.
+     *
+     * @param  Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeUser(Request $request)
+    {
+        $validated = $request->validate([
+            "firstname" => "required|string|max:100",
+            "lastname" => "required|string|max:100",
+            "email" => "required|email|max:100",
+            "username" => "required|string|max:100",
+            "password" => "required|string|min:8",
+        ]);
+
+        try {
+            $userData = $validated;
+            $userData["auth"] = config("moodle.user_sync.default_auth") ?? "manual";
+            $userData["lang"] = config("app.locale");
+
+            $newUserResponse = $this->userService->createUser($userData);
+
+            if (!$newUserResponse || !isset($newUserResponse[0]["id"])) {
+                throw new Exception("La API de Moodle no devolvió un ID de usuario válido.");
+            }
+
+            return redirect()->route("moodle.admin.users")->with("success", "Usuario ".$validated["username"]." creado correctamente en Moodle.");
+        } catch (Exception $e) {
+            Log::error("Admin Store User Error: {" . $e->getMessage() . "}", ["data" => $validated]);
+            return redirect()->route("moodle.admin.users")->with("error", "Error al crear usuario: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Update the specified user in Moodle.
+     *
+     * @param  Request $request
+     * @param  int  $userId Moodle User ID
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateUser(Request $request, $userId)
+    {
+        $validated = $request->validate([
+            "firstname" => "required|string|max:100",
+            "lastname" => "required|string|max:100",
+            "email" => "required|email|max:100",
+            "password" => "nullable|string|min:8",
+            "suspended" => "boolean",
+        ]);
+
+        try {
+            $userData = $validated;
+            $userData["id"] = $userId;
+
+            if (empty($validated["password"])) {
+                unset($userData["password"]);
+            }
+            $userData["suspended"] = $request->has("suspended") ? 1 : 0;
+
+            $this->userService->updateUser($userId, $userData);
+
+            return redirect()->route("moodle.admin.users")->with("success", "Usuario actualizado correctamente.");
+        } catch (Exception $e) {
+            Log::error("Admin Update User Error: {" . $e->getMessage() . "}", ["userId" => $userId, "data" => $validated]);
+            return redirect()->route("moodle.admin.users")->with("error", "Error al actualizar usuario: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove the specified user from Moodle.
+     *
+     * @param  int  $userId Moodle User ID
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroyUser($userId)
+    {
+        try {
+            $this->userService->deleteUser($userId);
+            return redirect()->route("moodle.admin.users")->with("success", "Usuario eliminado correctamente.");
+        } catch (Exception $e) {
+            Log::error("Admin Delete User Error: {" . $e->getMessage() . "}", ["userId" => $userId]);
+            return redirect()->route("moodle.admin.users")->with("error", "Error al eliminar usuario: " . $e->getMessage());
         }
     }
 
@@ -121,25 +244,157 @@ class AdminController extends Controller
      * Display the courses management page.
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View
      */
     public function courses(Request $request)
     {
         try {
-            // Get courses from Moodle
-            $courses = $this->courseService->getAllCourses();
+            $search = $request->input("search");
+            $categoryId = $request->input("category");
+            $visibility = $request->input("visibility");
+            $page = $request->input("page", 1);
+            $perPage = 15;
 
-            // Get categories
+            $moodleCourses = $this->courseService->getAllCourses();
+
+            // --- Local Filtering ---
+            if ($search) {
+                $moodleCourses = array_filter($moodleCourses, function($course) use ($search) {
+                    return stripos($course["fullname"], $search) !== false || stripos($course["shortname"], $search) !== false;
+                });
+            }
+            if ($categoryId) {
+                $moodleCourses = array_filter($moodleCourses, fn($course) => $course["categoryid"] == $categoryId);
+            }
+            if ($visibility === "visible") {
+                $moodleCourses = array_filter($moodleCourses, fn($course) => isset($course["visible"]) && $course["visible"] == 1);
+            } elseif ($visibility === "hidden") {
+                $moodleCourses = array_filter($moodleCourses, fn($course) => !isset($course["visible"]) || $course["visible"] == 0);
+            }
+            // --- End Local Filtering ---
+
             $categories = $this->courseService->getCategories();
 
-            return view('moodle::admin.courses', [
-                'courses' => $courses,
-                'categories' => $categories
+            $coursesCollection = new Collection(array_values($moodleCourses));
+            $paginatedCourses = new LengthAwarePaginator(
+                $coursesCollection->forPage($page, $perPage),
+                $coursesCollection->count(),
+                $perPage,
+                $page,
+                ["path" => $request->url(), "query" => $request->query()]
+            );
+
+            return view("moodle::admin.courses", [
+                "courses" => $paginatedCourses,
+                "categories" => $categories,
+                "search" => $search,
+                "selectedCategory" => $categoryId,
+                "selectedVisibility" => $visibility
             ]);
         } catch (Exception $e) {
-            return view('moodle::admin.courses', [
-                'error' => $e->getMessage()
-            ]);
+            Log::error("Admin Courses Error: {" . $e->getMessage() . "}");
+            return view("moodle::admin.courses", ["error" => "Error al obtener cursos: " . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Store a newly created course in Moodle.
+     *
+     * @param  Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeCourse(Request $request)
+    {
+        $validated = $request->validate([
+            "fullname" => "required|string|max:254",
+            "shortname" => "required|string|max:100",
+            "categoryid" => "required|integer",
+            "summary" => "nullable|string",
+            "format" => "nullable|string|in:topics,weeks,social,singleactivity",
+            "startdate" => "nullable|date",
+            "enddate" => "nullable|date|after_or_equal:startdate",
+            "visible" => "boolean",
+        ]);
+
+        try {
+            $courseData = $validated;
+            if (!empty($validated["startdate"])) {
+                $courseData["startdate"] = strtotime($validated["startdate"]);
+            }
+            if (!empty($validated["enddate"])) {
+                $courseData["enddate"] = strtotime($validated["enddate"]);
+            }
+            $courseData["visible"] = $request->has("visible") ? 1 : 0;
+            $courseData["format"] = $validated["format"] ?? "topics";
+
+            $newCourseResponse = $this->courseService->createCourse($courseData);
+
+            if (!$newCourseResponse || !isset($newCourseResponse[0]["id"])) {
+                throw new Exception("La API de Moodle no devolvió un ID de curso válido.");
+            }
+
+            return redirect()->route("moodle.admin.courses")->with("success", "Curso ".$validated["shortname"]." creado correctamente en Moodle.");
+        } catch (Exception $e) {
+            Log::error("Admin Store Course Error: {" . $e->getMessage() . "}", ["data" => $validated]);
+            return redirect()->route("moodle.admin.courses")->with("error", "Error al crear curso: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Update the specified course in Moodle.
+     *
+     * @param  Request $request
+     * @param  int  $courseId Moodle Course ID
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateCourse(Request $request, $courseId)
+    {
+        $validated = $request->validate([
+            "fullname" => "required|string|max:254",
+            "shortname" => "required|string|max:100",
+            "categoryid" => "required|integer",
+            "summary" => "nullable|string",
+            "format" => "nullable|string|in:topics,weeks,social,singleactivity",
+            "startdate" => "nullable|date",
+            "enddate" => "nullable|date|after_or_equal:startdate",
+            "visible" => "boolean",
+        ]);
+
+        try {
+            $courseData = $validated;
+            $courseData["id"] = $courseId;
+             if (!empty($validated["startdate"])) {
+                $courseData["startdate"] = strtotime($validated["startdate"]);
+            }
+            if (!empty($validated["enddate"])) {
+                $courseData["enddate"] = strtotime($validated["enddate"]);
+            }
+            $courseData["visible"] = $request->has("visible") ? 1 : 0;
+            $courseData["format"] = $validated["format"] ?? "topics";
+
+            $this->courseService->updateCourse($courseId, $courseData);
+
+            return redirect()->route("moodle.admin.courses")->with("success", "Curso actualizado correctamente.");
+        } catch (Exception $e) {
+            Log::error("Admin Update Course Error: {" . $e->getMessage() . "}", ["courseId" => $courseId, "data" => $validated]);
+            return redirect()->route("moodle.admin.courses")->with("error", "Error al actualizar curso: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove the specified course from Moodle.
+     *
+     * @param  int  $courseId Moodle Course ID
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroyCourse($courseId)
+    {
+        try {
+            $this->courseService->deleteCourse($courseId);
+            return redirect()->route("moodle.admin.courses")->with("success", "Curso eliminado correctamente.");
+        } catch (Exception $e) {
+            Log::error("Admin Delete Course Error: {" . $e->getMessage() . "}", ["courseId" => $courseId]);
+            return redirect()->route("moodle.admin.courses")->with("error", "Error al eliminar curso: " . $e->getMessage());
         }
     }
 
@@ -147,169 +402,328 @@ class AdminController extends Controller
      * Display the enrollments management page.
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View
      */
     public function enrollments(Request $request)
     {
         try {
-            // Get course ID from request
-            $courseId = $request->input('course_id');
+            $courseId = $request->input("course_id");
+            $enrolledUsers = [];
+            $courses = $this->courseService->getAllCourses(); // For dropdown
 
-            // Get enrolled users if course ID is provided
-            $enrolledUsers = $courseId ? $this->enrollmentService->getEnrolledUsers($courseId) : [];
+            if ($courseId) {
+                $enrolledUsersData = $this->enrollmentService->getEnrolledUsers($courseId);
+                // TODO: Consider pagination if the list is large
+                $collection = collect($enrolledUsersData);
 
-            // Get all courses for the dropdown
-            $courses = $this->courseService->getAllCourses();
+                // Paginate manually (10 per page, for example)
+                $perPage = 10;
+                $currentPage = LengthAwarePaginator::resolveCurrentPage();
+                $pagedData = $collection->slice(($currentPage - 1) * $perPage, $perPage)->values();
 
-            return view('moodle::admin.enrollments', [
-                'enrolledUsers' => $enrolledUsers,
-                'courses' => $courses,
-                'selectedCourseId' => $courseId
+                $enrolledUsers = new LengthAwarePaginator(
+                    $pagedData,
+                    $collection->count(),
+                    $perPage,
+                    $currentPage,
+                    ['path' => $request->url(), 'query' => $request->query()]
+                );
+            }
+
+            // Fetch Moodle roles for enrollment modal
+            $moodleRoles = [];
+            try {
+                $rolesData = $this->apiService->call("core_role_get_roles");
+                if (is_array($rolesData)) {
+                    $assignableRoles = ["student", "teacher", "editingteacher"];
+                    $moodleRoles = array_filter($rolesData, fn($role) => in_array($role["shortname"], $assignableRoles));
+                }
+            } catch (Exception $roleEx) {
+                Log::error("Failed to fetch Moodle roles for enrollment: {" . $roleEx->getMessage() . "}");
+            }
+
+            return view("moodle::admin.enrollments", [
+                "enrolledUsers" => $enrolledUsers,
+                "courses" => $courses,
+                "roles" => $moodleRoles,
+                "selectedCourseId" => $courseId
             ]);
         } catch (Exception $e) {
-            return view('moodle::admin.enrollments', [
-                'error' => $e->getMessage()
-            ]);
+            Log::error("Admin Enrollments Error: {" . $e->getMessage() . "}", ["course_id" => $request->input("course_id")]);
+            $courses = $this->courseService->getAllCourses();
+            return view("moodle::admin.enrollments", [
+                "error" => "Error al obtener matriculaciones: " . $e->getMessage(),
+                "courses" => $courses,
+                "selectedCourseId" => $request->input("course_id")
+                ]);
         }
     }
 
     /**
-     * Display the certificates management page.
+     * Enroll a user in a course.
+     *
+     * @param  Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function enrollUser(Request $request)
+    {
+        $validated = $request->validate([
+            "course_id" => "required|integer",
+            "user_id" => "required|integer",
+            "role_id" => "required|integer",
+        ]);
+
+        try {
+            $this->enrollmentService->enrollUser(
+                $validated["user_id"],
+                $validated["course_id"],
+                $validated["role_id"]
+            );
+
+            return redirect()->route("moodle.admin.enrollments", ["course_id" => $validated["course_id"]])
+                             ->with("success", "Usuario matriculado correctamente.");
+        } catch (Exception $e) {
+            Log::error("Admin Enroll User Error: {" . $e->getMessage() . "}", ["data" => $validated]);
+            return redirect()->route("moodle.admin.enrollments", ["course_id" => $validated["course_id"]])
+                             ->with("error", "Error al matricular usuario: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Update a user"s enrollment (e.g., change role).
+     *
+     * @param  Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateEnrollment(Request $request)
+    {
+        $validated = $request->validate([
+            "course_id" => "required|integer",
+            "user_id" => "required|integer",
+            "role_id" => "required|integer", // New Role ID
+        ]);
+
+        try {
+            // Workaround: Unenroll and re-enroll
+            $this->enrollmentService->unenrollUser($validated["user_id"], $validated["course_id"]);
+            $this->enrollmentService->enrollUser($validated["user_id"], $validated["course_id"], $validated["role_id"]);
+
+            return redirect()->route("moodle.admin.enrollments", ["course_id" => $validated["course_id"]])
+                             ->with("success", "Matriculación actualizada correctamente (mediante re-matriculación).");
+        } catch (Exception $e) {
+            Log::error("Admin Update Enrollment Error: {" . $e->getMessage() . "}", ["data" => $validated]);
+            return redirect()->route("moodle.admin.enrollments", ["course_id" => $validated["course_id"]])
+                             ->with("error", "Error al actualizar matriculación: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Unenroll a user from a course.
+     *
+     * @param  Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function unenrollUser(Request $request)
+    {
+         $validated = $request->validate([
+            "course_id" => "required|integer",
+            "user_id" => "required|integer",
+        ]);
+
+        try {
+            $this->enrollmentService->unenrollUser($validated["user_id"], $validated["course_id"]);
+
+            return redirect()->route("moodle.admin.enrollments", ["course_id" => $validated["course_id"]])
+                             ->with("success", "Usuario desmatriculado correctamente.");
+        } catch (Exception $e) {
+            Log::error("Admin Unenroll User Error: {" . $e->getMessage() . "}", ["data" => $validated]);
+            return redirect()->route("moodle.admin.enrollments", ["course_id" => $validated["course_id"]])
+                             ->with("error", "Error al desmatricular usuario: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Display the certificates management page (local DB records).
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View
      */
     public function certificates(Request $request)
     {
         try {
-            // Get certificates from database
-            $certificates = \App\Modules\Moodle\Models\MoodleCertificate::with(['user', 'course'])
-                ->orderBy('created_at', 'desc')
-                ->paginate(20);
+            $search = $request->input("search"); // Search user name, course name, cert ID
+            $selectedCourseId = $request->input("course_id");
+            $dateFrom = $request->input("date_from");
+            $dateTo = $request->input("date_to");
+            $page = $request->input("page", 1);
+            $perPage = 15;
 
-            return view('moodle::admin.certificates', [
-                'certificates' => $certificates
+            $query = MoodleCertificate::query()->with(["user", "course"]); // Eager load relationships
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where("certificate_id", "like", "%{$search}%")
+                      ->orWhereHas("user", function ($userQuery) use ($search) {
+                          $userQuery->where("user_id", "like", "%{$search}%"); // Search by Moodle User ID
+                      })
+                      ->orWhereHas("course", function ($courseQuery) use ($search) {
+                          $courseQuery->where("course_id", "like", "%{$search}%"); // Search by Moodle Course ID
+                      });
+                });
+            }
+
+            if ($selectedCourseId) {
+                $query->where("course_id", $selectedCourseId);
+            }
+
+            if ($dateFrom) {
+                $query->whereDate("issued_at", ">=", $dateFrom);
+            }
+            if ($dateTo) {
+                $query->whereDate("issued_at", "<=", $dateTo);
+            }
+
+            $certificates = $query->orderBy("issued_at", "desc")->paginate($perPage);
+
+            $courses = $this->courseService->getAllCourses();
+
+            return view("moodle::admin.certificates", [
+                "certificates" => $certificates,
+                "courses" => $courses,
+                "search" => $search,
+                "selectedCourseId" => $selectedCourseId,
+                "dateFrom" => $dateFrom,
+                "dateTo" => $dateTo
             ]);
         } catch (Exception $e) {
-            return view('moodle::admin.certificates', [
-                'error' => $e->getMessage()
-            ]);
+            Log::error("Admin Certificates Error: {" . $e->getMessage() . "}");
+            return view("moodle::admin.certificates", ["error" => "Error al obtener certificados: " . $e->getMessage()]);
         }
     }
 
     /**
      * Display the settings page.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View
      */
     public function settings()
     {
-        try {
-            $connectionStatus = $this->apiService->testConnection();
+        $connectionStatus = $this->apiService->testConnection();
 
-            // Get current settings
-            $settings = [
-                'url' => config('moodle.connection.url'),
-                'token' => config('moodle.connection.token'),
-                'protocol' => config('moodle.connection.protocol'),
-                'format' => config('moodle.connection.format'),
-                'timeout' => config('moodle.timeout'),
-                'cache_enabled' => config('moodle.cache.enabled'),
-                'cache_ttl' => config('moodle.cache.ttl'),
-                'auto_create_users' => config('moodle.user_sync.auto_create'),
-                'auto_update_users' => config('moodle.user_sync.auto_update'),
-                'default_role' => config('moodle.user_sync.default_role'),
-                'auto_enroll' => config('moodle.enrollment.auto_enroll'),
-                'enroll_method' => config('moodle.enrollment.enroll_method'),
-                'certificates_path' => config('moodle.certificates.path'),
-                'certificate_template' => config('moodle.certificates.template'),
-                'signature_image' => config('moodle.certificates.signature_image'),
-            ];
-
-            return view('moodle::admin.settings', [
-                'settings' => $settings,
-                'connectionStatus' => $connectionStatus,
-
-            ]);
-        } catch (Exception $e) {
-            return view('moodle::admin.settings', [
-                'error' => $e->getMessage()
-            ]);
-        }
+        $settings = [
+            "url" => config("moodle.connection.url"),
+            "token" => config("moodle.connection.token"),
+            "protocol" => config("moodle.connection.protocol"),
+            "format" => config("moodle.connection.format"),
+            "timeout" => config("moodle.timeout"),
+            "cache_enabled" => config("moodle.cache.enabled"),
+            "cache_ttl" => config("moodle.cache.ttl"),
+            "certificates_path" => config("moodle.certificates.path"),
+            "certificate_template" => config("moodle.certificates.template"),
+            "signature_image" => config("moodle.certificates.signature_image"),
+        ];
+        return view("moodle::admin.settings", compact("settings", "connectionStatus"));
     }
 
     /**
-     * Update settings.
+     * Update the Moodle module settings.
+     * This function updates the .env file. Be cautious with file permissions.
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function updateSettings(Request $request)
     {
+
+        $request->merge([
+            'cache_enabled' => $request->has('cache_enabled') ? 1 : 0,
+            'auto_create_users' => $request->has('cache_enabled') ? 1 : 0,
+            'auto_update_users' => $request->has('cache_enabled') ? 1 : 0,
+            'auto_enroll' => $request->has('cache_enabled') ? 1 : 0,
+        ]);
+        $validated = $request->validate([
+            "url" => "required|url",
+            "token" => "required|string|min:32",
+            "protocol" => "required|in:rest",
+            "format" => "required|in:json",
+            "timeout" => "required|integer|min:5",
+            "cache_enabled" => "boolean",
+            "cache_ttl" => "required_if:cache_enabled,1|integer|min:60",
+            "certificates_path" => "required|string",
+            "certificate_template" => "required|string",
+            "signature_image" => "nullable|string", // Path to signature image
+        ]);
         try {
-            // Validate request
-            $validated = $request->validate([
-                'url' => 'required|url',
-                'token' => 'required|string',
-                'protocol' => 'required|in:rest,soap,xmlrpc',
-                'format' => 'required|in:json,xml',
-                'timeout' => 'required|integer|min:5|max:120',
-                'cache_enabled' => 'boolean',
-                'cache_ttl' => 'required|integer|min:60|max:86400',
-                'auto_create_users' => 'boolean',
-                'auto_update_users' => 'boolean',
-                'default_role' => 'required|string',
-                'auto_enroll' => 'boolean',
-                'enroll_method' => 'required|string',
-                'certificates_path' => 'required|string',
-                'certificate_template' => 'required|string',
-                'signature_image' => 'nullable|string',
-            ]);
+            // Path to the .env file
+            $envPath = base_path(".env");
 
-            // In a real implementation, this would update the .env file or database settings
-            // For now, we'll just return success
+            if (!File::exists($envPath)) {
+                throw new Exception(".env file not found.");
+            }
 
-            return redirect()->route('moodle.admin.settings')
-                ->with('success', 'Configuración actualizada correctamente');
+            // Read the existing .env content
+            $content = File::get($envPath);
+
+            // Prepare the settings to update/add
+            $settingsToUpdate = [
+                "MOODLE_API_URL" => $validated["url"] ?? config("moodle.connection.url"),
+                "MOODLE_API_TOKEN" => $validated["token"] ?? config("moodle.connection.token"),
+                "MOODLE_API_PROTOCOL" => $validated["protocol"] ?? config("moodle.connection.protocol"),
+                "MOODLE_API_FORMAT" => $validated["format"] ?? config("moodle.connection.format"),
+                "MOODLE_API_TIMEOUT" => $validated["timeout"] ?? config("moodle.timeout"),
+                "MOODLE_CACHE_ENABLED" => $request->has("cache_enabled") ? "true" : "false",
+                "MOODLE_CACHE_TTL" => $validated["cache_ttl"] ?? config("moodle.cache.ttl"),
+                "MOODLE_CERTIFICATES_PATH" => $validated["certificates_path"] ?? config("moodle.certificates.path"),
+                "MOODLE_CERTIFICATE_TEMPLATE" => $validated["certificate_template"] ?? config("moodle.certificates.template"),
+                "MOODLE_SIGNATURE_IMAGE" => $validated["signature_image"] ?? config("moodle.certificates.signature_image"),
+            ];
+            // Update or add each setting in the .env content
+            foreach ($settingsToUpdate as $key => $value) {
+                $key = strtoupper($key);
+                $escapedValue = preg_match("/\s/", $value) ? "".$value."" : $value; // Add quotes if value has spaces
+
+                if (preg_match("/^" . $key . "=.*/m", $content)) {
+                    // Key exists, update it
+                    $content = preg_replace("/^" . $key . "=.*/m", "{$key}={$escapedValue}", $content);
+                } else {
+                    // Key doesn"t exist, add it to the end
+                    $content .= "\n{$key}={$escapedValue}";
+                }
+            }
+
+            // Write the updated content back to .env
+            if (File::put($envPath, $content) === false) {
+                throw new Exception("Failed to write to .env file. Check permissions.");
+            }
+
+            // Clear config cache to apply changes
+            Artisan::call("config:cache");
+
+            return redirect()->route("moodle.admin.settings")->with("success", "Configuración actualizada correctamente. La caché de configuración ha sido limpiada.");
+
         } catch (Exception $e) {
-            return redirect()->route('moodle.admin.settings')
-                ->with('error', 'Error al actualizar la configuración: ' . $e->getMessage());
+            Log::error("Admin Update Settings Error: {" . $e->getMessage() . "}", ["data" => $validated]);
+            return redirect()->route("moodle.admin.settings")->with("error", "Error al actualizar la configuración: " . $e->getMessage());
         }
     }
 
-    /**
-     * Test connection to Moodle API.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function testConnection(Request $request)
+
+    public function testConnection()
     {
         try {
-            // Validate request
-            $validated = $request->validate([
-                'url' => 'required|url',
-                'token' => 'required|string',
-                'protocol' => 'required|in:rest,soap,xmlrpc',
-                'format' => 'required|in:json,xml',
-            ]);
-
-            // Create a temporary API service with the provided credentials
-            $tempApiService = new MoodleApiService();
-
-            // Set the credentials
-            // In a real implementation, this would use dependency injection or a factory
-            // For now, we'll just return success
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Conexión exitosa con la API de Moodle'
-            ]);
+            $ok = $this->apiService->testConnection();
+            if ($ok) {
+                $siteInfo = $ok ? $this->apiService->getSiteInfo() : null;
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Conexión exitosa con Moodle.',
+                    'site' => $siteInfo
+                ]);
+            }
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al conectar con la API de Moodle: ' . $e->getMessage()
-            ], 500);
+            Log::error("Admin Dashboard Error: {" . $e->getMessage() . "}");
+            return view("moodle::admin.dashboard", ["connectionStatus" => false, "error" => "Error al conectar con Moodle: " . $e->getMessage()]);
         }
     }
 }
+

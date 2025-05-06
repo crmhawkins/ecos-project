@@ -591,16 +591,16 @@
 
 
         function updateTime() {
-            let hours = Math.floor(timerTime / 3600);
-            let minutes = Math.floor((timerTime % 3600) / 60);
-            let seconds = timerTime % 60;
+        let hours = Math.floor(timerTime / 3600);
+        let minutes = Math.floor((timerTime % 3600) / 60);
+        let seconds = Math.floor(timerTime % 60);
 
-            hours = hours < 10 ? '0' + hours : hours;
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-            seconds = seconds < 10 ? '0' + seconds : seconds;
+        hours = hours < 10 ? '0' + hours : hours;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
 
-            document.getElementById('timer').textContent = `${hours}:${minutes}:${seconds}`;
-        }
+        document.getElementById('timer').textContent = `${hours}:${minutes}:${seconds}`;
+    }
 
         function startTimer() {
                 timerState = 'running';

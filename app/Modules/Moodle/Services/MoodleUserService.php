@@ -36,13 +36,13 @@ class MoodleUserService
         try {
             // Required fields for Moodle user creation
             $requiredFields = ['username', 'password', 'firstname', 'lastname', 'email'];
-            
+
             foreach ($requiredFields as $field) {
                 if (!isset($userData[$field]) || empty($userData[$field])) {
                     throw new Exception("Missing required field: {$field}");
                 }
             }
-            
+
             // Prepare user data for Moodle API
             $user = [
                 'username' => $userData['username'],
@@ -62,23 +62,23 @@ class MoodleUserService
                 'country' => $userData['country'] ?? '',
                 'preferences' => $userData['preferences'] ?? [],
             ];
-            
+
             // Call Moodle API to create user
             $response = $this->apiService->call('core_user_create_users', [
                 'users' => [$user]
             ]);
-            
+
             if (is_array($response) && !empty($response)) {
                 return $response[0];
             }
-            
+
             return null;
         } catch (Exception $e) {
             Log::error("Moodle Create User Error: {$e->getMessage()}", [
                 'userData' => $userData,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error creating Moodle user: {$e->getMessage()}");
         }
     }
@@ -96,15 +96,15 @@ class MoodleUserService
             if (!$userId) {
                 throw new Exception("User ID is required");
             }
-            
+
             // Prepare user data for Moodle API
             $user = array_merge(['id' => $userId], $userData);
-            
+
             // Call Moodle API to update user
             $this->apiService->call('core_user_update_users', [
                 'users' => [$user]
             ]);
-            
+
             return true;
         } catch (Exception $e) {
             Log::error("Moodle Update User Error: {$e->getMessage()}", [
@@ -112,7 +112,7 @@ class MoodleUserService
                 'userData' => $userData,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error updating Moodle user: {$e->getMessage()}");
         }
     }
@@ -129,19 +129,19 @@ class MoodleUserService
             if (!$userId) {
                 throw new Exception("User ID is required");
             }
-            
+
             // Call Moodle API to delete user
             $this->apiService->call('core_user_delete_users', [
                 'userids' => [$userId]
             ]);
-            
+
             return true;
         } catch (Exception $e) {
             Log::error("Moodle Delete User Error: {$e->getMessage()}", [
                 'userId' => $userId,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error deleting Moodle user: {$e->getMessage()}");
         }
     }
@@ -158,7 +158,7 @@ class MoodleUserService
             if (!$userId) {
                 throw new Exception("User ID is required");
             }
-            
+
             // Call Moodle API to get user
             $response = $this->apiService->call('core_user_get_users', [
                 'criteria' => [
@@ -168,18 +168,18 @@ class MoodleUserService
                     ]
                 ]
             ]);
-            
+
             if (isset($response['users']) && !empty($response['users'])) {
                 return $response['users'][0];
             }
-            
+
             return null;
         } catch (Exception $e) {
             Log::error("Moodle Get User Error: {$e->getMessage()}", [
                 'userId' => $userId,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error getting Moodle user: {$e->getMessage()}");
         }
     }
@@ -196,7 +196,7 @@ class MoodleUserService
             if (!$username) {
                 throw new Exception("Username is required");
             }
-            
+
             // Call Moodle API to get user
             $response = $this->apiService->call('core_user_get_users', [
                 'criteria' => [
@@ -206,18 +206,18 @@ class MoodleUserService
                     ]
                 ]
             ]);
-            
+
             if (isset($response['users']) && !empty($response['users'])) {
                 return $response['users'][0];
             }
-            
+
             return null;
         } catch (Exception $e) {
             Log::error("Moodle Get User By Username Error: {$e->getMessage()}", [
                 'username' => $username,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error getting Moodle user by username: {$e->getMessage()}");
         }
     }
@@ -234,7 +234,7 @@ class MoodleUserService
             if (!$email) {
                 throw new Exception("Email is required");
             }
-            
+
             // Call Moodle API to get user
             $response = $this->apiService->call('core_user_get_users', [
                 'criteria' => [
@@ -244,18 +244,18 @@ class MoodleUserService
                     ]
                 ]
             ]);
-            
+
             if (isset($response['users']) && !empty($response['users'])) {
                 return $response['users'][0];
             }
-            
+
             return null;
         } catch (Exception $e) {
             Log::error("Moodle Get User By Email Error: {$e->getMessage()}", [
                 'email' => $email,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error getting Moodle user by email: {$e->getMessage()}");
         }
     }
@@ -272,23 +272,23 @@ class MoodleUserService
             if (!$userId) {
                 throw new Exception("User ID is required");
             }
-            
+
             // Call Moodle API to get user preferences
             $response = $this->apiService->call('core_user_get_user_preferences', [
                 'userid' => $userId
             ]);
-            
+
             if (isset($response['preferences'])) {
                 return $response['preferences'];
             }
-            
+
             return [];
         } catch (Exception $e) {
             Log::error("Moodle Get User Preferences Error: {$e->getMessage()}", [
                 'userId' => $userId,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error getting Moodle user preferences: {$e->getMessage()}");
         }
     }
@@ -306,11 +306,11 @@ class MoodleUserService
             if (!$userId) {
                 throw new Exception("User ID is required");
             }
-            
+
             if (empty($preferences)) {
                 throw new Exception("Preferences array cannot be empty");
             }
-            
+
             // Format preferences for Moodle API
             $formattedPreferences = [];
             foreach ($preferences as $name => $value) {
@@ -320,12 +320,12 @@ class MoodleUserService
                     'userid' => $userId
                 ];
             }
-            
+
             // Call Moodle API to set user preferences
             $this->apiService->call('core_user_set_user_preferences', [
                 'preferences' => $formattedPreferences
             ]);
-            
+
             return true;
         } catch (Exception $e) {
             Log::error("Moodle Set User Preferences Error: {$e->getMessage()}", [
@@ -333,8 +333,41 @@ class MoodleUserService
                 'preferences' => $preferences,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error setting Moodle user preferences: {$e->getMessage()}");
         }
     }
+    /**
+     * Search users in Moodle using an array of criteria
+     *
+     * @param array $criteria Array of search criteria, e.g.:
+     *                        [['key' => 'email', 'value' => 'example@domain.com']]
+     * @return array
+     * @throws Exception
+     */
+    public function searchUsers(array $criteria): array
+    {
+        try {
+            // Si no se pasan criterios, usamos comodín para obtener todos
+            if (empty($criteria)) {
+                $criteria = [
+                    ['key' => 'id', 'value' => '%']
+                ];
+            }
+
+            $response = $this->apiService->call('core_user_get_users', [
+                'criteria' => $criteria
+            ]);
+
+            return $response['users'] ?? [];
+        } catch (Exception $e) {
+            Log::error("Moodle Search Users Error: {$e->getMessage()}", [
+                'criteria' => $criteria,
+                'exception' => $e
+            ]);
+
+            throw new Exception("Error searching Moodle users: {$e->getMessage()}");
+        }
+    }
+
 }

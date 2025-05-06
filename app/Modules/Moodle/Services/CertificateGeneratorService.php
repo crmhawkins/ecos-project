@@ -2,63 +2,22 @@
 
 namespace App\Modules\Moodle\Services;
 
+use App\Modules\Moodle\Models\MoodleCertificate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\View; // Added for rendering Blade templates
+use Illuminate\Support\Facades\File; // Added for file operations
 use Exception;
-use TCPDF;
 
 class CertificateGeneratorService
 {
-    /**
-     * The MoodleApiService instance
-     *
-     * @var \App\Modules\Moodle\Services\MoodleApiService
-     */
     protected $apiService;
-
-    /**
-     * The MoodleCourseService instance
-     *
-     * @var \App\Modules\Moodle\Services\MoodleCourseService
-     */
     protected $courseService;
-
-    /**
-     * The MoodleUserService instance
-     *
-     * @var \App\Modules\Moodle\Services\MoodleUserService
-     */
     protected $userService;
-
-    /**
-     * Certificate storage path
-     *
-     * @var string
-     */
     protected $storagePath;
-
-    /**
-     * Certificate template
-     *
-     * @var string
-     */
     protected $template;
-
-    /**
-     * Signature image path
-     *
-     * @var string
-     */
     protected $signatureImage;
 
-    /**
-     * Create a new CertificateGeneratorService instance.
-     *
-     * @param \App\Modules\Moodle\Services\MoodleApiService $apiService
-     * @param \App\Modules\Moodle\Services\MoodleCourseService $courseService
-     * @param \App\Modules\Moodle\Services\MoodleUserService $userService
-     * @return void
-     */
     public function __construct(
         MoodleApiService $apiService,
         MoodleCourseService $courseService,
@@ -70,253 +29,128 @@ class CertificateGeneratorService
         $this->storagePath = config('moodle.certificates.path', storage_path('app/certificates'));
         $this->template = config('moodle.certificates.template', 'default');
         $this->signatureImage = config('moodle.certificates.signature_image', '');
-        
-        // Ensure storage directory exists
-        if (!file_exists($this->storagePath)) {
-            mkdir($this->storagePath, 0755, true);
+
+        if (!File::exists($this->storagePath)) {
+            File::makeDirectory($this->storagePath, 0755, true);
         }
+
+        $this->ensureDefaultTemplateExists();
     }
 
-    /**
-     * Generate a certificate for a user who completed a course
-     *
-     * @param int $userId Moodle user ID
-     * @param int $courseId Moodle course ID
-     * @param array $options Additional options for certificate
-     * @return string|null Path to the generated certificate
-     */
     public function generateCertificate($userId, $courseId, array $options = [])
     {
         try {
-            if (!$userId) {
-                throw new Exception("User ID is required");
-            }
-            
-            if (!$courseId) {
-                throw new Exception("Course ID is required");
-            }
-            
-            // Get user and course data
+            if (!$userId) throw new Exception("User ID is required");
+            if (!$courseId) throw new Exception("Course ID is required");
+
             $user = $this->userService->getUser($userId);
             $course = $this->courseService->getCourse($courseId);
-            
-            if (!$user) {
-                throw new Exception("User not found");
-            }
-            
-            if (!$course) {
-                throw new Exception("Course not found");
-            }
-            
-            // Check if user has completed the course
+
+            if (!$user) throw new Exception("User not found with Moodle ID: {$userId}");
+            if (!$course) throw new Exception("Course not found with Moodle ID: {$courseId}");
+
             $completionStatus = $this->courseService->getCourseCompletionStatus($courseId, $userId);
-            
             if (!isset($completionStatus['completionstatus']['completed']) || !$completionStatus['completionstatus']['completed']) {
-                throw new Exception("User has not completed the course");
+                if (!($options['force_generation'] ?? false)) {
+                    throw new Exception("User has not completed the course");
+                }
             }
-            
-            // Generate certificate
-            $certificatePath = $this->createPdfCertificate($user, $course, $completionStatus, $options);
-            
+
+            $completionTime = $completionStatus['completionstatus']['timecompleted'] ?? time();
+            $completionDate = date('d/m/Y', isset($options['completion_date']) ? strtotime($options['completion_date']) : $completionTime);
+            $certificateId = $options['certificate_id'] ?? 'CERT-' . uniqid();
+
+            $certificatePath = $this->createPdfCertificateWithWeasyPrint($user, $course, $completionDate, $certificateId, $options);
+
+            MoodleCertificate::create([
+                'user_id' => $userId,
+                'course_id' => $courseId,
+                'file_path' => basename($certificatePath),
+                'certificate_id' => $certificateId,
+                'generated_at' => now()
+            ]);
+
             return $certificatePath;
         } catch (Exception $e) {
-            Log::error("Certificate Generation Error: {$e->getMessage()}", [
+            Log::error("Certificate Generation Error: {" . $e->getMessage() . "}", [
                 'userId' => $userId,
                 'courseId' => $courseId,
                 'options' => $options,
                 'exception' => $e
             ]);
-            
-            throw new Exception("Error generating certificate: {$e->getMessage()}");
+            throw new Exception("Error generating certificate: {" . $e->getMessage() . "}");
         }
     }
 
-    /**
-     * Create a PDF certificate
-     *
-     * @param array $user User data
-     * @param array $course Course data
-     * @param array $completionStatus Completion status data
-     * @param array $options Additional options
-     * @return string Path to the generated PDF
-     */
-    protected function createPdfCertificate($user, $course, $completionStatus, $options)
+    protected function createPdfCertificateWithWeasyPrint($user, $course, $completionDate, $certificateId, $options)
     {
-        // Initialize TCPDF
-        $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
-        
-        // Set document information
-        $pdf->SetCreator('Moodle Module');
-        $pdf->SetAuthor('Laravel Moodle Module');
-        $pdf->SetTitle('Course Completion Certificate');
-        $pdf->SetSubject('Certificate for ' . $course['fullname']);
-        
-        // Remove default header/footer
-        $pdf->setPrintHeader(false);
-        $pdf->setPrintFooter(false);
-        
-        // Set margins
-        $pdf->SetMargins(15, 15, 15);
-        
-        // Add a page
-        $pdf->AddPage();
-        
-        // Set font
-        $pdf->SetFont('helvetica', '', 12);
-        
-        // Certificate title
-        $pdf->SetFont('helvetica', 'B', 24);
-        $pdf->Cell(0, 20, 'CERTIFICADO DE FINALIZACIÓN', 0, 1, 'C');
-        
-        // Certificate content
-        $pdf->SetFont('helvetica', '', 14);
-        $pdf->Ln(10);
-        $pdf->Cell(0, 10, 'Este certificado acredita que:', 0, 1, 'C');
-        
-        // User name
-        $pdf->SetFont('helvetica', 'B', 20);
-        $pdf->Cell(0, 15, $user['firstname'] . ' ' . $user['lastname'], 0, 1, 'C');
-        
-        // Course information
-        $pdf->SetFont('helvetica', '', 14);
-        $pdf->Ln(5);
-        $pdf->Cell(0, 10, 'Ha completado satisfactoriamente el curso:', 0, 1, 'C');
-        
-        $pdf->SetFont('helvetica', 'B', 18);
-        $pdf->Cell(0, 15, $course['fullname'], 0, 1, 'C');
-        
-        // Completion date
-        $pdf->SetFont('helvetica', '', 14);
-        $pdf->Ln(5);
-        
-        $completionDate = isset($completionStatus['completionstatus']['timecompleted']) 
-            ? date('d/m/Y', $completionStatus['completionstatus']['timecompleted']) 
-            : date('d/m/Y');
-            
-        $pdf->Cell(0, 10, 'Fecha de finalización: ' . $completionDate, 0, 1, 'C');
-        
-        // Certificate ID
-        $certificateId = uniqid('CERT-');
-        $pdf->SetFont('helvetica', '', 10);
-        $pdf->Ln(10);
-        $pdf->Cell(0, 10, 'ID del Certificado: ' . $certificateId, 0, 1, 'C');
-        
-        // Add signature if available
-        if (!empty($this->signatureImage) && file_exists($this->signatureImage)) {
-            $pdf->Image($this->signatureImage, 120, 180, 60, 0, '', '', '', false, 300);
-            $pdf->Ln(30);
-            $pdf->Cell(0, 10, '____________________________', 0, 1, 'C');
-            $pdf->Cell(0, 10, 'Firma Autorizada', 0, 1, 'C');
-        } else {
-            $pdf->Ln(40);
-            $pdf->Cell(0, 10, '____________________________', 0, 1, 'C');
-            $pdf->Cell(0, 10, 'Firma Autorizada', 0, 1, 'C');
-        }
-        
-        // QR code with verification URL if TCPDF has the feature
-        if (method_exists($pdf, 'write2DBarcode')) {
-            $verificationUrl = url('/verify-certificate/' . $certificateId);
-            $pdf->write2DBarcode($verificationUrl, 'QRCODE,M', 20, 160, 40, 40);
-            $pdf->SetXY(20, 205);
-            $pdf->Cell(40, 10, 'Verificar Certificado', 0, 1, 'C');
-        }
-        
-        // Generate filename
-        $filename = 'certificate_' . $user['id'] . '_' . $course['id'] . '_' . time() . '.pdf';
-        $filepath = $this->storagePath . '/' . $filename;
-        
-        // Save PDF
-        $pdf->Output($filepath, 'F');
-        
-        return $filepath;
-    }
+        $data = [
+            'user' => $user,
+            'course' => $course,
+            'completionDate' => $completionDate,
+            'certificateId' => $certificateId,
+            'signatureImagePath' => $this->signatureImage && File::exists($this->signatureImage) ? $this->signatureImage : null,
+            'verificationUrl' => route('moodle.certificates.verify.get', $certificateId),
+            'options' => $options
+        ];
 
-    /**
-     * Verify a certificate by ID
-     *
-     * @param string $certificateId Certificate ID
-     * @return bool|array
-     */
-    public function verifyCertificate($certificateId)
-    {
-        // In a real implementation, this would query a database of issued certificates
-        // For now, we'll just return false as this is a placeholder
-        return false;
-    }
+        $templateName = $options['template'] ?? $this->template;
+        $templateView = 'moodle::certificates.templates.' . $templateName;
+        if (!View::exists($templateView)) {
+            Log::warning("Template not found: {$templateView}, falling back to default.");
+            $templateView = 'moodle::certificates.templates.default';
+            if (!View::exists($templateView)) {
+                throw new Exception("Default certificate template view not found");
+            }
+        }
 
-    /**
-     * Get a list of certificates for a user
-     *
-     * @param int $userId Moodle user ID
-     * @return array
-     */
-    public function getUserCertificates($userId)
-    {
         try {
-            if (!$userId) {
-                throw new Exception("User ID is required");
-            }
-            
-            // Get user enrollments
-            $enrollments = app(MoodleEnrollmentService::class)->getUserEnrollments($userId);
-            $certificates = [];
-            
-            foreach ($enrollments as $enrollment) {
-                try {
-                    // Check if user has completed the course
-                    $completionStatus = $this->courseService->getCourseCompletionStatus($enrollment['id'], $userId);
-                    
-                    if (isset($completionStatus['completionstatus']['completed']) && $completionStatus['completionstatus']['completed']) {
-                        // Get certificate file if it exists
-                        $pattern = $this->storagePath . '/certificate_' . $userId . '_' . $enrollment['id'] . '_*.pdf';
-                        $files = glob($pattern);
-                        
-                        $certificateFile = !empty($files) ? basename(end($files)) : null;
-                        
-                        $certificates[] = [
-                            'course_id' => $enrollment['id'],
-                            'course_name' => $enrollment['fullname'],
-                            'completion_date' => isset($completionStatus['completionstatus']['timecompleted']) 
-                                ? date('Y-m-d', $completionStatus['completionstatus']['timecompleted']) 
-                                : null,
-                            'certificate_file' => $certificateFile,
-                        ];
-                    }
-                } catch (Exception $e) {
-                    // Log error but continue with other enrollments
-                    Log::error("Error checking completion for course: {$e->getMessage()}", [
-                        'userId' => $userId,
-                        'courseId' => $enrollment['id'],
-                        'exception' => $e
-                    ]);
-                }
-            }
-            
-            return $certificates;
+            $htmlContent = View::make($templateView, $data)->render();
         } catch (Exception $e) {
-            Log::error("Error getting user certificates: {$e->getMessage()}", [
-                'userId' => $userId,
-                'exception' => $e
-            ]);
-            
-            throw new Exception("Error getting user certificates: {$e->getMessage()}");
+            throw new Exception("Error rendering template: {" . $e->getMessage() . "}");
         }
+
+        $tmpHtmlPath = tempnam(sys_get_temp_dir(), 'cert_html_') . '.html';
+        if (File::put($tmpHtmlPath, $htmlContent) === false) {
+            throw new Exception("Could not write temporary HTML file: {$tmpHtmlPath}");
+        }
+
+        $filename = 'certificate_' . ($user['username'] ?? $user['id']) . '_' . ($course['shortname'] ?? $course['id']) . '_' . time() . '.pdf';
+        $pdfFilePath = $this->storagePath . '/' . $filename;
+
+        $cssPath = $options['css_path'] ?? null;
+        $command = 'weasyprint ' . escapeshellarg($tmpHtmlPath) . ' ' . escapeshellarg($pdfFilePath);
+        if ($cssPath && File::exists($cssPath)) {
+            $command = 'weasyprint -s ' . escapeshellarg($cssPath) . ' ' . escapeshellarg($tmpHtmlPath) . ' ' . escapeshellarg($pdfFilePath);
+        }
+
+        exec($command, $output, $returnCode);
+
+        if ($returnCode !== 0 || !File::exists($pdfFilePath)) {
+            throw new Exception("WeasyPrint failed to generate PDF. Command: {$command}");
+        }
+
+        File::delete($tmpHtmlPath);
+
+        return $pdfFilePath;
     }
 
-    /**
-     * Download a certificate
-     *
-     * @param string $filename Certificate filename
-     * @return string Full path to certificate file
-     */
-    public function downloadCertificate($filename)
+    protected function ensureDefaultTemplateExists()
     {
-        $filepath = $this->storagePath . '/' . $filename;
-        
-        if (!file_exists($filepath)) {
-            throw new Exception("Certificate file not found");
+        $viewPath = resource_path('views/vendor/moodle/certificates/templates/default.blade.php');
+
+        if (!File::exists($viewPath)) {
+            $stubPath = __DIR__ . '/../resources/stubs/default.blade.php';
+
+            if (!File::exists($stubPath)) {
+                Log::warning("Default certificate stub not found at: {$stubPath}");
+                return;
+            }
+
+            File::ensureDirectoryExists(dirname($viewPath));
+            File::copy($stubPath, $viewPath);
+
+            Log::info("Default certificate template published to: {$viewPath}");
         }
-        
-        return $filepath;
     }
 }

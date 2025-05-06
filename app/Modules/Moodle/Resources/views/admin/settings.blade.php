@@ -107,6 +107,16 @@ namespace App\Modules\Moodle\Resources\views\admin;
                     </div>
                 </div>
 
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="timeout" class="form-label">Timeout de conexión (segundos)</label>
+                            <input type="number" class="form-control" id="timeout" name="timeout" value="{{ $settings['timeout'] ?? 30 }}" min="5" max="120">
+                            <small class="form-text text-muted">Tiempo máximo de espera para una respuesta desde la API de Moodle</small>
+                        </div>
+                    </div>
+                </div>
+
                 <h5 class="mb-3">Configuración de Caché</h5>
                 <div class="row mb-4">
                     <div class="col-md-6">

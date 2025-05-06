@@ -573,7 +573,7 @@
     function updateTime() {
         let hours = Math.floor(timerTime / 3600);
         let minutes = Math.floor((timerTime % 3600) / 60);
-        let seconds = timerTime % 60;
+        let seconds = Math.floor(timerTime % 60);
 
         hours = hours < 10 ? '0' + hours : hours;
         minutes = minutes < 10 ? '0' + minutes : minutes;
