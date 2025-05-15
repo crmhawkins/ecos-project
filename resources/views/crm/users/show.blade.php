@@ -338,7 +338,7 @@
             </div>
         </section>
     </div>
-    @include('partials.modalAvatar')
+    @include('crm.partials.modalAvatar')
 
 @endsection
 

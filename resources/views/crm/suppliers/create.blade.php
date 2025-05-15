@@ -35,7 +35,7 @@
         <section class="section pt-4">
             <div class="card">
                 <div class="card-body">
-                    @include('suppliers.form', [
+                    @include('crm.suppliers.form', [
                         'action' => route('proveedores.store'),
                         'buttonText' => 'Guardar proveedor',
                         'countries' => $countries,

@@ -22,22 +22,20 @@ namespace App\Modules\Moodle\Resources\views\admin;
                     <input type="text" class="form-control" id="search" name="search" placeholder="Nombre, email o username" value="{{ $search ?? '' }}">
                 </div>
                 <div class="col-md-3">
-                    <label for="role" class="form-label">Rol</label>
-                    <select class="form-select" id="role" name="role">
-                        <option value="">Todos los roles</option>
-                        <option value="student" {{ isset($role) && $role == 'student' ? 'selected' : '' }}>Estudiante</option>
-                        <option value="teacher" {{ isset($role) && $role == 'teacher' ? 'selected' : '' }}>Profesor</option>
-                        <option value="manager" {{ isset($role) && $role == 'manager' ? 'selected' : '' }}>Gestor</option>
-                        <option value="admin" {{ isset($role) && $role == 'admin' ? 'selected' : '' }}>Administrador</option>
+                    <label for="searchType" class="form-label">Campo de busqueda</label>
+                    <select class="form-select" id="searchType" name="searchType">
+                        <option value="firstname" {{ isset($searchType) && $searchType == 'firstname' ? 'selected' : '' }} selected>Nombre</option>
+                        <option value="lastname" {{ isset($searchType) && $searchType == 'lastname' ? 'selected' : '' }}>Apellidos</option>
+                        <option value="email" {{ isset($searchType) && $searchType == 'email' ? 'selected' : '' }}>Correo</option>
+                        <option value="username" {{ isset($searchType) && $searchType == 'username' ? 'selected' : '' }}>Usuario</option>
                     </select>
                 </div>
                 <div class="col-md-3">
                     <label for="status" class="form-label">Estado</label>
                     <select class="form-select" id="status" name="status">
                         <option value="">Todos los estados</option>
-                        <option value="active" {{ isset($status) && $status == 'active' ? 'selected' : '' }}>Activo</option>
-                        <option value="suspended" {{ isset($status) && $status == 'suspended' ? 'selected' : '' }}>Suspendido</option>
-                        <option value="deleted" {{ isset($status) && $status == 'deleted' ? 'selected' : '' }}>Eliminado</option>
+                        <option value="active" {{ isset($selectedStatus) && $selectedStatus == 'active' ? 'selected' : '' }}>Activo</option>
+                        <option value="suspended" {{ isset($selectedStatus) && $selectedStatus == 'suspended' ? 'selected' : '' }}>Suspendido</option>
                     </select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
@@ -81,12 +79,10 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                     <td>{{ $user['firstname'] }} {{ $user['lastname'] }}</td>
                                     <td>{{ $user['email'] }}</td>
                                     <td>{{ $user['username'] }}</td>
-                                    <td>{{ isset($user['lastaccess']) ? date('d/m/Y H:i', $user['lastaccess']) : 'Nunca' }}</td>
+                                    <td>{{ (isset($user['lastaccess']) && $user['lastaccess'] !== 0) ? date('d/m/Y H:i', $user['lastaccess']) : 'Nunca' }}</td>
                                     <td>
                                         @if(isset($user['suspended']) && $user['suspended'])
                                             <span class="badge bg-warning">Suspendido</span>
-                                        @elseif(isset($user['deleted']) && $user['deleted'])
-                                            <span class="badge bg-danger">Eliminado</span>
                                         @else
                                             <span class="badge bg-success">Activo</span>
                                         @endif
@@ -109,7 +105,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                         </tbody>
                     </table>
                 </div>
-                
+
                 <!-- Pagination -->
                 <div class="d-flex justify-content-center mt-4">
                     {{ $users->links() }}
@@ -263,7 +259,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                 <div class="col-md-9">
                                     <h4>{{ $user['firstname'] }} {{ $user['lastname'] }}</h4>
                                     <p class="text-muted">{{ $user['email'] }}</p>
-                                    
+
                                     <div class="row mt-3">
                                         <div class="col-md-6">
                                             <p><strong>ID:</strong> {{ $user['id'] }}</p>
@@ -271,7 +267,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                             <p><strong>Idioma:</strong> {{ $user['lang'] ?? 'No especificado' }}</p>
                                         </div>
                                         <div class="col-md-6">
-                                            <p><strong>Estado:</strong> 
+                                            <p><strong>Estado:</strong>
                                                 @if(isset($user['suspended']) && $user['suspended'])
                                                     <span class="badge bg-warning">Suspendido</span>
                                                 @elseif(isset($user['deleted']) && $user['deleted'])
@@ -286,7 +282,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="mt-4">
                                 <h5>Cursos Matriculados</h5>
                                 <div id="enrolledCourses{{ $user['id'] }}">
@@ -345,7 +341,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                     html = '<div class="table-responsive"><table class="table table-striped table-sm">';
                                     html += '<thead><tr><th>ID</th><th>Curso</th><th>Fecha de matriculación</th><th>Progreso</th></tr></thead>';
                                     html += '<tbody>';
-                                    
+
                                     response.courses.forEach(function(course) {
                                         html += '<tr>';
                                         html += '<td>' + course.id + '</td>';
@@ -356,12 +352,12 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                         html += '</div></td>';
                                         html += '</tr>';
                                     });
-                                    
+
                                     html += '</tbody></table></div>';
                                 } else {
                                     html = '<p class="text-muted">El usuario no está matriculado en ningún curso.</p>';
                                 }
-                                
+
                                 $('#enrolledCourses{{ $user['id'] }}').html(html);
                             } else {
                                 $('#enrolledCourses{{ $user['id'] }}').html('<p class="text-danger">Error al cargar los cursos: ' + response.message + '</p>');

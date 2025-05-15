@@ -1,5 +1,6 @@
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendors/choices.js/choices.min.css')}}" />
+
 @endsection
 <div>
     <div class="filtros row mb-4">

@@ -699,7 +699,7 @@
         }
 
         function endLlamada() {
-            fetch('/dashboard/llamadafin', {
+            fetch('/crm/dashboard/llamadafin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -911,7 +911,7 @@
             function markMessagesAsRead(todoId) {
                 if (!todoId) return;  // Asegúrate de que todoId es válido
 
-                fetch(`mark-as-read/${todoId}`, {
+                fetch(`/crm/mark-as-read/${todoId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -967,7 +967,7 @@
                             toast.onmouseleave = Swal.resumeTimer;
                         },
                     });
-            fetch(`/todos/complete/${todoId}`, {
+            fetch(`/crm/todos/complete/${todoId}`, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -1015,7 +1015,7 @@
                             toast.onmouseleave = Swal.resumeTimer;
                         },
                     });
-            fetch(`/todos/finish/${todoId}`, {
+            fetch(`/crm/todos/finish/${todoId}`, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -1043,7 +1043,7 @@
         }
 
         function updateUnreadMessagesCount(todoId) {
-            fetch(`/todos/unread-messages-count/${todoId}`,{
+            fetch(`/crm/todos/unread-messages-count/${todoId}`,{
                 method: 'POST', // Cambiamos a POST
                 headers: {
                     'Content-Type': 'application/json' // Indicamos que enviamos JSON
@@ -1067,7 +1067,7 @@
 
         function loadMessages(todoId) {
             $.ajax({
-                url: `/todos/getMessages/${todoId}`,
+                url: `crm/todos/getMessages/${todoId}`,
                 type: 'POST',
                 success: function(data) {
                     let messagesContainer = $(`#todo-card-${todoId} .chat-container`);

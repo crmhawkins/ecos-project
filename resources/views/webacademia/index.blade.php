@@ -106,7 +106,7 @@
                         <p>Descubre cursos diseñados para llevarte al próximo nivel profesional.</p>
 					</div>
 					<div class="home_btn">
-						<a href="#" class="cta"><span>Nuestros Cursos</span>
+						<a href="/course" class="cta"><span>Nuestros Cursos</span>
 						  <svg width="13px" height="10px" viewBox="0 0 13 10">
 							<path d="M1,5 L11,5"></path>
 							<polyline points="8 1 12 5 8 9"></polyline>
@@ -195,10 +195,7 @@
                 <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
                     <div class="ab_img position-relative">
                         <img src="assets/images/all-img/about1.png" class="img-fluid" alt="Grupo ECOS">
-                        <!-- Puedes agregar un pequeño distintivo si quieres destacar los años de experiencia -->
-                        {{-- <div class="wc_year position-absolute top-0 start-0 bg-primary text-white p-3 rounded">
-                            <h3><span>28+</span><br />Años de experiencia</h3>
-                        </div> --}}
+
                     </div>
                 </div><!--- END COL -->
                 <div class="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">

@@ -517,7 +517,7 @@
     @php
         $usuario = $cliente;
     @endphp
-    @include('partials.modalAvatar')
+    @include('crm.partials.modalAvatar')
 
 @endsection
 

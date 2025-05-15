@@ -32,7 +32,7 @@
         <section class="section mt-4">
             <div class="card">
                 <div class="card-body">
-                    @include('departaments.form', [
+                    @include('crm.departaments.form', [
                         'action' => route('departamento.store'),
                         'buttonText' => 'Guardar Departamento',
                     ])

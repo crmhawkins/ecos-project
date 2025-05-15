@@ -1060,7 +1060,7 @@
         function markMessagesAsRead(todoId) {
             if (!todoId) return;
 
-            fetch(`mark-as-read/${todoId}`, {
+            fetch(`/crm/mark-as-read/${todoId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1115,7 +1115,7 @@
             },
         });
 
-        fetch(`/todos/complete/${todoId}`, {
+        fetch(`/crm/todos/complete/${todoId}`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -1161,7 +1161,7 @@
             },
         });
 
-        fetch(`/todos/finish/${todoId}`, {
+        fetch(`/crm/todos/finish/${todoId}`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -1196,7 +1196,7 @@
     });
 
     function updateUnreadMessagesCount(todoId) {
-        fetch(`/todos/unread-messages-count/${todoId}`,{
+        fetch(`/crm/todos/unread-messages-count/${todoId}`,{
             method: 'POST', // Cambiamos a POST
             headers: {
                 'Content-Type': 'application/json', // Indicamos que enviamos JSON
@@ -1221,7 +1221,7 @@
 
     function loadMessages(todoId) {
         $.ajax({
-            url: `/todos/getMessages/${todoId}`,
+            url: `/crm/todos/getMessages/${todoId}`,
             type: 'POST',
             contentType: 'application/json', // Especifica el tipo de contenido
             headers: {

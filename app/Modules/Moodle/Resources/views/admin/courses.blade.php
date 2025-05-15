@@ -122,7 +122,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                         </tbody>
                     </table>
                 </div>
-                
+
                 <!-- Pagination -->
                 <div class="d-flex justify-content-center mt-4">
                     {{ $courses->links() }}
@@ -191,7 +191,8 @@ namespace App\Modules\Moodle\Resources\views\admin;
                         </div>
                         <div class="mb-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="visible" name="visible" checked>
+                                <input type="hidden" name="visible" value="0">
+                                <input class="form-check-input" type="checkbox" id="visible" name="visible" value="1" {{ old('visible', $item->visible ?? false) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="visible">
                                     Curso visible
                                 </label>
@@ -301,11 +302,11 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                     <p class="text-muted">{{ $course['shortname'] }}</p>
                                 </div>
                             </div>
-                            
+
                             <div class="row mb-4">
                                 <div class="col-md-6">
                                     <p><strong>ID:</strong> {{ $course['id'] }}</p>
-                                    <p><strong>Categoría:</strong> 
+                                    <p><strong>Categoría:</strong>
                                         @if(isset($categories))
                                             @foreach($categories as $category)
                                                 @if($category['id'] == $course['categoryid'])
@@ -319,7 +320,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                     <p><strong>Formato:</strong> {{ ucfirst($course['format'] ?? 'topics') }}</p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong>Visibilidad:</strong> 
+                                    <p><strong>Visibilidad:</strong>
                                         @if(isset($course['visible']) && $course['visible'])
                                             <span class="badge bg-success">Visible</span>
                                         @else
@@ -330,7 +331,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                     <p><strong>Fecha de fin:</strong> {{ isset($course['enddate']) ? date('d/m/Y', $course['enddate']) : 'No especificada' }}</p>
                                 </div>
                             </div>
-                            
+
                             <div class="mb-4">
                                 <h5>Resumen</h5>
                                 <div class="card">
@@ -339,7 +340,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="mb-4">
                                 <h5>Estudiantes Matriculados</h5>
                                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -349,7 +350,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                     </a>
                                 </div>
                             </div>
-                            
+
                             <div>
                                 <h5>Contenido del Curso</h5>
                                 <div id="courseContent{{ $course['id'] }}">
@@ -406,30 +407,31 @@ namespace App\Modules\Moodle\Resources\views\admin;
                         type: 'GET',
                         success: function(response) {
                             if (response.success) {
+                                console.log(response);
                                 let html = '';
                                 if (response.contents && response.contents.length > 0) {
                                     html = '<div class="accordion" id="courseContentAccordion{{ $course['id'] }}">';
-                                    
+
                                     response.contents.forEach(function(section, index) {
                                         html += '<div class="accordion-item">';
                                         html += '<h2 class="accordion-header" id="heading' + index + '">';
                                         html += '<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse' + index + '" aria-expanded="false" aria-controls="collapse' + index + '">';
                                         html += section.name;
                                         html += '</button></h2>';
-                                        
+
                                         html += '<div id="collapse' + index + '" class="accordion-collapse collapse" aria-labelledby="heading' + index + '" data-bs-parent="#courseContentAccordion{{ $course['id'] }}">';
                                         html += '<div class="accordion-body">';
-                                        
+
                                         if (section.summary) {
                                             html += '<div class="mb-3">' + section.summary + '</div>';
                                         }
-                                        
+
                                         if (section.modules && section.modules.length > 0) {
                                             html += '<ul class="list-group">';
                                             section.modules.forEach(function(module) {
                                                 html += '<li class="list-group-item d-flex justify-content-between align-items-center">';
                                                 html += '<div>';
-                                                
+
                                                 // Module icon based on modname
                                                 let icon = 'fa-file';
                                                 if (module.modname === 'forum') icon = 'fa-comments';
@@ -437,33 +439,33 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                                 else if (module.modname === 'assign') icon = 'fa-tasks';
                                                 else if (module.modname === 'resource') icon = 'fa-file-alt';
                                                 else if (module.modname === 'url') icon = 'fa-link';
-                                                
+
                                                 html += '<i class="fas ' + icon + ' me-2"></i> ';
                                                 html += module.name;
                                                 html += '</div>';
-                                                
+
                                                 // Visibility badge
                                                 if (module.visible) {
                                                     html += '<span class="badge bg-success">Visible</span>';
                                                 } else {
                                                     html += '<span class="badge bg-secondary">Oculto</span>';
                                                 }
-                                                
+
                                                 html += '</li>';
                                             });
                                             html += '</ul>';
                                         } else {
                                             html += '<p class="text-muted">No hay contenido en esta sección.</p>';
                                         }
-                                        
+
                                         html += '</div></div></div>';
                                     });
-                                    
+
                                     html += '</div>';
                                 } else {
                                     html = '<p class="text-muted">No hay contenido disponible para este curso.</p>';
                                 }
-                                
+
                                 $('#courseContent{{ $course['id'] }}').html(html);
                             } else {
                                 $('#courseContent{{ $course['id'] }}').html('<p class="text-danger">Error al cargar el contenido: ' + response.message + '</p>');

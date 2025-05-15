@@ -30,7 +30,7 @@
         <section class="section mt-4">
             <div class="card">
                 <div class="card-body">
-                    @include('nominas.form', [
+                    @include('crm.nominas.form', [
                         'action' => route('nominas.update', $nomina->id),
                         'buttonText' => 'Actualizar Nómina',
                         'nomina' => $nomina,

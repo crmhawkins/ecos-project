@@ -163,7 +163,7 @@ class MoodleUserService
             $response = $this->apiService->call('core_user_get_users', [
                 'criteria' => [
                     [
-                        'key' => 'id',
+                        'key' => 'idnumber',
                         'value' => $userId
                     ]
                 ]
@@ -351,14 +351,14 @@ class MoodleUserService
             // Si no se pasan criterios, usamos comodín para obtener todos
             if (empty($criteria)) {
                 $criteria = [
-                    ['key' => 'id', 'value' => '%']
+                    ['key' => 'firstname', 'value' => '%']
                 ];
             }
 
             $response = $this->apiService->call('core_user_get_users', [
                 'criteria' => $criteria
             ]);
-
+            //dd($response);
             return $response['users'] ?? [];
         } catch (Exception $e) {
             Log::error("Moodle Search Users Error: {$e->getMessage()}", [

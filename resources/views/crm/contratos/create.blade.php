@@ -32,7 +32,7 @@
         <section class="section mt-4">
             <div class="card">
                 <div class="card-body">
-                    @include('contratos.form', [
+                    @include('crm.contratos.form', [
                         'action' => route('contratos.store'),
                         'buttonText' => 'Guardar Contrato',
                         'usuarios' => $usuarios,

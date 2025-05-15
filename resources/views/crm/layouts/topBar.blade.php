@@ -397,7 +397,7 @@
                     var status = 2; //Resuelto
                     $.when(updateStatusAlert(id, status)).then(function(data, textStatus, jqXHR) {
                         if (jqXHR.responseText != 503) {
-                        window.open( "/petition/edit/" + alertaSeleccionada['reference_id'] , '_blank');
+                        window.open( "crm/petition/edit/" + alertaSeleccionada['reference_id'] , '_blank');
                         eliminarAlertaDOM(stage_id, index);
                         } else {
                         swal(
@@ -415,7 +415,7 @@
                     var status = 2; //Resuelto
                     $.when(updateStatusAlert(id, status)).then(function(data, textStatus, jqXHR) {
                         if (jqXHR.responseText != 503) {
-                        window.open( "/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
+                        window.open( "crm/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
                         eliminarAlertaDOM(stage_id, index);
                         } else {
                         swal(
@@ -432,7 +432,7 @@
                     var status = 2; //Resuelto
                     $.when(updateStatusAlert(id, status)).then(function(data, textStatus, jqXHR) {
                         if (jqXHR.responseText != 503) {
-                        window.open( "/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
+                        window.open( "crm/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
                         eliminarAlertaDOM(stage_id, index);
                         } else {
                         swal(
@@ -449,7 +449,7 @@
                     var status = 2; //Resuelto
                     $.when(updateStatusAlert(id, status)).then(function(data, textStatus, jqXHR) {
                         if (jqXHR.responseText != 503) {
-                        window.open( "/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
+                        window.open( "crm/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
                         eliminarAlertaDOM(stage_id, index);
                         } else {
                         swal(
@@ -466,7 +466,7 @@
                     var status = 2; //Resuelto
                     $.when(updateStatusAlert(id, status)).then(function(data, textStatus, jqXHR) {
                         if (jqXHR.responseText != 503) {
-                        window.open( "/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
+                        window.open( "crm/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
                         eliminarAlertaDOM(stage_id, index);
                         } else {
                         swal(
@@ -479,12 +479,12 @@
                     break;
 
                 case 6:
-                window.open( "/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
+                window.open( "crm/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
                 var id = alertaSeleccionada['id'];
                     var status = 2; //Resuelto
                     $.when(updateStatusAlert(id, status)).then(function(data, textStatus, jqXHR) {
                         if (jqXHR.responseText != 503) {
-                        window.open( "/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
+                        window.open( "crm/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
                         eliminarAlertaDOM(stage_id, index);
                         } else {
                         swal(
@@ -497,12 +497,12 @@
                     break;
 
                 case 7:
-                window.open( "/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
+                window.open( "crm/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
                 var id = alertaSeleccionada['id'];
                     var status = 2; //Resuelto
                     $.when(updateStatusAlert(id, status)).then(function(data, textStatus, jqXHR) {
                         if (jqXHR.responseText != 503) {
-                        window.open( "/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
+                        window.open( "crm/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
                         eliminarAlertaDOM(stage_id, index);
                         } else {
                         swal(
@@ -520,7 +520,7 @@
                     var status = 2; //Resuelto
                     $.when(updateStatusAlert(id, status)).then(function(data, textStatus, jqXHR) {
                         if (jqXHR.responseText != 503) {
-                        window.open( "/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
+                        window.open( "crm/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
                         eliminarAlertaDOM(stage_id, index);
                         } else {
                         swal(
@@ -538,7 +538,7 @@
                     var status = 2; //Resuelto
                     $.when(updateStatusAlert(id, status)).then(function(data, textStatus, jqXHR) {
                         if (jqXHR.responseText != 503) {
-                        window.open( "/treasury", '_blank');
+                        window.open( "crm/treasury", '_blank');
                         eliminarAlertaDOM(stage_id, index);
                         } else {
                         swal(
@@ -761,7 +761,7 @@
                     var status = 2; //Resuelto
                     $.when(updateStatusAlert(id, status)).then(function(data, textStatus, jqXHR) {
                         if (jqXHR.responseText != 503) {
-                        window.open( "/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
+                        window.open( "crm/budget/edit/" + alertaSeleccionada['reference_id'] , '_blank');
                         eliminarAlertaDOM(stage_id, index);
                         } else {
                         swal(
@@ -915,7 +915,7 @@
                     var status = 2; //Resuelto
                     $.when(updateStatusAlert(id, status)).then(function(data, textStatus, jqXHR) {
                         if (jqXHR.responseText != 503) {
-                        window.open( "/petition/edit/" + alertaSeleccionada['reference_id'] , '_blank');
+                        window.open( "crm/petition/edit/" + alertaSeleccionada['reference_id'] , '_blank');
                         eliminarAlertaDOM(stage_id, index);
                         } else {
                         swal(
@@ -933,7 +933,7 @@
                     var status = 2; //Resuelto
                     $.when(updateStatusAlert(id, status)).then(function(data, textStatus, jqXHR) {
                         if (jqXHR.responseText != 503) {
-                        window.open( "/clients/surveys/" + alertaSeleccionada['reference_id'] + "/get", '_blank');
+                        window.open( "crm/clients/surveys/" + alertaSeleccionada['reference_id'] + "crm/get", '_blank');
                         eliminarAlertaDOM(stage_id, index);
                         } else {
                         swal(
@@ -950,7 +950,7 @@
                     var status = 2; //Resuelto
                     $.when(updateStatusAlert(id, status)).then(function(data, textStatus, jqXHR) {
                         if (jqXHR.responseText != 503) {
-                        window.open( "/crm-activity-meeting-view/" + alertaSeleccionada['reference_id'], '_blank');
+                        window.open( "crm/crm-activity-meeting-view/" + alertaSeleccionada['reference_id'], '_blank');
                         eliminarAlertaDOM(stage_id, index);
                         } else {
                         swal(
@@ -1004,7 +1004,7 @@
                 var status = 2;
                 $.when(updateStatusAlert(id, status)).then(function(data, textStatus, jqXHR) {
                             if (jqXHR.responseText != 503) {
-                            window.open( "/task/edit/"+ alertaSeleccionada['reference_id'], '_blank');
+                            window.open( "crm/task/edit/"+ alertaSeleccionada['reference_id'], '_blank');
                             eliminarAlertaDOM(stage_id, index);
                             } else {
                             swal(
@@ -1022,7 +1022,7 @@
                 var status = 2;
                 $.when(updateStatusAlert(id, status)).then(function(data, textStatus, jqXHR) {
                             if (jqXHR.responseText != 503) {
-                            window.open( "/task/edit/"+ alertaSeleccionada['reference_id'], '_blank');
+                            window.open( "crm/task/edit/"+ alertaSeleccionada['reference_id'], '_blank');
                             eliminarAlertaDOM(stage_id, index);
                             } else {
                             swal(
@@ -1057,7 +1057,7 @@
         function updateStatusAlert(id, status) {
             return $.ajax({
             type: "POST",
-            url: '/alert/update',
+            url: 'crm/alert/update',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
             },
@@ -1073,7 +1073,7 @@
             eliminarAlertaDOM(stage_id, index);
             return $.ajax({
             type: "POST",
-            url: '/alert/postpone',
+            url: 'crm/alert/postpone',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
             },
@@ -1087,7 +1087,7 @@
         function updateStatusAlertAndAcceptHours(id, status) {
             return $.ajax({
                 type: "POST",
-                url: 'dashboard/updateStatusAlertAndAcceptHours',
+                url: 'crm/dashboard/updateStatusAlertAndAcceptHours',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                 },
@@ -1102,7 +1102,7 @@
         function responseAlert(id, text) {
             return $.ajax({
                 type: "POST",
-                url: 'dashboard/responseAlert',
+                url: 'crm/dashboard/responseAlert',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                 },

@@ -82,7 +82,7 @@
                         <tr class="clickable-row" data-href="{{route('contratos.edit', $contrato->id)}}">
                             <td>{{$contrato->usuario ? ($contrato->usuario->name.' '.$contrato->usuario->surname) : 'Usuario no encontrado'}}</td>
                             <td>{{ \Carbon\Carbon::parse($contrato->fecha)->format('d/m/Y') }}</td>
-                            <td class="flex flex-row justify-evenly align-middle" style="min-width: 120px">
+                            <td class="d-flex flex-row justify-evenly align-middle" style="min-width: 120px">
                                 <a class="" href="{{route('contratos.show', $contrato->id)}}"><img src="{{asset('assets/icons/eye.svg')}}" alt="Mostrar contrato"></a>
                                 <a class="" href="{{route('contratos.edit', $contrato->id)}}"><img src="{{asset('assets/icons/edit.svg')}}" alt="Editar contrato"></a>
                                 <a class="delete" data-id="{{$contrato->id}}" href=""><img src="{{asset('assets/icons/trash.svg')}}" alt="Eliminar contrato"></a>

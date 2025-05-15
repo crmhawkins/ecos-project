@@ -35,13 +35,13 @@ class MoodleCourseService
         try {
             // Call Moodle API to get all courses
             $response = $this->apiService->call('core_course_get_courses');
-            
+
             return $response;
         } catch (Exception $e) {
             Log::error("Moodle Get All Courses Error: {$e->getMessage()}", [
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error getting all Moodle courses: {$e->getMessage()}");
         }
     }
@@ -58,25 +58,25 @@ class MoodleCourseService
             if (!$courseId) {
                 throw new Exception("Course ID is required");
             }
-            
+
             // Call Moodle API to get course
             $response = $this->apiService->call('core_course_get_courses', [
                 'options' => [
                     'ids' => [$courseId]
                 ]
             ]);
-            
+
             if (is_array($response) && !empty($response)) {
                 return $response[0];
             }
-            
+
             return null;
         } catch (Exception $e) {
             Log::error("Moodle Get Course Error: {$e->getMessage()}", [
                 'courseId' => $courseId,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error getting Moodle course: {$e->getMessage()}");
         }
     }
@@ -93,19 +93,19 @@ class MoodleCourseService
             if (!$courseId) {
                 throw new Exception("Course ID is required");
             }
-            
+
             // Call Moodle API to get course contents
             $response = $this->apiService->call('core_course_get_contents', [
                 'courseid' => $courseId
             ]);
-            
+
             return $response;
         } catch (Exception $e) {
             Log::error("Moodle Get Course Contents Error: {$e->getMessage()}", [
                 'courseId' => $courseId,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error getting Moodle course contents: {$e->getMessage()}");
         }
     }
@@ -121,13 +121,13 @@ class MoodleCourseService
         try {
             // Required fields for Moodle course creation
             $requiredFields = ['fullname', 'shortname', 'categoryid'];
-            
+
             foreach ($requiredFields as $field) {
                 if (!isset($courseData[$field]) || empty($courseData[$field])) {
                     throw new Exception("Missing required field: {$field}");
                 }
             }
-            
+
             // Prepare course data for Moodle API
             $course = [
                 'fullname' => $courseData['fullname'],
@@ -150,26 +150,27 @@ class MoodleCourseService
                 'defaultgroupingid' => $courseData['defaultgroupingid'] ?? 0,
                 'enablecompletion' => $courseData['enablecompletion'] ?? 1,
                 'completionnotify' => $courseData['completionnotify'] ?? 0,
-                'lang' => $courseData['lang'] ?? '',
+                'lang' => !empty($courseData['lang']) ? $courseData['lang'] : null,
                 'forcetheme' => $courseData['forcetheme'] ?? '',
             ];
-            
+
             // Call Moodle API to create course
             $response = $this->apiService->call('core_course_create_courses', [
                 'courses' => [$course]
             ]);
-            
+
+
             if (is_array($response) && !empty($response)) {
                 return $response[0];
             }
-            
+
             return null;
         } catch (Exception $e) {
             Log::error("Moodle Create Course Error: {$e->getMessage()}", [
                 'courseData' => $courseData,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error creating Moodle course: {$e->getMessage()}");
         }
     }
@@ -187,15 +188,15 @@ class MoodleCourseService
             if (!$courseId) {
                 throw new Exception("Course ID is required");
             }
-            
+
             // Prepare course data for Moodle API
             $course = array_merge(['id' => $courseId], $courseData);
-            
+
             // Call Moodle API to update course
             $this->apiService->call('core_course_update_courses', [
                 'courses' => [$course]
             ]);
-            
+
             return true;
         } catch (Exception $e) {
             Log::error("Moodle Update Course Error: {$e->getMessage()}", [
@@ -203,7 +204,7 @@ class MoodleCourseService
                 'courseData' => $courseData,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error updating Moodle course: {$e->getMessage()}");
         }
     }
@@ -220,19 +221,19 @@ class MoodleCourseService
             if (!$courseId) {
                 throw new Exception("Course ID is required");
             }
-            
+
             // Call Moodle API to delete course
             $this->apiService->call('core_course_delete_courses', [
                 'courseids' => [$courseId]
             ]);
-            
+
             return true;
         } catch (Exception $e) {
             Log::error("Moodle Delete Course Error: {$e->getMessage()}", [
                 'courseId' => $courseId,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error deleting Moodle course: {$e->getMessage()}");
         }
     }
@@ -247,13 +248,13 @@ class MoodleCourseService
         try {
             // Call Moodle API to get categories
             $response = $this->apiService->call('core_course_get_categories');
-            
+
             return $response;
         } catch (Exception $e) {
             Log::error("Moodle Get Categories Error: {$e->getMessage()}", [
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error getting Moodle categories: {$e->getMessage()}");
         }
     }
@@ -269,13 +270,13 @@ class MoodleCourseService
         try {
             // Required fields for Moodle category creation
             $requiredFields = ['name'];
-            
+
             foreach ($requiredFields as $field) {
                 if (!isset($categoryData[$field]) || empty($categoryData[$field])) {
                     throw new Exception("Missing required field: {$field}");
                 }
             }
-            
+
             // Prepare category data for Moodle API
             $category = [
                 'name' => $categoryData['name'],
@@ -285,23 +286,23 @@ class MoodleCourseService
                 'descriptionformat' => $categoryData['descriptionformat'] ?? 1,
                 'visible' => $categoryData['visible'] ?? 1,
             ];
-            
+
             // Call Moodle API to create category
             $response = $this->apiService->call('core_course_create_categories', [
                 'categories' => [$category]
             ]);
-            
+
             if (is_array($response) && !empty($response)) {
                 return $response[0];
             }
-            
+
             return null;
         } catch (Exception $e) {
             Log::error("Moodle Create Category Error: {$e->getMessage()}", [
                 'categoryData' => $categoryData,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error creating Moodle category: {$e->getMessage()}");
         }
     }
@@ -319,17 +320,17 @@ class MoodleCourseService
             if (!$courseId) {
                 throw new Exception("Course ID is required");
             }
-            
+
             if (!$userId) {
                 throw new Exception("User ID is required");
             }
-            
+
             // Call Moodle API to get course completion status
             $response = $this->apiService->call('core_completion_get_course_completion_status', [
                 'courseid' => $courseId,
                 'userid' => $userId
             ]);
-            
+
             return $response;
         } catch (Exception $e) {
             Log::error("Moodle Get Course Completion Status Error: {$e->getMessage()}", [
@@ -337,7 +338,7 @@ class MoodleCourseService
                 'userId' => $userId,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error getting Moodle course completion status: {$e->getMessage()}");
         }
     }
@@ -355,17 +356,17 @@ class MoodleCourseService
             if (!$courseId) {
                 throw new Exception("Course ID is required");
             }
-            
+
             if (!$userId) {
                 throw new Exception("User ID is required");
             }
-            
+
             // Call Moodle API to get user grades
             $response = $this->apiService->call('gradereport_user_get_grade_items', [
                 'courseid' => $courseId,
                 'userid' => $userId
             ]);
-            
+
             return $response;
         } catch (Exception $e) {
             Log::error("Moodle Get User Grades Error: {$e->getMessage()}", [
@@ -373,7 +374,7 @@ class MoodleCourseService
                 'userId' => $userId,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error getting Moodle user grades: {$e->getMessage()}");
         }
     }

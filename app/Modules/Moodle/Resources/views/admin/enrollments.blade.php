@@ -60,7 +60,6 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                     <th>Nombre</th>
                                     <th>Email</th>
                                     <th>Rol</th>
-                                    <th>Fecha de Matriculación</th>
                                     <th>Progreso</th>
                                     <th>Acciones</th>
                                 </tr>
@@ -80,7 +79,6 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                                 <span class="badge bg-secondary">Sin rol</span>
                                             @endif
                                         </td>
-                                        <td>{{ isset($user['enrollmentdate']) ? date('d/m/Y', $user['enrollmentdate']) : 'No disponible' }}</td>
                                         <td>
                                             @php
                                                 // Simulate progress calculation - in real implementation this would come from Moodle
@@ -134,7 +132,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                             <div class="mb-3">
                                 <label for="user_search" class="form-label">Buscar Usuario</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="user_search" placeholder="Nombre, email o username">
+                                    <input type="text" class="form-control" id="user_search" placeholder="Nombre">
                                     <button class="btn btn-outline-secondary" type="button" id="searchUserBtn">
                                         <i class="fas fa-search"></i>
                                     </button>

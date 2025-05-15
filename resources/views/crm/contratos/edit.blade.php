@@ -30,7 +30,7 @@
         <section class="section mt-4">
             <div class="card">
                 <div class="card-body">
-                    @include('contratos.form', [
+                    @include('crm.contratos.form', [
                         'action' => route('contratos.update', $contrato->id),
                         'buttonText' => 'Actualizar Contrato',
                         'contrato' => $contrato,

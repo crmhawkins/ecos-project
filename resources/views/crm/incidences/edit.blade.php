@@ -29,7 +29,7 @@
         <section class="section mt-4">
             <div class="card">
                 <div class="card-body">
-                    @include('incidences.form', [
+                    @include('crm.incidences.form', [
                         'action' => route('incidencias.update', $incidencia->id),
                         'buttonText' => 'Actualizar Incidencia',
                         'incidencia' => $incidencia,

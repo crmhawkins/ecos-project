@@ -22,7 +22,7 @@ Route::prefix('moodle/admin')->name('moodle.admin.')->middleware(['web', 'auth']
 
     // Users
     Route::get('/users', [AdminController::class, 'users'])->name('users');
-    Route::get('/users/search', [AdminController::class, 'searchUsers'])->name('users.search');
+    Route::get('/users/search', [AdminController::class, 'searchUsersAjax'])->name('users.search');
     Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
     Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('users.update');
     Route::delete('/users/{id}', [AdminController::class, 'destroyUser'])->name('users.destroy');

@@ -52,70 +52,6 @@
                     $comercial = (Auth::user()->access_level_id == 6);
                     @endphp
                 <li class="sidebar-title">Academia</li>
-                {{-- <li class="sidebar-item has-sub {{ $clientesActive ? 'active' : '' }}">
-                    <a href="#" class='sidebar-link'>
-                        <i class="fa-solid fa-people-group fs-5"></i>
-                        <span>Alumnos</span>
-                    </a>
-                    <ul class="submenu" style="{{ $clientesActive ? 'display:block;' : 'display:none' }}">
-                        <li class="submenu-item {{ request()->routeIs('clientes.index') ? 'active' : '' }} ">
-                            <a href="{{route('clientes.index')}}">
-                                <i class="fa-solid fa-list"></i>
-                                <span>
-                                    Ver todos
-                                </span>
-                            </a>
-                        </li>
-                        <li class="submenu-item {{ request()->routeIs('clientes.create') ? 'active' : '' }} {{ request()->routeIs('cliente.createFromBudget') ? 'active' : ''}}">
-                            <a href="{{route('clientes.create')}}">
-                                <i class="fa-solid fa-plus"></i>
-                                <span>
-                                    Crear Alunmo
-                                </span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="sidebar-item has-sub {{ $servicesActive ? 'active' : '' }}">
-                    <a href="#" class='sidebar-link'>
-                        <i class="fa-solid fa-book"></i>
-                        <span>Cursos</span>
-                    </a>
-                    <ul class="submenu" style="{{ $servicesActive ? 'display:block;' : 'display:none;' }}">
-                        <li class="submenu-item {{ request()->routeIs('cursos.index') ? 'active' : '' }}">
-                            <a href="{{route('cursos.index')}}">
-                                <i class="fa-solid fa-list"></i>
-                                <span>
-                                    Ver todos
-                                </span>
-                            </a>
-                        </li>
-                        <li class="submenu-item {{ request()->routeIs('servicios.create') ? 'active' : '' }}">
-                            <a href="{{route('cursos.create')}}">
-                                <i class="fa-solid fa-plus"></i>
-                                <span>
-                                    Crear Cursos
-                                </span>
-                            </a>
-                        </li>
-                        <li class="submenu-item {{ request()->routeIs('cursosCategoria.index') ? 'active' : '' }}">
-                            <a href="{{route('cursosCategoria.index')}}">
-                                <i class="fa-solid fa-list"></i>
-                                <span>
-                                    Ver Categorias
-                                </span>
-                            </a>
-                        </li>
-                        <li class="submenu-item {{ request()->routeIs('cursosCategoria.create') ? 'active' : '' }}">
-                            <a href="{{route('cursosCategoria.create')}}">
-                                <i class="fa-solid fa-plus"></i>
-                                <span>
-                                    Crear categoria de cursos
-                                </span>
-                            </a>
-                        </li>
-                    </ul>
-                </li> --}}
                 <li class="sidebar-item {{ request()->routeIs('moodle.admin.dashboard') ? 'active' : '' }}">
                     <a href="{{route('moodle.admin.dashboard')}}" class='sidebar-link'>
                         <i class="fa-solid fa-school-flag fs-5"></i>
@@ -432,14 +368,6 @@
                                     <i class="fa-solid fa-plus"></i>
                                     <span>
                                         Añadir Gasto Asociado
-                                    </span>
-                                </a>
-                            </li>
-                            <li class="submenu-item {{ request()->routeIs('gasto-sin-clasificar.index') ? 'active' : '' }}">
-                                <a href="{{route('gasto-sin-clasificar.index')}}">
-                                    <i class="fa-solid fa-list"></i>
-                                    <span>
-                                        Ver Gastos Sin Clasificar
                                     </span>
                                 </a>
                             </li>

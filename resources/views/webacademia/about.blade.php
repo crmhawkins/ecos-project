@@ -10,7 +10,7 @@
     align-items: stretch;
 }
 
-.col-lg-3 {
+.col-lg-3-p {
     flex: 1 1 25%; /* Asegura que cada caja toma exactamente el 25% del espacio y se ajusta según la pantalla */
     display: flex;
     padding: 0;
@@ -70,7 +70,7 @@
 	<section class="tp_feature">
 	   <div class="container-fluid">
 			<div class="row">
-				<div class="col-lg-3 col-sm-3 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
+				<div class="col-lg-3-p col-sm-3 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
 					<div class="single_tp">
 						<h3>Excelencia </h3>
 						<p>Desde Grupo ECOS, apostamos por la excelencia de una formación para que se puedan recoger los frutos de un buen trabajo aportado por la simbiosis entre el profesor y sus alumnos.</p>
@@ -82,7 +82,7 @@
 						</a> --}}
 					</div>
 				</div><!-- END COL -->
-				<div class="col-lg-3 col-sm-3 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+				<div class="col-lg-3-p col-sm-3 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
 					<div class="single_tp">
 						<h3>Compromiso</h3>
 						<p>Nos comprometemos a maximizar la satisfacción y el entusiasmo de nuestros alumnos durante su formación, asegurando también que nuestros profesores se mantengan altamente motivados para ofrecer la mejor enseñanza posible.</p>
@@ -94,7 +94,7 @@
 						</a> --}}
 					</div>
 				</div><!-- END COL -->
-				<div class="col-lg-3 col-sm-3 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+				<div class="col-lg-3-p col-sm-3 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
 					<div class="single_tp">
 						<h3>Organización</h3>
 						<p>La buena organización de la entidad, con la correcta atribución de responsabilidades a cada uno de sus profesionales, nos permite ofrecer una mayor calidad de los servicios formativos, así como mayor rendimiento y satisfacción de nuestros alumnos.</p>
@@ -106,7 +106,7 @@
 						</a> --}}
 					</div>
 				</div><!-- END COL -->
-				<div class="col-lg-3 col-sm-3 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
+				<div class="col-lg-3-p col-sm-3 col-xs-12 no-padding wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
 					<div class="single_tp">
 						<h3>Superación</h3>
 						<p>En Grupo ECOS, contamos con profesionales con alto afán de superación, con el objetivo de aportar lo mejor de sí mismos a todo el alumnado que confíe en nuestros servicios.</p>

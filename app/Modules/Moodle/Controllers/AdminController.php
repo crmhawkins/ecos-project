@@ -67,28 +67,23 @@ class AdminController extends Controller
     {
         try {
             $search = $request->input("search");
-            $role = $request->input("role"); // Moodle role shortname
+            $searchType = $request->input("searchType");
             $status = $request->input("status"); // active, suspended
             $page = $request->input("page", 1);
             $perPage = 15;
 
             $criteria = [];
-            if ($search) {
-                $criteria[] = ["key" => "fullname", "value" => "%" . $search . "%"];
+            if ($search && $searchType) {
+                $criteria[] = ["key" => $searchType , "value" => "%" . $search . "%"];
             }
-
             $moodleUsers = $this->userService->searchUsers($criteria);
-
+            //dd($moodleUsers);
             // --- Local Filtering ---
             if ($status === "suspended") {
-                $moodleUsers = array_filter($moodleUsers, fn($user) => isset($user["suspended"]) && $user["suspended"]);
+                $moodleUsers = array_filter($moodleUsers, fn($user) => $user["suspended"] === true);
             } elseif ($status === "active") {
-                $moodleUsers = array_filter($moodleUsers, fn($user) => !isset($user["suspended"]) || !$user["suspended"]);
+                $moodleUsers = array_filter($moodleUsers, fn($user) => $user["suspended"] === false);
             }
-            if ($role) {
-                Log::warning("Role filtering in AdminController::users is not fully implemented due to API limitations/complexity.");
-            }
-            // --- End Local Filtering ---
 
             $usersCollection = new Collection(array_values($moodleUsers));
             $paginatedUsers = new LengthAwarePaginator(
@@ -99,23 +94,11 @@ class AdminController extends Controller
                 ["path" => $request->url(), "query" => $request->query()]
             );
 
-            // Fetch Moodle roles for filter dropdown
-            $moodleRoles = [];
-            try {
-                $rolesData = $this->apiService->call("core_role_get_roles");
-                if (is_array($rolesData)) {
-                    $moodleRoles = $rolesData;
-                }
-            } catch (Exception $roleEx) {
-                Log::error("Failed to fetch Moodle roles: {" . $roleEx->getMessage() . "}");
-            }
-
             return view("moodle::admin.users", [
                 "users" => $paginatedUsers,
                 "search" => $search,
-                "selectedRole" => $role,
+                "searchType" => $searchType,
                 "selectedStatus" => $status,
-                "roles" => $moodleRoles
             ]);
         } catch (Exception $e) {
             Log::error("Admin Users Error: {" . $e->getMessage() . "}");
@@ -138,16 +121,16 @@ class AdminController extends Controller
             }
 
             $criteria = [
-                ["key" => "fullname", "value" => "%" . $search . "%"]
+                ["key" => "firstname", "value" => "%" . $search . "%"]
             ];
 
             $users = $this->userService->searchUsers($criteria);
 
             $formattedUsers = array_map(function($user) {
-                return ["id" => $user["id"], "text" => $user["fullname"] . " (" . $user["email"] . ")"];
+                return ["id" => $user["id"], "firstname" => $user["firstname"], "lastname" => $user["lastname"], "email" => $user["email"], "username" => $user["username"]];
             }, array_slice($users, 0, 20));
 
-            return response()->json(["success" => true, "results" => $formattedUsers]);
+            return response()->json(["success" => true, "users" => $formattedUsers]);
         } catch (Exception $e) {
             Log::error("AJAX User Search Error: {" . $e->getMessage() . "}", ["search" => $request->input("search")]);
             return response()->json(["success" => false, "message" => "Error buscando usuarios: " . $e->getMessage()], 500);
@@ -177,7 +160,7 @@ class AdminController extends Controller
 
             $newUserResponse = $this->userService->createUser($userData);
 
-            if (!$newUserResponse || !isset($newUserResponse[0]["id"])) {
+            if (!$newUserResponse || !isset($newUserResponse["id"])) {
                 throw new Exception("La API de Moodle no devolvió un ID de usuario válido.");
             }
 
@@ -289,7 +272,7 @@ class AdminController extends Controller
                 "categories" => $categories,
                 "search" => $search,
                 "selectedCategory" => $categoryId,
-                "selectedVisibility" => $visibility
+                "visibility" => $visibility
             ]);
         } catch (Exception $e) {
             Log::error("Admin Courses Error: {" . $e->getMessage() . "}");
@@ -324,12 +307,11 @@ class AdminController extends Controller
             if (!empty($validated["enddate"])) {
                 $courseData["enddate"] = strtotime($validated["enddate"]);
             }
-            $courseData["visible"] = $request->has("visible") ? 1 : 0;
             $courseData["format"] = $validated["format"] ?? "topics";
 
             $newCourseResponse = $this->courseService->createCourse($courseData);
 
-            if (!$newCourseResponse || !isset($newCourseResponse[0]["id"])) {
+            if (!$newCourseResponse || !isset($newCourseResponse["id"])) {
                 throw new Exception("La API de Moodle no devolvió un ID de curso válido.");
             }
 
@@ -707,7 +689,6 @@ class AdminController extends Controller
         }
     }
 
-
     public function testConnection()
     {
         try {
@@ -725,5 +706,61 @@ class AdminController extends Controller
             return view("moodle::admin.dashboard", ["connectionStatus" => false, "error" => "Error al conectar con Moodle: " . $e->getMessage()]);
         }
     }
-}
 
+    public function getUserCourses($id)
+    {
+        try {
+            $enrolledCourses = $this->enrollmentService->getUserEnrollments($id);
+
+            return response()->json([
+                'success' => true,
+                'courses' => $enrolledCourses
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Admin User Courses Error: {" . $e->getMessage() . "}");
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener cursos: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getCourseContent($id)
+    {
+        try {
+            $courseId = $id;
+            $courses = $this->courseService->getCourseContents($courseId);
+
+            return response()->json([
+                'success' => true,
+                'contents' => $courses
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Admin User Courses Error: {" . $e->getMessage() . "}");
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener cursos: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getCompletedCourses(Request $request){
+        $userId = $request->input('user_id');
+        try {
+            $courses = $this->enrollmentService->getUserEnrollments($userId);
+            return response()->json([
+                'success' => true,
+                'courses' => $courses
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Admin User Courses Error: {" . $e->getMessage() . "}");
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener cursos: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+}
