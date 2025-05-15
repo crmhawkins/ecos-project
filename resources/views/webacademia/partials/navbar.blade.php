@@ -74,8 +74,8 @@
 					   </a>
 					</div>
 					<div class="call_to_action">
-						<a class="btn_one" href="login">Iniciar Sesión</a>
-						<a class="btn_two" href="register">Registro</a>
+						<a class="btn_one" href="weblogin">Iniciar Sesión</a>
+						<a class="btn_two" href="webregister">Registro</a>
 					</div><!--- END SOCIAL PROFILE -->
 				</div><!--- END Col -->
 			</div><!--- END ROW -->
