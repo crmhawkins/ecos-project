@@ -41,7 +41,7 @@
 						<div class="form-group col-lg-12">
 							<button class="btn_one" type="submit" name="submit">Iniciar Sesión</button>
 						</div>
-						<p>No tienes cuenta? <a href="register">Registrate</a></p>
+						<p>No tienes cuenta? <a href="webregister">Registrate</a></p>
 					</div>
 				</div><!--- END COL -->
 			</div><!--- END ROW -->

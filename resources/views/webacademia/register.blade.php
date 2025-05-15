@@ -50,7 +50,7 @@
 						<div class="form-group col-lg-12">
 							<button class="btn_one" type="submit" name="submit">Registrar</button>
 						</div>
-						<p>Ya tienes cuenta? <a href="login">Iniciar Sesión</a></p>
+						<p>Ya tienes cuenta? <a href="weblogin">Iniciar Sesión</a></p>
 					</div>
 				</div><!--- END COL -->
 			</div><!--- END ROW -->
