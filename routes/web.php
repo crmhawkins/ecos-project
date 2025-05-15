@@ -130,11 +130,11 @@ Route::get('index', function () {
     return view('webacademia.index');
 });
 
-Route::get('/login', function () {
+Route::get('/weblogin', function () {
     return view('webacademia.login');
 });
 
-Route::get('/register', function () {
+Route::get('/webregister', function () {
     return view('webacademia.register');
 });
 
