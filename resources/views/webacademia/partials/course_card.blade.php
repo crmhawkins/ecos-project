@@ -23,15 +23,19 @@
             <div class="course-content p-3" style="flex-grow: 1;">
                 <span class="c_btn d-inline-block mb-2" style="color: white;">{{ $curso->category->name ?? 'Sin categoría' }}</span>
                 <h3 class="mt-2">{{ $curso->name }}</h3>
-                @if (isset($curso->inicio))
-                <span><i class="fa fa-calendar"></i> {{ optional($curso->inicio)->format('d M Y') }} </span>
-                @endif
-                @if (isset($curso->duracion))
-                <span><i class="fa fa-clock-o"></i> {{$curso->duracion}} Horas </span>
-                @endif
-                @if (isset($curso->plazas))
-                <span><i class="fa fa-table"></i><strong> {{$curso->plazas}} Plazas</strong></span>
-                @endif
+                <div class="d-flex align-items-center gap-3 flex-wrap mt-2">
+                    @if (isset($curso->inicio))
+                        <span><i class="fa fa-calendar"></i> {{ \Carbon\Carbon::parse($curso->inicio)->format('d/m/Y') }}</span>
+                    @endif
+
+                    @if (isset($curso->duracion))
+                        <span><i class="fa fa-clock-o"></i> {{ $curso->duracion }}</span>
+                    @endif
+
+                    @if (isset($curso->plazas))
+                        <span><i class="fa fa-table"></i> <strong>{{ $curso->plazas }}</strong></span>
+                    @endif
+                </div>
             </div>
         </div>
     </a>

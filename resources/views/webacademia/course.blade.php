@@ -40,7 +40,7 @@
         <div class="row">
             <div class="col-lg-9">
                 <div class="row" id="course-container">
-                    @include('webacademia.partial.course_card', ['cursos' => $initialCursos])
+                    @include('webacademia.partials.course_card', ['cursos' => $initialCursos])
                 </div>
                 <div id="loading" class="loading" style="display: none;">
                     <p>Cargando más cursos...</p>

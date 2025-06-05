@@ -28,7 +28,7 @@ class WebController extends Controller
             $cursos = $query->skip($offset)->take(3)->get();
 
             return response()->json([
-                'html' => view('webacademia.partial.course_card', compact('cursos'))->render(),
+                'html' => view('webacademia.partials.course_card', compact('cursos'))->render(),
                 'count' => $cursos->count(),
             ]);
         }

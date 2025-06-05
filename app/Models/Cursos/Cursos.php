@@ -25,7 +25,7 @@ class Cursos extends Model
         'duracion',
         'plazas',
         'lecciones',
-        'certificacion',
+        'certificado',
 
     ];
 

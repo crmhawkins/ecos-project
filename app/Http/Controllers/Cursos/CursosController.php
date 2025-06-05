@@ -29,6 +29,13 @@ class CursosController extends Controller
             'price' => 'required',
             'category_id' => 'required',
             'inactive' => 'nullable',
+            'description' => 'nullable',
+            'inicio' => 'nullable',
+            'duracion' => 'nullable',
+            'plazas' => 'nullable',
+            'lecciones' => 'nullable',
+            'certificado' => 'nullable',
+
         ], [
             'name.required' => 'El nombre es requerido para continuar',
             'name.max' => 'El nombre no pueder tener mas de 255 caracteres',
@@ -70,6 +77,12 @@ class CursosController extends Controller
             'price' => 'required',
             'category_id' => 'required',
             'inactive' => 'nullable',
+            'description' => 'nullable',
+            'inicio' => 'nullable',
+            'duracion' => 'nullable',
+            'plazas' => 'nullable',
+            'lecciones' => 'nullable',
+            'certificado' => 'nullable',
         ], [
             'name.required' => 'El nombre es requerido para continuar',
             'name.max' => 'El nombre no pueder tener mas de 255 caracteres',

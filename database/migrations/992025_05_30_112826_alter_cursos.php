@@ -14,6 +14,11 @@ return new class extends Migration
         Schema::table('cursos', function (Blueprint $table) {
             $table->string('description')->nullable();
             $table->string('moodle_id')->nullable();
+            $table->date('inicio')->nullable();
+            $table->integer('duracion')->nullable();
+            $table->integer('plazas')->nullable();
+            $table->integer('lecciones')->nullable();
+            $table->boolean('certificado')->default(0);
         });
     }
     /**
@@ -24,6 +29,11 @@ return new class extends Migration
         Schema::table('cursos', function (Blueprint $table) {
             $table->dropColumn('description');
             $table->dropColumn('moodle_id');
+            $table->dropColumn('inicio');
+            $table->dropColumn('duracion');
+            $table->dropColumn('plazas');
+            $table->dropColumn('lecciones');
+            $table->dropColumn('certificado');
         });
     }
 };

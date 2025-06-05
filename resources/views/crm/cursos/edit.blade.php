@@ -75,6 +75,7 @@
                                     @enderror
                                 </div>
                             </div>
+
                             <div class="col-sm-12 col-md-12">
                                 <div class="form-group mb-3">
                                     <label for="concept">Imagen:</label>
@@ -82,6 +83,69 @@
                                 </div>
                             </div>
                             <div class="col-sm-12 col-md-12">
+                                <div class="form-group mb-3">
+                                    <label for="description">Descripción:</label>
+                                    <textarea class="form-control @error('description') is-invalid @enderror" name="description" id="description" rows="4">{{ old('description', $servicio->description) }}</textarea>
+                                    @error('description')
+                                    <span class="invalid-feedback d-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="inicio">Fecha de Inicio:</label>
+                                    <input type="date" class="form-control @error('inicio') is-invalid @enderror" name="inicio" id="inicio" value="{{ old('inicio', \Carbon\Carbon::parse($servicio->inicio)->format('Y-m-d')) }}">
+                                    @error('inicio')
+                                    <span class="invalid-feedback d-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="duracion">Duración (horas):</label>
+                                    <input type="text" class="form-control @error('duracion') is-invalid @enderror" name="duracion" id="duracion" value="{{ old('duracion', $servicio->duracion) }}">
+                                    @error('duracion')
+                                    <span class="invalid-feedback d-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="plazas">Plazas:</label>
+                                    <input type="number" class="form-control @error('plazas') is-invalid @enderror" name="plazas" id="plazas" value="{{ old('plazas', $servicio->plazas) }}">
+                                    @error('plazas')
+                                    <span class="invalid-feedback d-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="lecciones">Lecciones:</label>
+                                    <input type="number" class="form-control @error('lecciones') is-invalid @enderror" name="lecciones" id="lecciones" value="{{ old('lecciones', $servicio->lecciones) }}">
+                                    @error('lecciones')
+                                    <span class="invalid-feedback d-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="certificado">¿Incluye Certificación?</label>
+                                    <select name="certificado" id="certificado" class="form-select @error('certificado') is-invalid @enderror">
+                                        <option value="">Seleccione...</option>
+                                        <option value="1" {{ old('certificado', $servicio->certificado) == '1' ? 'selected' : '' }}>Sí</option>
+                                        <option value="0" {{ old('certificado', $servicio->certificado) == '0' ? 'selected' : '' }}>No</option>
+                                    </select>
+                                    @error('certificado')
+                                    <span class="invalid-feedback d-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-center">
                                 <div class="form-group mb-3">
                                     <label class="text-left" for="inactive">Ocultar:</label>
                                     <input type="checkbox" id="inactive" name="inactive" value="1" {{ old('inactive', $servicio->inactive) ? 'checked' : '' }}>

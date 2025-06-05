@@ -45,12 +45,11 @@
 
                         <div class="col-md-6 mb-3">
                             <label for="contacto_profesor">Contacto</label>
-                            <input type="text" name="contacto_profesor" value="{{ old('contacto_profesor') }}" class="form-control">
+                            <input type="text" name="contacto_profesor" value="{{ old('contacto_profesor') }}" class="form-control" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="alumnos">Nº de Alumnos</label>
-                            <input type="number" name="alumnos" value="{{ old('alumnos') }}" class="form-control">
-                        </div>
+                            <input type="number" name="alumnos" value="{{ old('alumnos') }}" class="form-control" required>
 
                         <div class="col-md-6 mb-3">
                             <label for="fecha_inicio">Fecha de Inicio</label>
