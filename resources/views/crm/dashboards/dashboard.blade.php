@@ -9,7 +9,7 @@
 @endsection
 
 @section('content')
-<div class="page-heading card" style="box-shadow: none !important" >
+<div class="page-heading card" style="box-shadow: none !important; border:none !important;" >
     <div class="page-title card-body">
         <div class="row">
             <div class="col-12 col-md-4 order-md-1 order-last">

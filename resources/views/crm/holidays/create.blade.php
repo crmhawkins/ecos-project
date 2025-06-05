@@ -3,7 +3,7 @@
 @section('title', 'Mis Vacaciones')
 
 @section('css')
-<link rel="stylesheet" href="{{ asset('assets/vendors/simple-datatables/style.css') }}">
+<link rel="stylesheet" href="{{ asset('{{asset('assets/vendors/simple-datatables/style.css')}}') }}">
 @endsection
 
 @section('content')

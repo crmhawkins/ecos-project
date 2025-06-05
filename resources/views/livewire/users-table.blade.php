@@ -4,7 +4,7 @@
             <div class="flex flex-row justify-start">
                 <div class="mr-3">
                     <label for="">Nº</label>
-                    <select wire:model="perPage" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="perPage" class="form-select">
                         <option value="10">10 por página</option>
                         <option value="25">25 por página</option>
                         <option value="15">50 por página</option>
@@ -13,7 +13,22 @@
                 </div>
                 <div class="w-75">
                     <label for="">Buscar</label>
-                    <input wire:model.debounce.300ms="buscar" type="text" class="form-control w-100" placeholder="Escriba la palabra a buscar...">
+                    <input
+                        wire:model="buscar"
+                        x-data="{ enterPresionado: false }"
+                        @keydown.enter="
+                            enterPresionado = true;
+                            $wire.aplicarFiltro();
+                        "
+                        @blur="
+                            if (!enterPresionado) $wire.aplicarFiltro();
+                            enterPresionado = false;
+                        "
+                        type="text"
+                        id="inputBuscar"
+                        class="form-control w-100"
+                        placeholder="Escriba la palabra a buscar..."
+                    >
                 </div>
             </div>
         </div>
@@ -21,7 +36,7 @@
             <div class="flex flex-row justify-end">
                 <div class="mr-3">
                     <label for="">Departamentos</label>
-                    <select wire:model="selectedDepartamento" name="" id="" class="form-select ">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedDepartamento" name="" id="" class="form-select ">
                         <option value="">-- Seleccione un Gestor --</option>
                         @foreach ($departamentos as $departamento)
                             <option value="{{$departamento->id}}">{{$departamento->name}}</option>
@@ -30,7 +45,7 @@
                 </div>
                 <div>
                     <label for="">Nivel de Accesos</label>
-                    <select wire:model="selectedNivel" name="" id="" class="form-select ">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedNivel" name="" id="" class="form-select ">
                         <option value="">-- Seleccione un Nivel --</option>
                         @foreach ($niveles as $nivele)
                             <option value="{{$nivele->id}}">{{$nivele->name}}</option>

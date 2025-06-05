@@ -229,5 +229,10 @@ class TasksTable extends Component
         return $fechasEstimadas;
     }
 
+    public function aplicarFiltro()
+    {
+        $this->actualizartareas(); // Ahora se llama directamente en render para refrescar los clientes.
+    }
+
 
 }

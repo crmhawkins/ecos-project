@@ -33,13 +33,14 @@ class CursosTable extends Component
 
     protected function actualizarServicios()
     {
-        $query = Cursos::where('cursos.inactive',0)->when($this->buscar, function ($query) {
-                    $query->where('name', 'like', '%' . $this->buscar . '%')
+        $query = Cursos::when($this->buscar, function ($query) {
+                    $query->where('cursos.name', 'like', '%' . $this->buscar . '%')
                           ->orWhere('price', 'like', '%' . $this->buscar . '%');
                 })
                 ->when($this->selectedCategoria, function ($query) {
                     $query->where('category_id', $this->selectedCategoria);
-                }) ->join('cursos_category', 'cursos.category_id', '=', 'cursos_category.id')
+                })
+                ->leftjoin('cursos_category', 'cursos.category_id', '=', 'cursos_category.id')
                 ->select('cursos.*', 'cursos_category.name as categoria_nombre');
 
         $query->orderBy($this->sortColumn, $this->sortDirection);

@@ -3,7 +3,7 @@
 @section('titulo', 'Plan General Contable')
 
 @section('css')
-<link rel="stylesheet" href="assets/vendors/simple-datatables/style.css">
+<link rel="stylesheet" href="{{asset('assets/vendors/simple-datatables/style.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendors/choices.js/choices.min.css')}}" />
 
 @endsection
@@ -48,7 +48,7 @@
                             <tbody>
                                 @foreach ($grupos as $grupo)
                                     <tr>
-              
+
                                         <td><strong>{{ $grupo->numero }}</strong></td>
                                         <td><strong>{{ $grupo->nombre }}</strong></td>
                                         {{-- <td>{{ $grupo->descripcion }}</td> --}}

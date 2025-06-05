@@ -3,7 +3,7 @@
 @section('titulo', 'Categoria de Servicios')
 
 @section('css')
-<link rel="stylesheet" href="assets/vendors/simple-datatables/style.css">
+<link rel="stylesheet" href="{{asset('assets/vendors/simple-datatables/style.css')}}">
 
 @endsection
 
@@ -15,15 +15,15 @@
         <div class="page-title card-body">
             <div class="row justify-content-between">
                 <div class="col-12 col-md-4 order-md-1 order-last">
-                    <h3><i class="bi bi-bookmark-check"></i> Categoria de Productos</h3>
-                    <p class="text-subtitle text-muted">Listado de categoria de productos</p>
+                    <h3><i class="bi bi-bookmark-check"></i> Categoria de Cursos</h3>
+                    <p class="text-subtitle text-muted">Listado de categoria de cursos</p>
                     {{-- {{$servicios->count()}} --}}
                 </div>
                 <div class="col-12 col-md-4 order-md-2 order-first">
                     <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{route('dashboard')}}">Dashboard</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Categoria de Productos</li>
+                            <li class="breadcrumb-item active" aria-current="page">Categoria de cursos</li>
                         </ol>
                     </nav>
                 </div>

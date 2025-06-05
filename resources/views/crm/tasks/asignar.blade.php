@@ -3,7 +3,7 @@
 @section('titulo', 'Tareas por asignar')
 
 @section('css')
-<link rel="stylesheet" href="assets/vendors/simple-datatables/style.css">
+<link rel="stylesheet" href="{{asset('assets/vendors/simple-datatables/style.css')}}">
 
 @endsection
 @section('content')
@@ -31,7 +31,7 @@
             <div class="card">
 
                 <div class="card-body">
-                   
+
                         @livewire('tasks-asignar-table')
                 </div>
             </div>

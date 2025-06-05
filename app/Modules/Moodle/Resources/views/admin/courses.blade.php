@@ -109,6 +109,9 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                             <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewCourseModal{{ $course['id'] }}">
                                                 <i class="fas fa-eye"></i>
                                             </button>
+                                            <a href="{{ route('moodle.admin.courses.clone',$course['id']) }}" class="btn btn-secondary btn-sm">
+                                                <i class="fa-solid fa-clone"></i>
+                                            </a>
                                             <a href="{{ route('moodle.admin.enrollments') }}?course_id={{ $course['id'] }}" class="btn btn-warning btn-sm">
                                                 <i class="fas fa-user-graduate"></i>
                                             </a>

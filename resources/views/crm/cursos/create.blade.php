@@ -30,14 +30,14 @@
     <section class="section mt-4">
         <div class="card">
             <div class="card-body">
-                <form action="{{route('productos.store')}}" method="POST" enctype="multipart/form-data">
+                <form action="{{route('cursos.store')}}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="bloque-formulario">
                         <div class="row">
                             <div class="col-sm-12 col-md-12">
                                 <div class="form-group mb-3">
                                     <label for="name">Nombre:</label>
-                                    <input placeholder="Titulo del servicio" type="text" class="form-control @error('name') is-invalid @enderror" id="name" value="{{ old('name') }}" name="name">
+                                    <input placeholder="Titulo del curso" type="text" class="form-control @error('name') is-invalid @enderror" id="name" value="{{ old('name') }}" name="name">
                                     @error('name')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>

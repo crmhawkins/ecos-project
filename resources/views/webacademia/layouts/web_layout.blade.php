@@ -34,7 +34,7 @@
         <div class="loader-section section-right"></div>
     </div>
 	<!-- END PRELOADER -->
-<main>
+<main style="margin-top: 90px;">
     @yield('content')
 </main>
 

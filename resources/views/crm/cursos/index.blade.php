@@ -1,9 +1,9 @@
 @extends('crm.layouts.app')
 
-@section('titulo', 'Productos')
+@section('titulo', 'Cursos')
 
 @section('css')
-<link rel="stylesheet" href="assets/vendors/simple-datatables/style.css">
+<link rel="stylesheet" href="{{asset('assets/vendors/simple-datatables/style.css')}}">
 
 @endsection
 
@@ -15,8 +15,8 @@
         <div class="page-title card-body">
             <div class="row justify-content-between">
                 <div class="col-12 col-md-4 order-md-1 order-last">
-                    <h3><i class="bi bi-sliders"></i> Productos</h3>
-                    <p class="text-subtitle text-muted">Listado de Productos</p>
+                    <h3><i class="bi bi-sliders"></i> Cursos</h3>
+                    <p class="text-subtitle text-muted">Listado de cursos</p>
                     {{-- {{$servicios->count()}} --}}
                 </div>
 
@@ -24,7 +24,7 @@
                     <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{route('dashboard')}}">Dashboard</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Productos</li>
+                            <li class="breadcrumb-item active" aria-current="page">Cursos</li>
                         </ol>
                     </nav>
 

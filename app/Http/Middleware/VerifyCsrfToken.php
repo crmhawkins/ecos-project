@@ -21,5 +21,6 @@ class VerifyCsrfToken extends Middleware
         '/api/Facturas',
         '/api/Proyectos',
         '/api/Servicios',
+        '/builder/save',
     ];
 }

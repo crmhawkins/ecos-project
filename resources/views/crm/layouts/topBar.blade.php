@@ -1129,7 +1129,7 @@
 
             // Llamada inicial para cargar alertas
             obtenerAlertas();
-            obtenerCorreos();
+           // obtenerCorreos();
         });
     </script>
     <style>

@@ -91,5 +91,9 @@ class LogsTable extends Component
             $this->resetPage(); // Resetear la paginación solo cuando estos filtros cambien.
         }
     }
+    public function aplicarFiltro()
+    {
+        $this->actualizarLogs(); // Resetear la paginación solo cuando estos filtros cambien.
+    }
 
 }

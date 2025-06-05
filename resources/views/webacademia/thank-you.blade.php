@@ -25,22 +25,22 @@
 		text-transform: capitalize;
 		}
 		.hero-text h3 {
-	margin-bottom: 60px;
-	font-weight: 600;
-	color:#232434;
-}
+			margin-bottom: 60px;
+			font-weight: 600;
+			color:#232434;
+		}
 		.back-home{
-		background:none;
-		border: 2px solid #D93690 ;
-		border-radius: 500px;
-		color: #D93690;
-		font-weight: 600;
-		position: relative;
-		margin: 15px 15px 0;
-		padding: 12px 36px;
-		text-transform: uppercase;
-		text-decoration: none;
-		transition: all 0.2s ease 0s;
+			background:none;
+			border: 2px solid #D93690 ;
+			border-radius: 500px;
+			color: #D93690;
+			font-weight: 600;
+			position: relative;
+			margin: 15px 15px 0;
+			padding: 12px 36px;
+			text-transform: uppercase;
+			text-decoration: none;
+			transition: all 0.2s ease 0s;
 		}
 		.back-home:hover,
 		.back-home:focus {

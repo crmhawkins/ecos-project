@@ -3,7 +3,7 @@
 @section('titulo', 'Tareas')
 
 @section('css')
-<link rel="stylesheet" href="assets/vendors/simple-datatables/style.css">
+<link rel="stylesheet" href="{{asset('assets/vendors/simple-datatables/style.css')}}">
 
 @endsection
 @section('content')
@@ -30,7 +30,7 @@
             <div class="card">
 
                 <div class="card-body">
-                  
+
                         @livewire('tasks-table')
                 </div>
             </div>

@@ -78,9 +78,9 @@
                                             <a class="list-group-item list-group-item-action"
                                                 id="list-presupuestos-list" data-bs-toggle="list"
                                                 href="#list-facturas" role="tab">Facturas</a>
-                                            <a class="list-group-item list-group-item-action"
+                                            {{-- <a class="list-group-item list-group-item-action"
                                                 id="list-dominios-list" data-bs-toggle="list"
-                                                href="#list-dominios" role="tab">Dominios</a>
+                                                href="#list-dominios" role="tab">Dominios</a> --}}
                                             <a class="list-group-item list-group-item-action"
                                                 id="list-contactos-list" data-bs-toggle="list"
                                                 href="#list-contactos" role="tab">Contactos</a>
@@ -412,7 +412,7 @@
                                                 </div>
                                                 @endif
                                             </div>
-                                            <div class="tab-pane" id="list-dominios" role="tabpanel"
+                                            {{-- <div class="tab-pane" id="list-dominios" role="tabpanel"
                                                 aria-labelledby="list-dominios-list">
                                                 <h3 class="mb-2 fs-4 text-uppercase">Dominios del Cliente</h3>
                                                 <hr class="border mb-4" >
@@ -446,7 +446,7 @@
                                                     <h3 class="text-center fs-4">No se encontraron registros de <strong>Facturas</strong></h3>
                                                 </div>
                                                 @endif
-                                            </div>
+                                            </div> --}}
                                             <div class="tab-pane" id="list-contactos" role="tabpanel"
                                                 aria-labelledby="list-contactos-list">
                                                 <h3 class="fs-5">Contactos Asociados</h3>

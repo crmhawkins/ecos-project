@@ -72,4 +72,9 @@ class NominasTable extends Component
         }
     }
 
+    public function aplicarFiltro()
+    {
+        $this->actualizarNominas(); // Resetear la paginación solo cuando estos filtros cambien.
+    }
+
 }

@@ -37,6 +37,7 @@ Route::prefix('moodle/admin')->name('moodle.admin.')->middleware(['web', 'auth']
     Route::get('/courses/{id}/content', [AdminController::class, 'courseContent'])->name('courses.content');
     Route::get('/courses/{id}/content/get', [AdminController::class, 'getCourseContent'])->name('courses.content.get');
     Route::post('/courses/{id}/content', [AdminController::class, 'updateCourseContent'])->name('courses.content.update');
+    Route::get('/courses/{courseId}/clone', [AdminController::class, 'clonarCourse'])->name('courses.clone');
 
     // Enrollments
     Route::get('/enrollments', [AdminController::class, 'enrollments'])->name('enrollments');

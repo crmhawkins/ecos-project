@@ -1,6 +1,6 @@
 @extends('crm.layouts.app')
 
-@section('titulo', 'Crear Cliente')
+@section('titulo', 'Editar categoria de cursos')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendors/choices.js/choices.min.css')}}" />
@@ -11,16 +11,16 @@
     <div class="page-title card-body">
         <div class="row">
             <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Editar categoria de servicio</h3>
-                <p class="text-subtitle text-muted">Formulario para editar una categoria de servicio</p>
+                <h3>Editar categoria de cursos</h3>
+                <p class="text-subtitle text-muted">Formulario para editar una categoria de cursos</p>
             </div>
 
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{route('dashboard')}}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{route('productosCategoria.index')}}">Categorias de Servicios</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Editar servicio</li>
+                        <li class="breadcrumb-item"><a href="{{route('cursosCategoria.index')}}">Categorias de cursos</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Editar Categoria</li>
                     </ol>
                 </nav>
             </div>
@@ -30,7 +30,7 @@
     <section class="section mt-4">
         <div class="card">
             <div class="card-body">
-                <form action="{{route('productosCategoria.update', $categoria->id)}}" method="POST" enctype="multipart/form-data">
+                <form action="{{route('cursosCategoria.update', $categoria->id)}}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="bloque-formulario">
                         <div class="row">

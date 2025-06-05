@@ -43,6 +43,10 @@
                     $EmailConfig = request()->routeIs('admin.categoriaEmail.*') || request()->routeIs('admin.statusMail.*');
                     $BajaActive = request()->routeIs('bajas.*');
                     $StadisticsActive = request()->routeIs('estadistica.*');
+                    $CursosActive = request()->routeIs('cursos.*');
+                    $CategoriasCursosActive = request()->routeIs('cursosCategoria.*');
+                    $reservasActive = request()->routeIs('reservas.*');
+                    $aulasActive = request()->routeIs('aulas.*');
                     $ContabilidadActive = request()->routeIs('cuentasContables.*') || request()->routeIs('subCuentasContables.*') || request()->routeIs('subCuentasHijaContables.*') || request()->routeIs('grupoContabilidad.*') || request()->routeIs('subGrupoContabilidad.*') || request()->routeIs('admin.planContable.index');
                     $admin = (Auth::user()->access_level_id == 1);
                     $gerente = (Auth::user()->access_level_id == 2);
@@ -52,11 +56,110 @@
                     $comercial = (Auth::user()->access_level_id == 6);
                     @endphp
                 <li class="sidebar-title">Academia</li>
+
                 <li class="sidebar-item {{ request()->routeIs('moodle.admin.dashboard') ? 'active' : '' }}">
                     <a href="{{route('moodle.admin.dashboard')}}" class='sidebar-link'>
-                        <i class="fa-solid fa-school-flag fs-5"></i>
-                        <span>Academia</span>
+                        <img src="{{asset('assets/icons/Moodle.svg')}}" style="max-height: 20px;" alt="Moodle">
+                        <span>Moodle</span>
                     </a>
+                </li>
+                <li class="sidebar-item has-sub {{ $CursosActive ? 'active' : '' }}">
+                    <a href="#" class='sidebar-link'>
+                        <i class="fa-solid fa-school-flag fs-5"></i>
+                        <span>Cursos</span>
+                    </a>
+                    <ul class="submenu" style="{{ $CursosActive ? 'display:block;' : 'display:none' }}">
+                        <li class="submenu-item {{ request()->routeIs('cursos.index') ? 'active' : '' }} ">
+                            <a href="{{route('cursos.index')}}">
+                                <i class="fa-solid fa-list"></i>
+                                <span>
+                                    Cursos
+                                </span>
+                            </a>
+                        </li>
+                        <li class="submenu-item {{ request()->routeIs('cursos.create') ? 'active' : '' }}">
+                            <a href="{{route('cursos.create')}}">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>
+                                    Añadir Cursos
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sidebar-item has-sub {{ $CategoriasCursosActive ? 'active' : '' }}">
+                    <a href="#" class='sidebar-link'>
+                        <i class="fa-solid fa-school-flag fs-5"></i>
+                        <span>Categorias de Cursos</span>
+                    </a>
+                    <ul class="submenu" style="{{ $CategoriasCursosActive ? 'display:block;' : 'display:none' }}">
+                        <li class="submenu-item {{ request()->routeIs('cursosCategoria.index') ? 'active' : '' }} ">
+                            <a href="{{route('cursosCategoria.index')}}">
+                                <i class="fa-solid fa-list"></i>
+                                <span>
+                                    Categorias de Cursos
+                                </span>
+                            </a>
+                        </li>
+                        <li class="submenu-item {{ request()->routeIs('cursosCategoria.create') ? 'active' : '' }}">
+                            <a href="{{route('cursosCategoria.create')}}">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>
+                                    Añadir Cursos
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="sidebar-item has-sub {{ $aulasActive ? 'active' : '' }}">
+                    <a href="#" class='sidebar-link'>
+                        <i class="fa-solid fa-school-flag fs-5"></i>
+                        <span>Aula</span>
+                    </a>
+                    <ul class="submenu" style="{{ $aulasActive ? 'display:block;' : 'display:none' }}">
+                        <li class="submenu-item {{ request()->routeIs('aulas.index') ? 'active' : '' }} ">
+                            <a href="{{route('aulas.index')}}">
+                                <i class="fa-solid fa-list"></i>
+                                <span>
+                                    Aulas
+                                </span>
+                            </a>
+                        </li>
+                        <li class="submenu-item {{ request()->routeIs('aulas.create') ? 'active' : '' }}">
+                            <a href="{{route('aulas.create')}}">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>
+                                    Crear Aula
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="sidebar-item has-sub {{ $reservasActive ? 'active' : '' }}">
+                    <a href="#" class='sidebar-link'>
+                        <i class="fa-solid fa-school-flag fs-5"></i>
+                        <span>Reservas de aula</span>
+                    </a>
+                    <ul class="submenu" style="{{ $reservasActive ? 'display:block;' : 'display:none' }}">
+                        <li class="submenu-item {{ request()->routeIs('reservas.index') ? 'active' : '' }} ">
+                            <a href="{{route('reservas.index')}}">
+                                <i class="fa-solid fa-list"></i>
+                                <span>
+                                    Reservas
+                                </span>
+                            </a>
+                        </li>
+                        <li class="submenu-item {{ request()->routeIs('reservas.create') ? 'active' : '' }}">
+                            <a href="{{route('reservas.create')}}">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>
+                                    Crear Reserva
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 <li class="sidebar-title">Empresa</li>
@@ -521,29 +624,12 @@
                             <span>Jornadas</span>
                         </a>
                     </li>
-                    <li class="sidebar-item has-sub {{ request()->routeIs('logs.*') ? 'active' : '' }}">
-                        <a href="#" class='sidebar-link'>
+
+                    <li class="sidebar-item {{ request()->routeIs('logs.index') ? 'active' : '' }}">
+                        <a href="{{route('logs.index')}}" class='sidebar-link'>
                             <i class="fa-solid fa-list"></i>
                             <span>Logs</span>
                         </a>
-                        <ul class="submenu" style="{{ request()->routeIs('logs.*') ? 'display:block;' : 'display:none;' }}">
-                            <li class="submenu-item {{ request()->routeIs('logs.index') ? 'active' : '' }}">
-                                <a href="{{route('logs.index')}}">
-                                    <i class="fa-solid fa-list"></i>
-                                    <span>
-                                        Ver Logs
-                                    </span>
-                                </a>
-                            </li>
-                            <li class="submenu-item {{ request()->routeIs('logs.clasificado') ? 'active' : '' }}">
-                                <a href="{{route('logs.clasificado')}}">
-                                    <i class="fa-solid fa-eye"></i>
-                                    <span>
-                                        Ver Logs por usuario
-                                    </span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                     <li class="sidebar-item {{ request()->routeIs('estadistica.index') ? 'active' : '' }}">
                         <a href="{{route('estadistica.index')}}" class='sidebar-link'>

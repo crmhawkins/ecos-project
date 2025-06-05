@@ -5,7 +5,7 @@
             <div class="flex flex-row justify-start">
                 <div class="mr-3">
                     <label for="">Nº</label>
-                    <select wire:model="perPage" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="perPage" class="form-select">
                         <option value="10">10 por página</option>
                         <option value="25">25 por página</option>
                         <option value="15">50 por página</option>
@@ -14,8 +14,22 @@
                 </div>
                 <div class="w-75">
                     <label for="">Buscar</label>
-                    <input wire:model.debounce.300ms="buscar" type="text" class="form-control w-100" placeholder="Escriba la palabra a buscar...">
-                </div>
+                    <input
+                        wire:model="buscar"
+                        x-data="{ enterPresionado: false }"
+                        @keydown.enter="
+                            enterPresionado = true;
+                            $wire.aplicarFiltro();
+                        "
+                        @blur="
+                            if (!enterPresionado) $wire.aplicarFiltro();
+                            enterPresionado = false;
+                        "
+                        type="text"
+                        id="inputBuscar"
+                        class="form-control w-100"
+                        placeholder="Escriba la palabra a buscar..."
+                    >                 </div>
             </div>
         </div>
 
@@ -49,8 +63,11 @@
                     @foreach ( $categorias as $categoria )
                         <tr class="clickable-row" data-href="{{route('productosCategoria.edit', $categoria->id)}}">
                             <td class="px-3" >{{$categoria->name}}</td>
-                            <td class="px-3"><img class="img-fluid" src="{{url($categoria->image)}}" alt="Categoria de producto" style="width: 40px; height: 40px; border-radius:40%;"></td>
-
+                            <td >
+                                @if ($categoria->image)
+                                    <img class="img-fluid" src="{{url($categoria->image)}}" alt="cursos" style="width: 40px; height: 40px; border-radius:40%;">
+                                @endif
+                            </td>
                             <td class="flex flex-row justify-evenly align-middle" style="min-width: 120px">
                                 <a class="" href="{{route('productosCategoria.edit', $categoria->id)}}"><img src="{{asset('assets/icons/edit.svg')}}" alt="Editar servicio"></a>
                                 <a class="delete" data-id="{{$categoria->id}}" href=""><img src="{{asset('assets/icons/trash.svg')}}" alt="Eliminar servicio"></a>

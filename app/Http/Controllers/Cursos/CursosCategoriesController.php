@@ -11,8 +11,7 @@ class CursosCategoriesController extends Controller
 {
     public function index()
     {
-        $servicios = Category::paginate(2);
-        return view('crm.cursos-categories.index', compact('servicios'));
+        return view('crm.cursos-categories.index');
     }
 
     public function create() {

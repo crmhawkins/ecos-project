@@ -76,4 +76,7 @@ class ClientsTable extends Component
     {
         $this->resetPage();
     }
+    public function aplicarFiltro(){
+        $this->actualizarClientes(); // Luego actualizas la lista de usuarios basada en los filtros
+    }
 }

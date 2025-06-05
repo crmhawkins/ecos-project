@@ -4,7 +4,7 @@
             <div class="flex flex-row justify-start">
                 <div class="mr-3">
                     <label for="">Nº</label>
-                    <select wire:model="perPage" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="perPage" class="form-select">
                         <option value="10">10 por página</option>
                         <option value="25">25 por página</option>
                         <option value="15">50 por página</option>
@@ -13,15 +13,29 @@
                 </div>
                 <div class="w-75">
                     <label for="">Buscar</label>
-                    <input wire:model.debounce.300ms="buscar" type="text" class="form-control w-100" placeholder="Escriba la palabra a buscar...">
-                </div>
+                    <input
+                        wire:model="buscar"
+                        x-data="{ enterPresionado: false }"
+                        @keydown.enter="
+                            enterPresionado = true;
+                            $wire.aplicarFiltro();
+                        "
+                        @blur="
+                            if (!enterPresionado) $wire.aplicarFiltro();
+                            enterPresionado = false;
+                        "
+                        type="text"
+                        id="inputBuscar"
+                        class="form-control w-100"
+                        placeholder="Escriba la palabra a buscar..."
+                    >                 </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="flex flex-row justify-end">
                 <div class="mr-3">
                     <label for="">Gestores-</label>
-                    <select wire:model="selectedGestor" name="" id="" class="form-select ">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedGestor" name="" id="" class="form-select ">
                         <option value="">-- Seleccione un Gestor --</option>
                         @foreach ($gestores as $gestor)
                             <option value="{{$gestor->id}}">{{$gestor->name}}</option>

@@ -8,7 +8,7 @@
             <div class="flex flex-row justify-center">
                 <div class="mb-3 px-2" style="width: 85px">
                     <label class="titulo_filtros" for="" >Nª</label>
-                    <select wire:model="perPage" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="perPage" class="form-select">
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
@@ -17,8 +17,22 @@
                 </div>
                 <div class="w-20 mb-3 px-2 flex-fill" style="width: 140px">
                     <label class="titulo_filtros" for="">Buscar</label>
-                    <input wire:model.debounce.300ms="buscar" type="text" class="form-control w-100" placeholder="Escriba la palabra a buscar...">
-                </div>
+                    <input
+                        wire:model="buscar"
+                        x-data="{ enterPresionado: false }"
+                        @keydown.enter="
+                            enterPresionado = true;
+                            $wire.aplicarFiltro();
+                        "
+                        @blur="
+                            if (!enterPresionado) $wire.aplicarFiltro();
+                            enterPresionado = false;
+                        "
+                        type="text"
+                        id="inputBuscar"
+                        class="form-control w-100"
+                        placeholder="Escriba la palabra a buscar..."
+                    >                 </div>
                 <div wire:ignore  class="mb-3 px-2 flex-fill" style="width: 200px">
                     <label class="titulo_filtros" for="">Clientes</label>
                     <select wire:key="{{rand()}}" wire:model="selectedCliente" name="selectedCliente" id="selectedCliente" class="form-select choices">
@@ -30,7 +44,7 @@
                 </div>
                 <div class="mb-3 px-2 flex-fill" style="width: 140px">
                     <label class="titulo_filtros" for="">Gestor</label>
-                    <select wire:model="selectedGestor" name="selectedGestor" id="selectedGestor" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedGestor" name="selectedGestor" id="selectedGestor" class="form-select">
                         <option value=""> Gestor </option>
                         @foreach ($gestores as $gestor)
                             <option value="{{$gestor->id}}">{{$gestor->name}}</option>
@@ -39,7 +53,7 @@
                 </div>
                 <div class="mb-3 px-2 flex-fill" style="width: 140px">
                     <label class="titulo_filtros"for="">Comercial</label>
-                    <select wire:model="selectedComerciales" name="selectedComerciales" id="selectedComerciales" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedComerciales" name="selectedComerciales" id="selectedComerciales" class="form-select">
                         <option value=""> Comercial </option>
                         @foreach ($comerciales as $comercial)
                             <option value="{{$comercial->id}}">{{$comercial->name}}</option>
@@ -49,7 +63,7 @@
 
                 <div class="mb-3 px-2 flex-fill" style="width: 140px">
                     <label class="titulo_filtros" for="">Estados</label>
-                    <select wire:model="selectedEstado" name="selectedEstado" id="selectedEstado" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedEstado" name="selectedEstado" id="selectedEstado" class="form-select">
                         <option value=""> Estado </option>
                         @foreach ($estados as $estado)
                             <option value="{{$estado->id}}">{{$estado->nombre}}</option>
@@ -58,7 +72,7 @@
                 </div>
                 <div class="mb-3 px-2 flex-fill" style="width: 140px">
                     <label class="titulo_filtros" for="">Servicios</label>
-                    <select wire:model="selectedServicio" name="selectedServicio" id="selectedServicio" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedServicio" name="selectedServicio" id="selectedServicio" class="form-select">
                         <option value=""> Servicio </option>
                         @foreach ($servicios as $servicio)
                             <option value="{{$servicio->id}}">{{$servicio->name}}</option>
@@ -67,7 +81,7 @@
                 </div>
                 <div class="mb-3 px-2 flex-fill" style="width: 140px">
                     <label class="titulo_filtros" for="">Estado de la Factura</label>
-                    <select wire:model="selectedEstadoFactura" name="selectedEstadoFactura" id="selectedEstadoFactura" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedEstadoFactura" name="selectedEstadoFactura" id="selectedEstadoFactura" class="form-select">
                         <option value=""> Estado </option>
                         @foreach ($estados_facturas as $estadofactura)
                             <option value="{{$estadofactura['id']}}">{{$estadofactura['nombre']}}</option>
@@ -76,7 +90,7 @@
                 </div>
                 <div class="mb-3 px-2 flex-fill" style="width: 140px">
                     <label class="titulo_filtros" for="">Segmento</label>
-                    <select wire:model="selectedSegmento" name="selectedSegmento" id="selectedSegmento" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedSegmento" name="selectedSegmento" id="selectedSegmento" class="form-select">
                         <option value=""> Segmento </option>
                         @foreach ($segmentos as $segmento)
                             <option value="{{$segmento['id']}}">{{$segmento['nombre']}}</option>
@@ -85,7 +99,7 @@
                 </div>
                 <div class="mb-3 px-2 flex-fill" style="width: 140px">
                     <label class="titulo_filtros" for="filterByDate">Filtrar por Fecha</label>
-                    <select wire:model="selectedDateField" name="selectedDateField" id="selectedDateField" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedDateField" name="selectedDateField" id="selectedDateField" class="form-select">
                         <option value="">Seleccione campo de fecha</option>
                         <option value="created_at">Fecha de Creación</option>
                         <option value="fecha_actualizacion">Fecha de Actualización</option>

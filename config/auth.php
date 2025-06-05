@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Alumnos\Alumno;
 use App\Models\Users\User;
 
 return [
@@ -42,6 +43,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'alumno' => [
+            'driver' => 'session',
+            'provider' => 'alumnos',
+        ],
     ],
 
     /*
@@ -66,11 +71,10 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'alumnos' => [
+            'driver' => 'eloquent',
+            'model' => Alumno::class,
+        ],
     ],
 
     /*

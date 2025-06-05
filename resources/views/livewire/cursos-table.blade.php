@@ -5,7 +5,7 @@
             <div class="flex flex-row justify-start">
                 <div class="mr-3">
                     <label for="">Nº</label>
-                    <select wire:model="perPage" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="perPage" class="form-select">
                         <option value="10">10 por página</option>
                         <option value="25">25 por página</option>
                         <option value="15">50 por página</option>
@@ -14,15 +14,29 @@
                 </div>
                 <div class="w-75">
                     <label for="">Buscar</label>
-                    <input wire:model.debounce.300ms="buscar" type="text" class="form-control w-100" placeholder="Escriba la palabra a buscar...">
-                </div>
+                    <input
+                        wire:model="buscar"
+                        x-data="{ enterPresionado: false }"
+                        @keydown.enter="
+                            enterPresionado = true;
+                            $wire.aplicarFiltro();
+                        "
+                        @blur="
+                            if (!enterPresionado) $wire.aplicarFiltro();
+                            enterPresionado = false;
+                        "
+                        type="text"
+                        id="inputBuscar"
+                        class="form-control w-100"
+                        placeholder="Escriba la palabra a buscar..."
+                    >                 </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="flex flex-row justify-end">
                 <div class="mr-3">
                     <label for="">Categorias-</label>
-                    <select wire:model="selectedCategoria" name="" id="" class="form-select ">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedCategoria" name="" id="" class="form-select ">
                         <option value="">-- Seleccione una categoria --</option>
                         @foreach ($categorias as $categoria)
                             <option value="{{$categoria->id}}">{{$categoria->name}}</option>
@@ -44,6 +58,7 @@
                             'name' => 'NOMBRE',
                             'categoria_nombre' => 'CATEGORIA',
                             'price' => 'PRECIO',
+                            'inactive' => 'VISIBLE',
                         ] as $field => $label)
                             <th class="px-3" style="font-size:0.75rem">
                                 <a href="#" wire:click.prevent="sortBy('{{ $field }}')">
@@ -60,14 +75,19 @@
                 <tbody>
                     {{-- Recorremos los servicios --}}
                     @foreach ( $servicios as $servicio )
-                        <tr class="clickable-row" data-href="{{route('productos.edit', $servicio->id)}}">
+                        <tr class="clickable-row" data-href="{{route('cursos.edit', $servicio->id)}}">
                             <td class="px-3">{{$servicio->name}}</td>
-                            <td >{{$servicio->category->name}}</td>
-                            <td style="; text-align: right; padding-right: 2rem"><strong>{{ number_format($servicio->price, 2, ',', '') }} €</strong></td>
-                            <td class="px-3"><img class="img-fluid" src="{{url($servicio->image)}}" alt="producto" style="width: 40px; height: 40px; border-radius:40%;"></td>
+                            <td >{{optional($servicio->category)->name}}</td>
+                            <td><strong>{{ number_format($servicio->price, 2, ',', '') }} €</strong></td>
+                            <td>{{$servicio->inactive ? 'No' : 'Si'}}</td>
+                            <td >
+                                @if ($servicio->image)
+                                    <img class="img-fluid" src="{{url($servicio->image)}}" alt="cursos" style="width: 40px; height: 40px; border-radius:40%;">
+                                @endif
+                            </td>
                             <td class="flex flex-row justify-evenly align-middle" style="min-width: 120px">
-                                <a class="" href="{{route('productos.edit', $servicio->id)}}"><img src="{{asset('assets/icons/edit.svg')}}" alt="Editar servicio"></a>
-                                <a class="delete" data-id="{{$servicio->id}}" href=""><img src="{{asset('assets/icons/trash.svg')}}" alt="Eliminar servicio"></a>
+                                <a class="" href="{{route('cursos.edit', $servicio->id)}}"><img src="{{asset('assets/icons/edit.svg')}}" alt="Editar curso"></a>
+                                <a class="delete" data-id="{{$servicio->id}}" href=""><img src="{{asset('assets/icons/trash.svg')}}" alt="Eliminar curso"></a>
                             </td>
                         </tr>
                     @endforeach
@@ -76,8 +96,7 @@
             {{-- Si los servicios vienen vacio --}}
             @if( count($servicios) == 0 )
                 <div class="text-center py-4">
-                    <h3 class="text-center fs-3">No se encontraron registros de <strong>SERVICIOS</strong></h3>
-                    <p class="mt-2">Pulse el boton superior para crear algun servicio.</p>
+                    <h3 class="text-center fs-3">No se encontraron registros de <strong>Cursos</strong></h3>
                 </div>
             @endif
 
@@ -88,8 +107,7 @@
         </div>
     @else
         <div class="text-center py-4">
-            <h3 class="text-center fs-3">No se encontraron registros de <strong>SERVICIOS</strong></h3>
-            <p class="mt-2">Pulse el boton superior para crear algun servicio.</p>
+            <h3 class="text-center fs-3">No se encontraron registros de <strong>Cursos</strong></h3>
         </div>
     @endif
     {{-- {{$users}} --}}
@@ -111,7 +129,7 @@
         function botonAceptar(id){
             // Salta la alerta para confirmar la eliminacion
             Swal.fire({
-                title: "¿Estas seguro que quieres eliminar este servicio?",
+                title: "¿Estas seguro que quieres eliminar este curso?",
                 html: "<p>Esta acción es irreversible.</p>", // Corrige aquí
                 showDenyButton: false,
                 showCancelButton: true,
@@ -145,7 +163,7 @@
         }
         function getDelete(id) {
             // Ruta de la peticion
-            const url = '{{route("productos.delete")}}'
+            const url = '{{route("cursos.delete")}}'
             // Peticion
             return $.ajax({
                 type: "POST",

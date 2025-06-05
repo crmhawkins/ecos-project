@@ -61,4 +61,9 @@ class MyholidaysTable extends Component
     {
         $this->resetPage();
     }
+
+    public function aplicarFiltro()
+    {
+        $this->actualizargastos(); // Resetear la paginación solo cuando estos filtros cambien.
+    }
 }

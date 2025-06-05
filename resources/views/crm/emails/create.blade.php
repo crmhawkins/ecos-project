@@ -3,7 +3,7 @@
 @section('titulo', 'Enviar Nuevo Correo')
 
 @section('css')
-<link rel="stylesheet" href="assets/vendors/simple-datatables/style.css">
+<link rel="stylesheet" href="{{asset('assets/vendors/simple-datatables/style.css')}}">
 <link rel="stylesheet" href="{{ asset('assets/vendors/choices.js/choices.min.css') }}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote/dist/summernote-bs4.min.css">
 @endsection

@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Alert\AlertController;
 use App\Http\Controllers\Archivos\FileController;
+use App\Http\Controllers\Aulas\AulasController;
+use App\Http\Controllers\Aulas\ReservasController;
 use App\Http\Controllers\Bajas\BajaController;
 use App\Http\Controllers\CrmActivities\CrmActivityMeetingController;
 use App\Http\Controllers\Suppliers\SuppliersController;
@@ -56,15 +58,31 @@ use App\Http\Controllers\Tesoreria\CategoriaGastosController;
 use App\Http\Controllers\Tesoreria\IvaController;
 use App\Http\Controllers\Users\DepartamentController;
 use App\Http\Controllers\Users\PositionController;
-use App\Http\Controllers\Whatsapp\WhatsappController;
+use App\Http\Controllers\Web\WebController;
+use App\Http\Controllers\Builder\BuilderController;
+
+Route::get('/builder',[BuilderController::class, 'index'])->name('builder');
+
+Route::get('/builder/load', [BuilderController::class, 'load'])->name('builder.load');
+
+Route::post('/builder/save',[BuilderController::class, 'save'])->name('builder.save');
+
+Route::post('/builder/upload',[BuilderController::class, 'upload']);
+
+Route::post('/builder/create', [BuilderController::class, 'create'])->name('builder.create');
+
+Route::get('/builder/seo/{view}', [BuilderController::class, 'seo'])->name('builder.seo');
+
+Route::post('/builder/seo/save', [BuilderController::class, 'saveSeo'])->name('builder.seo.save');
+
+
+
+Route::get('/web/{slug}',[WebController::class, 'showSlug'])->name('webacademia.slug');
 
 Route::get('/', function () {
     return view('webacademia.index');
 });
 
-Route::get('/about', function () {
-    return view('webacademia.about');
-});
 
 Route::get('/blog_single', function () {
     return view('webacademia.blog_single');
@@ -90,17 +108,10 @@ Route::get('/course_sidebar', function () {
     return view('webacademia.course-sidebar');
 });
 
-Route::get('/course', function () {
-    return view('webacademia.course');
-});
+Route::get('/course', [WebController::class, 'courses'])->name('webacademia.courses');
+Route::get('/single_course/{id}', [WebController::class, 'singleCourse'])->name('webacademia.single_course');
 
-Route::get('/course2', function () {
-    return view('webacademia.course2');
-});
 
-Route::get('/course3', function () {
-    return view('webacademia.course3');
-});
 
 Route::get('/error', function () {
     return view('webacademia.error');
@@ -126,21 +137,15 @@ Route::get('/index_3', function () {
     return view('webacademia.index_3');
 });
 
-Route::get('index', function () {
-    return view('webacademia.index');
-});
 
-Route::get('/weblogin', function () {
-    return view('webacademia.login');
-});
+Route::get('/weblogin', function () { return view('webacademia.login');});
+Route::post('/weblogin', [WebController::class, 'login'])->name('webacademia.login');
 
-Route::get('/webregister', function () {
-    return view('webacademia.register');
-});
+Route::get('/webregister', function () { return view('webacademia.register');});
+Route::post('/webregister', [WebController::class, 'register'])->name('webacademia.register');
 
-Route::get('/shop', function () {
-    return view('webacademia.shop');
-});
+Route::get('/perfil',function () { return view('webacademia.perfil');})->name('webacademia.perfil');
+
 
 Route::get('/single_course', function () {
     return view('webacademia.single_course');
@@ -206,7 +211,7 @@ Route::prefix('crm')->group(function () {
         Route::post('/products-categories/update/{id}', [ProductsCategoriesController::class, 'update'])->name('productosCategoria.update');
         Route::post('/products-categories/destroy', [ProductsCategoriesController::class, 'destroy'])->name('productosCategoria.delete');
 
-        // Crusos (CURSOS)
+        // Cursos (CURSOS)
         Route::get('/cursos', [CursosController::class, 'index'])->name('cursos.index');
         Route::get('/cursos/create', [CursosController::class, 'create'])->name('cursos.create');
         Route::get('/cursos-show/{id}', [CursosController::class, 'show'])->name('cursos.show');
@@ -223,6 +228,29 @@ Route::prefix('crm')->group(function () {
         Route::get('/cursos-categories/edit/{id}', [CursosCategoriesController::class, 'edit'])->name('cursosCategoria.edit');
         Route::post('/cursos-categories/update/{id}', [CursosCategoriesController::class, 'update'])->name('cursosCategoria.update');
         Route::post('/cursos-categories/destroy', [CursosCategoriesController::class, 'destroy'])->name('cursosCategoria.delete');
+
+        //Aulas
+        Route::get('/aulas', [AulasController::class, 'index'])->name('aulas.index');
+        Route::get('/aulas/create', [AulasController::class, 'create'])->name('aulas.create');
+        Route::get('/aulas/edit/{id}', [AulasController::class, 'edit'])->name('aulas.edit');
+        Route::post('/aulas/store', [AulasController::class, 'store'])->name('aulas.store');
+        Route::post('/aulas/update/{id}', [AulasController::class, 'update'])->name('aulas.update');
+        Route::post('/aulas/destroy', [AulasController::class, 'destroy'])->name('aulas.delete');
+
+        //reservas
+        Route::get('/reservas', [ReservasController::class, 'index'])->name('reservas.index');
+        Route::get('/reservas/create', [ReservasController::class, 'create'])->name('reservas.create');
+        Route::get('/reservas/edit/{id}', [ReservasController::class, 'edit'])->name('reservas.edit');
+        Route::post('/reservas/store', [ReservasController::class, 'store'])->name('reservas.store');
+        Route::post('/reservas/update/{id}', [ReservasController::class, 'update'])->name('reservas.update');
+        Route::post('/reservas/destroy', [ReservasController::class, 'destroy'])->name('reservas.delete');
+        Route::get('/reservas/asignar/{id}', [ReservasController::class, 'asignarVista'])->name('reservas.asignarVista');
+        Route::post('/reservas/asignar', [ReservasController::class, 'asignarAula'])->name('reservas.asignar');
+        Route::view('/calendario-mensual', 'crm.reservas.calendario')->name('calendario.mensual');
+        Route::get('/api/eventos', [ReservasController::class, 'eventosMensuales'])->name('api.calendario.eventos');
+        Route::post('/api/evento-actualizar', [ReservasController::class, 'actualizarEvento']);
+
+
         //Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('/dashboard/getDataTask', [DashboardController::class, 'getDataTask'])->name('dashboard.getDataTask');

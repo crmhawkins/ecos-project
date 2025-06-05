@@ -71,5 +71,9 @@ class ContratosTable extends Component
             $this->resetPage(); // Resetear la paginación solo cuando estos filtros cambien.
         }
     }
+    public function aplicarFiltro()
+    {
+        $this->actualizarNominas(); // Luego actualizas la lista de usuarios basada en los filtros
+    }
 
 }

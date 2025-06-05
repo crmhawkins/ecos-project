@@ -3,6 +3,7 @@
 namespace App\Modules\Moodle\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cursos\Cursos;
 use App\Modules\Moodle\Services\MoodleApiService;
 use App\Modules\Moodle\Services\MoodleUserService;
 use App\Modules\Moodle\Services\MoodleCourseService;
@@ -315,6 +316,13 @@ class AdminController extends Controller
                 throw new Exception("La API de Moodle no devolvió un ID de curso válido.");
             }
 
+            Cursos::create([
+                "moodle_id" => $newCourseResponse["id"],
+                "name" => $validated["fullname"],
+                "description" => $validated["summary"],
+                "inactive" => 1
+            ]);
+
             return redirect()->route("moodle.admin.courses")->with("success", "Curso ".$validated["shortname"]." creado correctamente en Moodle.");
         } catch (Exception $e) {
             Log::error("Admin Store Course Error: {" . $e->getMessage() . "}", ["data" => $validated]);
@@ -378,6 +386,20 @@ class AdminController extends Controller
             Log::error("Admin Delete Course Error: {" . $e->getMessage() . "}", ["courseId" => $courseId]);
             return redirect()->route("moodle.admin.courses")->with("error", "Error al eliminar curso: " . $e->getMessage());
         }
+    }
+
+    public function clonarCourse($courseId)
+    {
+        $course = $this->courseService->getCourse($courseId);
+        Cursos::updateOrCreate(
+            ['moodle_id' => $course['id']], // condición para encontrarlo
+            [
+                'name' => $course['fullname'],
+                'description' => $course['summary'],
+                'inactive' => 1,
+            ]);
+
+        return redirect()->route("moodle.admin.courses")->with("success", "Curso sincronizado correctamente.");
     }
 
     /**

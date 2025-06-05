@@ -8,7 +8,7 @@
             <div class="flex flex-row justify-start">
                 <div class="mr-3">
                     <label for="">Nº</label>
-                    <select wire:model="perPage" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="perPage" class="form-select">
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
@@ -17,7 +17,22 @@
                 </div>
                 <div class="w-75">
                     <label for="">Buscar</label>
-                    <input wire:model.debounce.300ms="buscar" type="text" class="form-control w-100" placeholder="Escriba la palabra a buscar...">
+                    <input
+                        wire:model="buscar"
+                        x-data="{ enterPresionado: false }"
+                        @keydown.enter="
+                            enterPresionado = true;
+                            $wire.aplicarFiltro();
+                        "
+                        @blur="
+                            if (!enterPresionado) $wire.aplicarFiltro();
+                            enterPresionado = false;
+                        "
+                        type="text"
+                        id="inputBuscar"
+                        class="form-control w-100"
+                        placeholder="Escriba la palabra a buscar..."
+                    >
                 </div>
             </div>
         </div>
@@ -25,7 +40,7 @@
             <div class="flex flex-row justify-end">
                 <div class="mr-3" style="width: 250px">
                     <label for="">Proveedor</label>
-                    <select wire:model="selectedSupplier" class="form-select choices">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedSupplier" class="form-select choices">
                         <option value=""> Proveedor </option>
                         @foreach ($Suppliers as $proveedor)
                             <option value="{{ $proveedor->id }}">{{ $proveedor->name }}</option>
@@ -34,7 +49,7 @@
                 </div>
                 <div class="mr-3" style="width: 120px">
                     <label for="">Banco</label>
-                    <select wire:model="selectedBanco" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedBanco" class="form-select">
                         <option value=""> Banco </option>
                         @foreach ($Bancos as $banco)
                             <option value="{{ $banco->id }}">{{ $banco->name }}</option>
@@ -51,7 +66,7 @@
                 </div>
                 <div class="mr-3" style="width: 100px">
                     <label for="">Año</label>
-                    <select wire:model="selectedYear" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedYear" class="form-select">
                         <option value=""> Año </option>
                         @for ($year = date('Y'); $year >= 2000; $year--)
                             <option value="{{ $year }}">{{ $year }}</option>

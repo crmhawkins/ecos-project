@@ -86,4 +86,9 @@ class CabinasTable extends Component
     {
         $this->resetPage();
     }
+
+    public function aplicarFiltro()
+    {
+        $this->actualizarCabinas(); // Luego actualizas la lista de usuarios basada en los filtros
+    }
 }

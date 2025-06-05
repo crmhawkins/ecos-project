@@ -520,6 +520,13 @@ class DashboardController extends Controller
         $user = Auth::user();
         $jornada = Jornada::where('admin_user_id', $user->id)->where('is_active', true)->first();
         if ($jornada) {
+             $pause = Pause::where('jornada_id', $jornada->id)->whereNull('end_time')->first();
+            if ($pause){
+                $pause->update([
+                    'end_time' => Carbon::now(),
+                    'is_active' => false,
+                ]);
+            }
             $finJornada = $jornada->update([
                 'end_time' => Carbon::now(),
                 'is_active' => false,

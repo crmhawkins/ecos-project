@@ -7,7 +7,7 @@
             <div class="flex flex-row justify-start">
                 <div class="mr-3">
                     <label for="">Nº</label>
-                    <select wire:model="perPage" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="perPage" class="form-select">
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
@@ -16,15 +16,29 @@
                 </div>
                 <div class="w-75">
                     <label for="">Buscar</label>
-                    <input wire:model.debounce.300ms="buscar" type="text" class="form-control w-100" placeholder="Escriba la palabra a buscar...">
-                </div>
+                    <input
+                        wire:model="buscar"
+                        x-data="{ enterPresionado: false }"
+                        @keydown.enter="
+                            enterPresionado = true;
+                            $wire.aplicarFiltro();
+                        "
+                        @blur="
+                            if (!enterPresionado) $wire.aplicarFiltro();
+                            enterPresionado = false;
+                        "
+                        type="text"
+                        id="inputBuscar"
+                        class="form-control w-100"
+                        placeholder="Escriba la palabra a buscar..."
+                    >                 </div>
             </div>
         </div>
         <div class="col-md-6 col-sm-12">
             <div class="flex flex-row justify-end">
                 <div class="mr-3">
                     <label for="">Año</label>
-                    <select wire:model="selectedYear" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedYear" class="form-select">
                         <option value=""> Año </option>
                         @for ($year = date('Y'); $year >= 2000; $year--)
                             <option value="{{ $year }}">{{ $year }}</option>

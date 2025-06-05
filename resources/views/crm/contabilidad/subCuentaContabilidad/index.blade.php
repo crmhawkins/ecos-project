@@ -3,7 +3,7 @@
 @section('titulo', 'Sub Cuenta Contable')
 
 @section('css')
-<link rel="stylesheet" href="assets/vendors/simple-datatables/style.css">
+<link rel="stylesheet" href="{{asset('assets/vendors/simple-datatables/style.css')}}">
 <link rel="stylesheet" href="{{ asset('assets/vendors/choices.js/choices.min.css') }}">
 <style>
     .inactive-sort {

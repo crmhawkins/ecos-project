@@ -43,7 +43,7 @@ class CursosController extends Controller
 
         $servicioCreado = Cursos::create($data);
 
-        return redirect()->route('productos.edit', $servicioCreado->id)->with('toast', [
+        return redirect()->route('cursos.edit', $servicioCreado->id)->with('toast', [
                 'icon' => 'success',
                 'mensaje' => 'El servicio creado con exito'
         ]);
@@ -57,7 +57,7 @@ class CursosController extends Controller
                 'icon' => 'error',
                 'mensaje' => 'El servicio no existe'
             ]);
-            return redirect()->route('productos.index');
+            return redirect()->route('cursos.index');
         }
         return view('crm.cursos.edit', compact('servicio','categorias'));
     }
@@ -77,13 +77,16 @@ class CursosController extends Controller
             'price.required' => 'El precio es requerido para continuar',
         ]);
 
+        if(!isset($data['inactive'])){
+            $data['inactive'] = 0;
+        }
         if($request->hasFile('image')){
             $imagen = $request->file('image')->store('public/products');
             $data['image'] = Storage::url($imagen);
         }
         $petitionCreado = $servicio->update($data);
 
-        return redirect()->route('servicios.index')->with('toast', [
+        return redirect()->route('cursos.index')->with('toast', [
                 'icon' => 'success',
                 'mensaje' => 'El servicio actualizado con exito'
         ]);

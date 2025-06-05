@@ -103,4 +103,8 @@ class TasksRevisionTable extends Component
         $this->resetPage();
     }
 
+    public function aplicarFiltro(){
+        $this->actualizartareas(); // Resetear la paginación solo cuando estos filtros cambien.
+    }
+
 }

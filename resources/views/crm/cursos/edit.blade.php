@@ -1,6 +1,6 @@
 @extends('crm.layouts.app')
 
-@section('titulo', 'Editar Producto')
+@section('titulo', 'Editar Curso')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendors/choices.js/choices.min.css')}}" />
@@ -19,7 +19,7 @@
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{route('dashboard')}}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{route('productos.index')}}">Productos</a></li>
+                        <li class="breadcrumb-item"><a href="{{route('cursos.index')}}">Cursos</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Editar Producto</li>
                     </ol>
                 </nav>
@@ -30,7 +30,7 @@
     <section class="section mt-4">
         <div class="card">
             <div class="card-body">
-                <form action="{{route('productos.update',$servicio->id )}}" method="POST" enctype="multipart/form-data">
+                <form action="{{route('cursos.update',$servicio->id )}}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="bloque-formulario">
                         <div class="row">

@@ -18,19 +18,28 @@ class Cursos extends Model
         'price',
         'category_id',
         'image',
+        'description',
+        'moodle_id',
         'inactive',
+        'inicio',
+        'duracion',
+        'plazas',
+        'lecciones',
+        'certificacion',
+
     ];
 
     protected $attributes = [
         'inactive' => 0,
     ];
     protected $dates = [
-        'created_at', 'updated_at', 'deleted_at',
+        'created_at', 'updated_at', 'deleted_at','inicio'
     ];
 
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
+
 }
 

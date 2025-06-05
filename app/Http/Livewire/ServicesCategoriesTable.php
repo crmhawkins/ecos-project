@@ -73,4 +73,5 @@ class ServicesCategoriesTable extends Component
     {
         $this->resetPage();
     }
+
 }

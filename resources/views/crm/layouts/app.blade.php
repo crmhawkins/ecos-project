@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="{{ asset('assets/vendors/iconly/bold.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/laravel-views.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/tailwind.css') }}">
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <!-- CDN -->
@@ -30,7 +32,6 @@
     @yield('css')
     <link rel="stylesheet" href="{{ asset('build/assets/app-d2e38ed8.css') }}" crossorigin="anonymous" referrerpolicy="no-referrer">
     <script src="{{ asset('build/assets/app-bf7e6802.js') }}"></script>
-    @livewireStyles
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     </head>
     <body class="" style="overflow-x: hidden">
@@ -55,16 +56,15 @@
     </div>
 
     <!-- Scripts -->
-
     <script src="https://code.jquery.com/jquery-3.7.0.min.js" crossorigin="anonymous"></script>
     <script src="{{ asset('assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
     <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/laravel-views.js') }}"></script>
 
     <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
 
     <script src="{{ asset('assets/js/main.js') }}"></script>
     @yield('scripts')
-    @livewireScripts
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
          document.addEventListener('DOMContentLoaded', function() {

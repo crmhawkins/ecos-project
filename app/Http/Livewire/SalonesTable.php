@@ -63,4 +63,8 @@ class SalonesTable extends Component
     {
         $this->resetPage();
     }
+    public function aplicarFiltro()
+    {
+        $this->actualizarClientes();
+    }
 }

@@ -71,4 +71,8 @@ class IncidencesTable extends Component
             $this->resetPage(); // Resetear la paginación solo cuando estos filtros cambien.
         }
     }
+    public function aplicarFiltro()
+    {
+        $this->actualizarIncidencias(); // Luego actualizas la lista de usuarios basada en los filtros
+    }
 }

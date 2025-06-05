@@ -3,7 +3,7 @@
 @section('titulo', 'Dominios')
 
 @section('css')
-<link rel="stylesheet" href="assets/vendors/simple-datatables/style.css">
+<link rel="stylesheet" href="{{asset('assets/vendors/simple-datatables/style.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendors/choices.js/choices.min.css')}}" />
 
 @endsection
@@ -35,7 +35,7 @@
             <div class="card">
 
                 <div class="card-body">
-                
+
                         @livewire('dominios-table')
                 </div>
             </div>

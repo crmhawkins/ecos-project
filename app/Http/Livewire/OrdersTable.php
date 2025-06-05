@@ -100,4 +100,9 @@ class OrdersTable extends Component
         ]);
     }
 
+    public function aplicarFiltro()
+    {
+        $this->actualizar(); // Resetear la paginación solo cuando estos filtros cambien.
+    }
+
 }

@@ -4,7 +4,7 @@
             <div class="d-flex flex-row justify-start">
                 <div class="w-25">
                     <label for="">Nº</label>
-                    <select wire:model="perPage" class="form-select">
+                    <select wire:change="aplicarFiltro()" wire:model="perPage" class="form-select">
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
@@ -13,15 +13,29 @@
                 </div>
                 <div class="ms-3 w-75">
                     <label for="">Buscar</label>
-                    <input wire:model.debounce.300ms="buscar" type="text" class="form-control w-100" placeholder="Escriba la palabra a buscar...">
-                </div>
+                    <input
+                        wire:model="buscar"
+                        x-data="{ enterPresionado: false }"
+                        @keydown.enter="
+                            enterPresionado = true;
+                            $wire.aplicarFiltro();
+                        "
+                        @blur="
+                            if (!enterPresionado) $wire.aplicarFiltro();
+                            enterPresionado = false;
+                        "
+                        type="text"
+                        id="inputBuscar"
+                        class="form-control w-100"
+                        placeholder="Escriba la palabra a buscar..."
+                    >                 </div>
             </div>
         </div>
         <div class="col-md-5">
             <div class="flex flex-row justify-end">
                 <div class="mr-3 w-50">
                     <label for="">Gestores</label>
-                    <select wire:model="selectedGestor" name="" id="" class="form-select ">
+                    <select wire:change="aplicarFiltro()" wire:model="selectedGestor" name="" id="" class="form-select ">
                         <option value="">-- Seleccione un Gestor --</option>
                         @foreach ($gestores as $gestor)
                             <option value="{{ $gestor->id }}">{{ $gestor->name }}</option>
@@ -30,7 +44,7 @@
                 </div>
                 <div  class="w-50">
                     <label for="">Cliente</label>
-                    <select wire:model="isClient" name="" id="" class="form-select ">
+                    <select wire:change="aplicarFiltro()" wire:model="isClient" name="" id="" class="form-select ">
                         <option {{ $isClient == 1 ? 'selected' : '' }} value="{{1}}">Cliente</option>
                         <option {{ $isClient == 0 ? 'selected' : '' }} value="{{0}}">Lead</option>
                     </select>

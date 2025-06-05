@@ -3,7 +3,7 @@
 @section('titulo', 'Actas de Reuniones')
 
 @section('css')
-<link rel="stylesheet" href="assets/vendors/simple-datatables/style.css">
+<link rel="stylesheet" href="{{asset('assets/vendors/simple-datatables/style.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendors/choices.js/choices.min.css')}}" />
 
 @endsection
@@ -35,7 +35,7 @@
             <div class="card">
 
                 <div class="card-body">
-                  
+
                         @livewire('actas-table')
                 </div>
             </div>

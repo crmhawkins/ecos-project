@@ -58,4 +58,9 @@ class CargosTable extends Component
         }
     }
 
+    public function aplicarFiltro()
+    {
+        $this->actualizarNominas(); // Luego actualizas la lista de usuarios basada en los filtros
+    }
+
 }
