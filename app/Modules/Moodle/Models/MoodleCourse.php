@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Placeholder Model for Moodle Course.
- * This model might not have a corresponding database table in Laravel 
+ * This model might not have a corresponding database table in Laravel
  * if course data is primarily fetched from Moodle API.
  * It's used here mainly to satisfy Eloquent relationships.
  */
 class MoodleCourse extends Model
 {
     // If you have a local table mirroring Moodle courses, define it here:
-    // protected $table = 'moodle_courses'; 
+    // protected $table = 'moodle_courses';
 
     // Define the primary key if it's not 'id'
     // protected $primaryKey = 'moodle_id';

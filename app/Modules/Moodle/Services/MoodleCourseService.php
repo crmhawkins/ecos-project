@@ -284,7 +284,6 @@ class MoodleCourseService
                 'idnumber' => $categoryData['idnumber'] ?? '',
                 'description' => $categoryData['description'] ?? '',
                 'descriptionformat' => $categoryData['descriptionformat'] ?? 1,
-                'visible' => $categoryData['visible'] ?? 1,
             ];
 
             // Call Moodle API to create category
@@ -307,6 +306,41 @@ class MoodleCourseService
         }
     }
 
+    public function updateCategory(array $categoryData)
+    {
+        try {
+            if (!isset($categoryData['id'])) {
+                throw new Exception("Falta el ID de la categoría.");
+            }
+
+            $this->apiService->call('core_course_update_categories', [
+                'categories' => [$categoryData]
+            ]);
+
+            return true;
+        } catch (Exception $e) {
+            Log::error("Error actualizando categoría: {$e->getMessage()}", ['data' => $categoryData]);
+            throw new Exception("Error al actualizar la categoría: {$e->getMessage()}");
+        }
+    }
+
+    public function deleteCategory($categoryId)
+    {
+        try {
+            if (!$categoryId) {
+                throw new Exception("ID de categoría requerido.");
+            }
+
+            $this->apiService->call('core_course_delete_categories', [
+                'categories' => [['id' => $categoryId, 'recursive' => 1]]
+            ]);
+
+            return true;
+        } catch (Exception $e) {
+            Log::error("Error eliminando categoría Moodle: {$e->getMessage()}", ['id' => $categoryId]);
+            throw new Exception("Error al eliminar la categoría: {$e->getMessage()}");
+        }
+    }
     /**
      * Get course completion status for a user
      *

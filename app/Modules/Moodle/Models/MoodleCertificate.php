@@ -2,10 +2,13 @@
 
 namespace App\Modules\Moodle\Models;
 
+ use App\Modules\Moodle\Services\MoodleCourseService;
+use App\Modules\Moodle\Services\MoodleUserService;
 use Illuminate\Database\Eloquent\Model;
 
 class MoodleCertificate extends Model
 {
+
     /**
      * The table associated with the model.
      *
@@ -39,20 +42,17 @@ class MoodleCertificate extends Model
         'metadata' => 'array'
     ];
 
-    /**
-     * Get the user that owns the certificate.
-     */
-    public function user()
+
+    public function getMoodleUser(): ?array
     {
-        return $this->belongsTo(MoodleUser::class, 'user_id');
+        $service = app(MoodleUserService::class);
+        return $service->getUser($this->user_id);
     }
 
-    /**
-     * Get the course that the certificate is for.
-     */
-    public function course()
+    public function getMoodleCourse(): ?array
     {
-        return $this->belongsTo(MoodleCourse::class, 'course_id');
+        $service = app(MoodleCourseService::class);
+        return $service->getCourse($this->course_id);
     }
 
     /**

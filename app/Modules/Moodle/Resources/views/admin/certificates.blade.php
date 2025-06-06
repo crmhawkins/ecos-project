@@ -35,8 +35,8 @@ namespace App\Modules\Moodle\Resources\views\admin;
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="date_range" class="form-label">Fecha de emisión</label>
-                    <select class="form-select" id="date_range" name="date_range">
+                    <label for="dateRange" class="form-label">Fecha de emisión</label>
+                    <select class="form-select" id="dateRange" name="dateRange">
                         <option value="">Cualquier fecha</option>
                         <option value="today" {{ isset($dateRange) && $dateRange == 'today' ? 'selected' : '' }}>Hoy</option>
                         <option value="week" {{ isset($dateRange) && $dateRange == 'week' ? 'selected' : '' }}>Última semana</option>
@@ -73,7 +73,6 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                 <th>Usuario</th>
                                 <th>Curso</th>
                                 <th>Fecha de Emisión</th>
-                                <th>Verificado</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -82,34 +81,25 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                 <tr>
                                     <td>{{ $certificate->certificate_id }}</td>
                                     <td>
-                                        @if(isset($certificate->user))
-                                            {{ $certificate->user->firstname }} {{ $certificate->user->lastname }}
+                                        @if(isset($certificate->user_data))
+                                            {{ $certificate->user_data['firstname'] ?? '' }} {{ $certificate->user_data['lastname'] ?? '' }}
                                         @else
                                             Usuario #{{ $certificate->user_id }}
                                         @endif
                                     </td>
                                     <td>
-                                        @if(isset($certificate->course))
-                                            {{ $certificate->course->fullname }}
+                                        @if(isset($certificate->course_data))
+                                            {{ $certificate->course_data['fullname'] ?? 'Curso desconocido' }}
                                         @else
                                             Curso #{{ $certificate->course_id }}
                                         @endif
                                     </td>
                                     <td>{{ $certificate->issued_at->format('d/m/Y H:i') }}</td>
-                                    <td>
-                                        @if($certificate->verified)
-                                            <span class="badge bg-success">Verificado</span>
-                                        @else
-                                            <span class="badge bg-warning">No verificado</span>
-                                        @endif
-                                    </td>
+
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="{{ route('moodle.certificates.download', $certificate->filename) }}" class="btn btn-primary btn-sm" target="_blank">
+                                            <a href="{{ route('moodle.certificates.download', $certificate->id) }}" class="btn btn-primary btn-sm" target="_blank">
                                                 <i class="fas fa-download"></i>
-                                            </a>
-                                            <a href="{{ route('moodle.certificates.verify.get', $certificate->certificate_id) }}" class="btn btn-info btn-sm" target="_blank">
-                                                <i class="fas fa-check-circle"></i>
                                             </a>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCertificateModal{{ $certificate->id }}">
                                                 <i class="fas fa-trash"></i>
@@ -121,7 +111,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                         </tbody>
                     </table>
                 </div>
-                
+
                 <!-- Pagination -->
                 <div class="d-flex justify-content-center mt-4">
                     {{ $certificates->links() }}
@@ -146,7 +136,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle me-2"></i> Para generar un certificado, el usuario debe haber completado el curso.
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="user_search" class="form-label">Buscar Usuario</label>
                             <div class="input-group">
@@ -157,7 +147,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                             </div>
                             <small class="form-text text-muted">Busque un usuario para generar su certificado.</small>
                         </div>
-                        
+
                         <div id="userSearchResults" class="mb-3" style="display: none;">
                             <label class="form-label">Resultados de la búsqueda</label>
                             <div class="table-responsive">
@@ -176,7 +166,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                 </table>
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="course_id_select" class="form-label">Curso</label>
                             <select class="form-select" id="course_id_select" name="course_id" required disabled>
@@ -189,7 +179,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                             </select>
                             <small class="form-text text-muted">Seleccione primero un usuario para ver sus cursos completados.</small>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="options" class="form-label">Opciones adicionales</label>
                             <div class="form-check">
@@ -231,16 +221,16 @@ namespace App\Modules\Moodle\Resources\views\admin;
                         <div class="modal-body">
                             <p>¿Está seguro de que desea eliminar este certificado?</p>
                             <p><strong>ID:</strong> {{ $certificate->certificate_id }}</p>
-                            <p><strong>Usuario:</strong> 
-                                @if(isset($certificate->user))
-                                    {{ $certificate->user->firstname }} {{ $certificate->user->lastname }}
+                            <p><strong>Usuario:</strong>
+                               @if(isset($certificate->user_data))
+                                    {{ $certificate->user_data['firstname'] ?? '' }} {{ $certificate->user_data['lastname'] ?? '' }}
                                 @else
                                     Usuario #{{ $certificate->user_id }}
                                 @endif
                             </p>
-                            <p><strong>Curso:</strong> 
-                                @if(isset($certificate->course))
-                                    {{ $certificate->course->fullname }}
+                            <p><strong>Curso:</strong>
+                                @if(isset($certificate->course_data))
+                                    {{ $certificate->course_data['fullname'] ?? 'Curso desconocido' }}
                                 @else
                                     Curso #{{ $certificate->course_id }}
                                 @endif
@@ -272,11 +262,11 @@ namespace App\Modules\Moodle\Resources\views\admin;
                 alert('Por favor, ingrese al menos 3 caracteres para buscar.');
                 return;
             }
-            
+
             // Show loading indicator
             $('#userSearchResultsBody').html('<tr><td colspan="4" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i> Buscando usuarios...</td></tr>');
             $('#userSearchResults').show();
-            
+
             // Make AJAX request to search users
             $.ajax({
                 url: '{{ route("moodle.admin.users.search") }}',
@@ -297,7 +287,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                         } else {
                             html = '<tr><td colspan="4" class="text-center">No se encontraron usuarios.</td></tr>';
                         }
-                        
+
                         $('#userSearchResultsBody').html(html);
                     } else {
                         $('#userSearchResultsBody').html('<tr><td colspan="4" class="text-center text-danger">' + response.message + '</td></tr>');
@@ -308,14 +298,14 @@ namespace App\Modules\Moodle\Resources\views\admin;
                 }
             });
         });
-        
+
         // When a user is selected, enable course selection and load completed courses
         $(document).on('change', '.user-select', function() {
             const userId = $(this).val();
-            
+
             // Enable course dropdown
             $('#course_id_select').prop('disabled', false);
-            
+
             // Load completed courses for the selected user
             $.ajax({
                 url: '{{ route("moodle.admin.users.completed-courses") }}',
@@ -333,7 +323,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                             html = '<option value="">No hay cursos completados</option>';
                             $('#generateBtn').prop('disabled', true);
                         }
-                        
+
                         $('#course_id_select').html(html);
                     } else {
                         $('#course_id_select').html('<option value="">Error al cargar cursos</option>');
@@ -346,7 +336,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                 }
             });
         });
-        
+
         // Toggle custom date input
         $('#custom_date').change(function() {
             if ($(this).is(':checked')) {
@@ -355,7 +345,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                 $('#custom_date_container').hide();
             }
         });
-        
+
         // Also trigger search when pressing Enter in the search field
         $('#user_search').keypress(function(e) {
             if (e.which === 13) {

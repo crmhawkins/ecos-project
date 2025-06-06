@@ -146,6 +146,14 @@ Route::post('/webregister', [WebController::class, 'register'])->name('webacadem
 
 Route::get('/perfil',function () { return view('webacademia.perfil');})->name('webacademia.perfil');
 
+Route::prefix('carrito')->name('carrito.')->group(function () {
+    Route::get('/', [WebController::class, 'verCarrito'])->name('ver');
+    Route::post('/agregar/{id}', [WebController::class, 'agregarAlCarrito'])->name('agregar');
+    Route::post('/eliminar/{id}', [WebController::class, 'eliminarDelCarrito'])->name('eliminar');
+    Route::post('/vaciar', [WebController::class, 'vaciarCarrito'])->name('vaciar');
+    Route::post('/checkout', [WebController::class, 'checkout'])->name('checkout'); // Pago simulado por ahora
+});
+
 
 Route::get('/single_course', function () {
     return view('webacademia.single_course');

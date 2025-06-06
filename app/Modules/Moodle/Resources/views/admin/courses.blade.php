@@ -115,6 +115,11 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                             <a href="{{ route('moodle.admin.enrollments') }}?course_id={{ $course['id'] }}" class="btn btn-warning btn-sm">
                                                 <i class="fas fa-user-graduate"></i>
                                             </a>
+                                            <a href="{{ $baseUrl.'/course/view.php?id=' . $course['id'] }}"
+                                                target="_blank"
+                                                class="btn btn-outline-success btn-sm" title="Ver en Moodle">
+                                                    <i class="fas fa-sign-in-alt"></i>
+                                            </a>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCourseModal{{ $course['id'] }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>

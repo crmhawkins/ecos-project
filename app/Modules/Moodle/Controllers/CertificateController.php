@@ -104,7 +104,7 @@ class CertificateController extends Controller
     {
         try {
             $certificate = MoodleCertificate::findOrFail($id);
-            $path = storage_path('app/certificates/' . $certificate->file_path);
+            $path = storage_path('app/certificates/' . $certificate->filename);
 
             if (!file_exists($path)) {
                 return response()->json(["success" => false, "message" => "El archivo del certificado no existe."], 404);

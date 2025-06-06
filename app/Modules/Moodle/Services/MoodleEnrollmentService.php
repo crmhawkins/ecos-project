@@ -40,11 +40,11 @@ class MoodleEnrollmentService
             if (!$userId) {
                 throw new Exception("User ID is required");
             }
-            
+
             if (!$courseId) {
                 throw new Exception("Course ID is required");
             }
-            
+
             // Call Moodle API to enroll user
             $this->apiService->call('enrol_manual_enrol_users', [
                 'enrolments' => [
@@ -55,7 +55,7 @@ class MoodleEnrollmentService
                     ]
                 ]
             ]);
-            
+
             return true;
         } catch (Exception $e) {
             Log::error("Moodle Enroll User Error: {$e->getMessage()}", [
@@ -65,7 +65,7 @@ class MoodleEnrollmentService
                 'enrolMethod' => $enrolMethod,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error enrolling user in Moodle course: {$e->getMessage()}");
         }
     }
@@ -84,11 +84,11 @@ class MoodleEnrollmentService
             if (!$userId) {
                 throw new Exception("User ID is required");
             }
-            
+
             if (!$courseId) {
                 throw new Exception("Course ID is required");
             }
-            
+
             // Call Moodle API to unenroll user
             $this->apiService->call('enrol_manual_unenrol_users', [
                 'enrolments' => [
@@ -98,7 +98,7 @@ class MoodleEnrollmentService
                     ]
                 ]
             ]);
-            
+
             return true;
         } catch (Exception $e) {
             Log::error("Moodle Unenroll User Error: {$e->getMessage()}", [
@@ -107,7 +107,7 @@ class MoodleEnrollmentService
                 'enrolMethod' => $enrolMethod,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error unenrolling user from Moodle course: {$e->getMessage()}");
         }
     }
@@ -124,19 +124,19 @@ class MoodleEnrollmentService
             if (!$courseId) {
                 throw new Exception("Course ID is required");
             }
-            
+
             // Call Moodle API to get enrolled users
             $response = $this->apiService->call('core_enrol_get_enrolled_users', [
                 'courseid' => $courseId
             ]);
-            
+
             return $response;
         } catch (Exception $e) {
             Log::error("Moodle Get Enrolled Users Error: {$e->getMessage()}", [
                 'courseId' => $courseId,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error getting enrolled users in Moodle course: {$e->getMessage()}");
         }
     }
@@ -153,19 +153,19 @@ class MoodleEnrollmentService
             if (!$courseId) {
                 throw new Exception("Course ID is required");
             }
-            
+
             // Call Moodle API to get enrollment methods
             $response = $this->apiService->call('core_enrol_get_course_enrolment_methods', [
                 'courseid' => $courseId
             ]);
-            
+
             return $response;
         } catch (Exception $e) {
             Log::error("Moodle Get Enrollment Methods Error: {$e->getMessage()}", [
                 'courseId' => $courseId,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error getting enrollment methods for Moodle course: {$e->getMessage()}");
         }
     }
@@ -182,19 +182,19 @@ class MoodleEnrollmentService
             if (!$userId) {
                 throw new Exception("User ID is required");
             }
-            
+
             // Call Moodle API to get user enrollments
             $response = $this->apiService->call('core_enrol_get_users_courses', [
                 'userid' => $userId
             ]);
-            
+
             return $response;
         } catch (Exception $e) {
             Log::error("Moodle Get User Enrollments Error: {$e->getMessage()}", [
-                'userId' => $userId,
+                'userid' => $userId,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error getting user enrollments in Moodle: {$e->getMessage()}");
         }
     }
@@ -212,21 +212,21 @@ class MoodleEnrollmentService
             if (!$userId) {
                 throw new Exception("User ID is required");
             }
-            
+
             if (!$courseId) {
                 throw new Exception("Course ID is required");
             }
-            
+
             // Get user enrollments
             $enrollments = $this->getUserEnrollments($userId);
-            
+
             // Check if user is enrolled in the specified course
             foreach ($enrollments as $enrollment) {
                 if ($enrollment['id'] == $courseId) {
                     return true;
                 }
             }
-            
+
             return false;
         } catch (Exception $e) {
             Log::error("Moodle Check User Enrollment Error: {$e->getMessage()}", [
@@ -234,7 +234,7 @@ class MoodleEnrollmentService
                 'courseId' => $courseId,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error checking user enrollment in Moodle course: {$e->getMessage()}");
         }
     }
@@ -253,21 +253,21 @@ class MoodleEnrollmentService
             if (!$userId) {
                 throw new Exception("User ID is required");
             }
-            
+
             if (!$courseId) {
                 throw new Exception("Course ID is required");
             }
-            
+
             // Enroll user in course
             $this->enrollUser($userId, $courseId);
-            
+
             // Log payment information
             Log::info("User enrolled after payment", [
                 'userId' => $userId,
                 'courseId' => $courseId,
                 'paymentData' => $paymentData
             ]);
-            
+
             return true;
         } catch (Exception $e) {
             Log::error("Moodle Enroll After Payment Error: {$e->getMessage()}", [
@@ -276,7 +276,7 @@ class MoodleEnrollmentService
                 'paymentData' => $paymentData,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error enrolling user after payment: {$e->getMessage()}");
         }
     }
@@ -291,13 +291,13 @@ class MoodleEnrollmentService
         try {
             // Call Moodle API to get roles
             $response = $this->apiService->call('core_role_get_all_roles');
-            
+
             return $response['roles'] ?? [];
         } catch (Exception $e) {
             Log::error("Moodle Get Roles Error: {$e->getMessage()}", [
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error getting Moodle roles: {$e->getMessage()}");
         }
     }
@@ -316,15 +316,15 @@ class MoodleEnrollmentService
             if (!$userId) {
                 throw new Exception("User ID is required");
             }
-            
+
             if (!$roleId) {
                 throw new Exception("Role ID is required");
             }
-            
+
             if (!$contextId) {
                 throw new Exception("Context ID is required");
             }
-            
+
             // Call Moodle API to assign role
             $this->apiService->call('core_role_assign_roles', [
                 'assignments' => [
@@ -335,7 +335,7 @@ class MoodleEnrollmentService
                     ]
                 ]
             ]);
-            
+
             return true;
         } catch (Exception $e) {
             Log::error("Moodle Assign Role Error: {$e->getMessage()}", [
@@ -344,7 +344,7 @@ class MoodleEnrollmentService
                 'contextId' => $contextId,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error assigning role in Moodle: {$e->getMessage()}");
         }
     }

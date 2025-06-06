@@ -163,7 +163,7 @@ class MoodleUserService
             $response = $this->apiService->call('core_user_get_users', [
                 'criteria' => [
                     [
-                        'key' => 'idnumber',
+                        'key' => 'id',
                         'value' => $userId
                     ]
                 ]

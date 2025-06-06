@@ -9,6 +9,7 @@ use App\Modules\Moodle\Services\MoodleUserService;
 use App\Modules\Moodle\Services\MoodleCourseService;
 use App\Modules\Moodle\Services\MoodleEnrollmentService;
 use App\Modules\Moodle\Models\MoodleCertificate; // Added for certificate admin
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -233,6 +234,7 @@ class AdminController extends Controller
     public function courses(Request $request)
     {
         try {
+            $baseUrl = config("moodle.connection.url");
             $search = $request->input("search");
             $categoryId = $request->input("category");
             $visibility = $request->input("visibility");
@@ -273,7 +275,8 @@ class AdminController extends Controller
                 "categories" => $categories,
                 "search" => $search,
                 "selectedCategory" => $categoryId,
-                "visibility" => $visibility
+                "visibility" => $visibility,
+                "baseUrl" => $baseUrl
             ]);
         } catch (Exception $e) {
             Log::error("Admin Courses Error: {" . $e->getMessage() . "}");
@@ -555,53 +558,83 @@ class AdminController extends Controller
     public function certificates(Request $request)
     {
         try {
-            $search = $request->input("search"); // Search user name, course name, cert ID
+            $search = $request->input("search");
             $selectedCourseId = $request->input("course_id");
-            $dateFrom = $request->input("date_from");
-            $dateTo = $request->input("date_to");
+            $dateRange = $request->input("dateRange");
             $page = $request->input("page", 1);
             $perPage = 15;
 
-            $query = MoodleCertificate::query()->with(["user", "course"]); // Eager load relationships
+            $query = MoodleCertificate::query();
 
+            // Filtros básicos por campo directo
             if ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where("certificate_id", "like", "%{$search}%")
-                      ->orWhereHas("user", function ($userQuery) use ($search) {
-                          $userQuery->where("user_id", "like", "%{$search}%"); // Search by Moodle User ID
-                      })
-                      ->orWhereHas("course", function ($courseQuery) use ($search) {
-                          $courseQuery->where("course_id", "like", "%{$search}%"); // Search by Moodle Course ID
-                      });
-                });
+                $query->where("certificate_id", "like", "%{$search}%")
+                    ->orWhere("user_id", "like", "%{$search}%")
+                    ->orWhere("course_id", "like", "%{$search}%");
             }
 
             if ($selectedCourseId) {
                 $query->where("course_id", $selectedCourseId);
             }
 
-            if ($dateFrom) {
-                $query->whereDate("issued_at", ">=", $dateFrom);
+             if ($dateRange) {
+            switch ($dateRange) {
+                case 'today':
+                    $query->whereDate('issued_at', Carbon::today());
+                    break;
+                case 'week':
+                    $query->whereDate('issued_at', '>=', Carbon::now()->subWeek());
+                    break;
+                case 'month':
+                    $query->whereDate('issued_at', '>=', Carbon::now()->subMonth());
+                    break;
+                case 'year':
+                    $query->whereDate('issued_at', '>=', Carbon::now()->subYear());
+                    break;
             }
-            if ($dateTo) {
-                $query->whereDate("issued_at", "<=", $dateTo);
-            }
+        }
+
 
             $certificates = $query->orderBy("issued_at", "desc")->paginate($perPage);
 
-            $courses = $this->courseService->getAllCourses();
+            // ✅ Cargar datos reales desde Moodle API
+            $userService = app(MoodleUserService::class);
+            $courseService = app(MoodleCourseService::class);
+
+            $certificates->getCollection()->transform(function ($cert) use ($userService, $courseService) {
+                $cert->user_data = $userService->getUser($cert->user_id);
+                $cert->course_data = $courseService->getCourse($cert->course_id);
+                $cert->verification_url = $cert->getVerificationUrl();
+                return $cert;
+            });
+
+            // Para filtros (lista de cursos)
+            $courses = $courseService->getAllCourses();
 
             return view("moodle::admin.certificates", [
                 "certificates" => $certificates,
                 "courses" => $courses,
                 "search" => $search,
                 "selectedCourseId" => $selectedCourseId,
-                "dateFrom" => $dateFrom,
-                "dateTo" => $dateTo
+                "dateRange" => $dateRange,
             ]);
         } catch (Exception $e) {
             Log::error("Admin Certificates Error: {" . $e->getMessage() . "}");
-            return view("moodle::admin.certificates", ["error" => "Error al obtener certificados: " . $e->getMessage()]);
+            return view("moodle::admin.certificates", [
+                "error" => "Error al obtener certificados: " . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function deleteCertificate($id)
+    {
+        try {
+            $certificate = MoodleCertificate::findOrFail($id);
+            $certificate->delete();
+            return redirect()->route("moodle.admin.certificates")->with("success", "Certificado eliminado correctamente.");
+        } catch (Exception $e) {
+            Log::error("Admin Delete Certificate Error: {" . $e->getMessage() . "}", ["certificate_id" => $id]);
+            return redirect()->route("moodle.admin.certificates")->with("error", "Error al eliminar certificado: " . $e->getMessage());
         }
     }
 
@@ -772,6 +805,7 @@ class AdminController extends Controller
         $userId = $request->input('user_id');
         try {
             $courses = $this->enrollmentService->getUserEnrollments($userId);
+
             return response()->json([
                 'success' => true,
                 'courses' => $courses
@@ -783,6 +817,69 @@ class AdminController extends Controller
                 'success' => false,
                 'message' => 'Error al obtener cursos: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Listado de categorías de cursos
+     */
+    public function categories()
+    {
+        try {
+            $categories = $this->courseService->getCategories();
+            return view('moodle::admin.categories', compact('categories'));
+        } catch (Exception $e) {
+            Log::error("Error al cargar categorías: " . $e->getMessage());
+            return view('moodle::admin.categories', ['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Crear nueva categoría de curso en Moodle
+     */
+    public function storeCategory(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'parent' => 'nullable|integer',
+            'description' => 'nullable|string',
+        ]);
+
+        try {
+            $this->courseService->createCategory($validated);
+            return redirect()->route('moodle.admin.categories')->with('success', 'Categoría creada correctamente.');
+        } catch (Exception $e) {
+            Log::error("Error al crear categoría: " . $e->getMessage());
+            return redirect()->route('moodle.admin.categories')->with('error', 'Error al crear la categoría: ' . $e->getMessage());
+        }
+    }
+
+    public function updateCategory(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'parent' => 'nullable|integer',
+            'description' => 'nullable|string',
+        ]);
+
+        try {
+            $validated['id'] = (int) $id;
+            $this->courseService->updateCategory($validated);
+            return redirect()->route('moodle.admin.categories')->with('success', 'Categoría actualizada correctamente.');
+        } catch (Exception $e) {
+            Log::error("Error al actualizar categoría: " . $e->getMessage());
+            return redirect()->route('moodle.admin.categories')->with('error', 'Error al actualizar la categoría: ' . $e->getMessage());
+        }
+    }
+
+    public function destroyCategory($id)
+    {
+        try {
+            $this->courseService->deleteCategory((int) $id);
+            return redirect()->route('moodle.admin.categories')->with('success', 'Categoría eliminada correctamente.');
+        } catch (Exception $e) {
+            Log::error("Error al eliminar categoría: " . $e->getMessage());
+            return redirect()->route('moodle.admin.categories')->with('error', 'Error al eliminar la categoría: ' . $e->getMessage());
         }
     }
 }

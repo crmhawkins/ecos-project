@@ -264,7 +264,6 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                         <div class="col-md-6">
                                             <p><strong>ID:</strong> {{ $user['id'] }}</p>
                                             <p><strong>Nombre de usuario:</strong> {{ $user['username'] }}</p>
-                                            <p><strong>Idioma:</strong> {{ $user['lang'] ?? 'No especificado' }}</p>
                                         </div>
                                         <div class="col-md-6">
                                             <p><strong>Estado:</strong>
@@ -276,8 +275,8 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                                     <span class="badge bg-success">Activo</span>
                                                 @endif
                                             </p>
-                                            <p><strong>Último acceso:</strong> {{ isset($user['lastaccess']) ? date('d/m/Y H:i', $user['lastaccess']) : 'Nunca' }}</p>
-                                            <p><strong>Fecha de creación:</strong> {{ isset($user['firstaccess']) ? date('d/m/Y', $user['firstaccess']) : 'No disponible' }}</p>
+                                            <p><strong>Último acceso:</strong>  {{ (isset($user['lastaccess']) && $user['lastaccess'] !== 0) ? date('d/m/Y H:i', $user['lastaccess']) : 'Nunca' }}</p>
+                                            <p><strong>Primer acceso:</strong> {{ (isset($user['firstaccess']) && $user['firstaccess'] !== 0) ? date('d/m/Y H:i', $user['firstaccess']) : 'No disponible' }} </p>
                                         </div>
                                     </div>
                                 </div>
@@ -336,19 +335,34 @@ namespace App\Modules\Moodle\Resources\views\admin;
                         type: 'GET',
                         success: function(response) {
                             if (response.success) {
+                                console.log(response);
                                 let html = '';
                                 if (response.courses.length > 0) {
                                     html = '<div class="table-responsive"><table class="table table-striped table-sm">';
-                                    html += '<thead><tr><th>ID</th><th>Curso</th><th>Fecha de matriculación</th><th>Progreso</th></tr></thead>';
-                                    html += '<tbody>';
+                                    html += '<thead><tr>';
+                                    html += '<th>ID</th>';
+                                    html += '<th>Curso</th>';
+                                    html += '<th>Inicio</th>';
+                                    html += '<th>Fin</th>';
+                                    html += '<th>Completado</th>';
+                                    html += '<th>Progreso</th>';
+                                    html += '</tr></thead><tbody>';
 
                                     response.courses.forEach(function(course) {
+                                        const progress = course.progress ?? 0;
+                                        const startDate = course.startdate ? new Date(course.startdate * 1000).toLocaleDateString() : 'No disponible';
+                                        const endDate = course.enddate ? new Date(course.enddate * 1000).toLocaleDateString() : 'No disponible';
+                                        const completed = course.completed ? '<span class="badge bg-success">Sí</span>' : '<span class="badge bg-secondary">No</span>';
+                                        const visibility = course.visible ? '<span class="badge bg-success">Visible</span>' : '<span class="badge bg-secondary">Oculto</span>';
+
                                         html += '<tr>';
                                         html += '<td>' + course.id + '</td>';
                                         html += '<td>' + course.fullname + '</td>';
-                                        html += '<td>' + (course.enrollmentdate ? course.enrollmentdate : 'No disponible') + '</td>';
+                                        html += '<td>' + startDate + '</td>';
+                                        html += '<td>' + endDate + '</td>';
+                                        html += '<td>' + completed + '</td>';
                                         html += '<td><div class="progress" style="height: 10px;">';
-                                        html += '<div class="progress-bar" role="progressbar" style="width: ' + (course.progress ? course.progress : 0) + '%;" aria-valuenow="' + (course.progress ? course.progress : 0) + '" aria-valuemin="0" aria-valuemax="100">' + (course.progress ? course.progress : 0) + '%</div>';
+                                        html += '<div class="progress-bar" role="progressbar" style="width: ' + progress + '%;" aria-valuenow="' + progress + '" aria-valuemin="0" aria-valuemax="100">' + progress + '%</div>';
                                         html += '</div></td>';
                                         html += '</tr>';
                                     });
@@ -368,6 +382,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                         }
                     });
                 });
+
             @endforeach
         @endif
     });

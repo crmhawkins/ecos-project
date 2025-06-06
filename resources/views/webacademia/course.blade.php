@@ -3,15 +3,35 @@
 @section('title', 'Course')
 
 @section('css')
+
 <style>
     .loading {
         text-align: center;
         padding: 20px;
     }
-    .list-group-item.active {
-        background-color: #007bff;
-        border-color: #007bff;
-        color: white;
+
+    .category-list {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .category-link {
+        text-decoration: none;
+        color: #333;
+        font-weight: 500;
+        padding: 5px 10px;
+        transition: color 0.2s;
+    }
+
+    .category-link:hover {
+        color: #D93690;
+    }
+
+    .category-link.active {
+        color: #D93690;
+        text-decoration: none;
     }
 </style>
 @endsection
@@ -47,10 +67,11 @@
                 </div>
             </div>
             <div class="col-lg-3 mb-4">
-                <div class="list-group">
-                    <a href="#" class="list-group-item list-group-item-action category-link active" data-id="">Todos</a>
+                <h3 class="text-center h3">Categorias</h3>
+               <div class="category-list">
+                    <a href="#" class="category-link active" data-id="">Todos</a>
                     @foreach($categorias as $cat)
-                        <a href="#" class="list-group-item list-group-item-action category-link" data-id="{{ $cat->id }}">{{ $cat->name }}</a>
+                        <a href="#" class="category-link" data-id="{{ $cat->id }}">{{ $cat->name }}</a>
                     @endforeach
                 </div>
             </div>

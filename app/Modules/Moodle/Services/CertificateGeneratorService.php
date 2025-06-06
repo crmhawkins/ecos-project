@@ -3,6 +3,7 @@
 namespace App\Modules\Moodle\Services;
 
 use App\Modules\Moodle\Models\MoodleCertificate;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View; // Added for rendering Blade templates
@@ -50,6 +51,7 @@ class CertificateGeneratorService
             if (!$course) throw new Exception("Course not found with Moodle ID: {$courseId}");
 
             $completionStatus = $this->courseService->getCourseCompletionStatus($courseId, $userId);
+
             if (!isset($completionStatus['completionstatus']['completed']) || !$completionStatus['completionstatus']['completed']) {
                 if (!($options['force_generation'] ?? false)) {
                     throw new Exception("User has not completed the course");
@@ -60,14 +62,14 @@ class CertificateGeneratorService
             $completionDate = date('d/m/Y', isset($options['completion_date']) ? strtotime($options['completion_date']) : $completionTime);
             $certificateId = $options['certificate_id'] ?? 'CERT-' . uniqid();
 
-            $certificatePath = $this->createPdfCertificateWithWeasyPrint($user, $course, $completionDate, $certificateId, $options);
+            $certificatePath = $this->createPdfCertificateWithDompdf($user, $course, $completionDate, $certificateId, $options);
 
             MoodleCertificate::create([
                 'user_id' => $userId,
                 'course_id' => $courseId,
-                'file_path' => basename($certificatePath),
+                'filename' => basename($certificatePath),
                 'certificate_id' => $certificateId,
-                'generated_at' => now()
+                'issued_at' => now()
             ]);
 
             return $certificatePath;
@@ -82,7 +84,7 @@ class CertificateGeneratorService
         }
     }
 
-    protected function createPdfCertificateWithWeasyPrint($user, $course, $completionDate, $certificateId, $options)
+    protected function createPdfCertificateWithDompdf($user, $course, $completionDate, $certificateId, $options)
     {
         $data = [
             'user' => $user,
@@ -105,32 +107,16 @@ class CertificateGeneratorService
         }
 
         try {
-            $htmlContent = View::make($templateView, $data)->render();
+            $pdf = Pdf::loadView($templateView, $data);
         } catch (Exception $e) {
-            throw new Exception("Error rendering template: {" . $e->getMessage() . "}");
-        }
-
-        $tmpHtmlPath = tempnam(sys_get_temp_dir(), 'cert_html_') . '.html';
-        if (File::put($tmpHtmlPath, $htmlContent) === false) {
-            throw new Exception("Could not write temporary HTML file: {$tmpHtmlPath}");
+            throw new Exception("Error generating PDF with DomPDF: " . $e->getMessage());
         }
 
         $filename = 'certificate_' . ($user['username'] ?? $user['id']) . '_' . ($course['shortname'] ?? $course['id']) . '_' . time() . '.pdf';
-        $pdfFilePath = $this->storagePath . '/' . $filename;
+        $pdfFilePath = storage_path('app/certificates/' . $filename);
 
-        $cssPath = $options['css_path'] ?? null;
-        $command = 'weasyprint ' . escapeshellarg($tmpHtmlPath) . ' ' . escapeshellarg($pdfFilePath);
-        if ($cssPath && File::exists($cssPath)) {
-            $command = 'weasyprint -s ' . escapeshellarg($cssPath) . ' ' . escapeshellarg($tmpHtmlPath) . ' ' . escapeshellarg($pdfFilePath);
-        }
-
-        exec($command, $output, $returnCode);
-
-        if ($returnCode !== 0 || !File::exists($pdfFilePath)) {
-            throw new Exception("WeasyPrint failed to generate PDF. Command: {$command}");
-        }
-
-        File::delete($tmpHtmlPath);
+        Storage::makeDirectory('certificates'); // asegúrate que exista
+        file_put_contents($pdfFilePath, $pdf->output());
 
         return $pdfFilePath;
     }

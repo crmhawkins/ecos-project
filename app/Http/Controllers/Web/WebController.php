@@ -78,8 +78,6 @@ class WebController extends Controller
         return redirect()->route('webacademia.perfil');
     }
 
-
-
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -115,5 +113,56 @@ class WebController extends Controller
             'contentView' => $view,
         ]);
     }
+
+    public function agregarAlCarrito($id)
+    {
+        $curso = Cursos::findOrFail($id);
+
+        $carrito = session()->get('carrito', []);
+
+        if (isset($carrito[$id])) {
+            $carrito[$id]['cantidad']++;
+        } else {
+            $carrito[$id] = [
+                'id' => $curso->id,
+                'nombre' => $curso->name,
+                'precio' => $curso->precio ?? 0,
+                'cantidad' => 1,
+            ];
+        }
+
+        session()->put('carrito', $carrito);
+
+        return redirect()->back()->with('success', 'Curso añadido al carrito.');
+    }
+
+    public function eliminarDelCarrito($id)
+    {
+        $carrito = session()->get('carrito', []);
+        unset($carrito[$id]);
+        session()->put('carrito', $carrito);
+
+        return redirect()->back()->with('success', 'Curso eliminado del carrito.');
+    }
+
+    public function vaciarCarrito()
+    {
+        session()->forget('carrito');
+        return redirect()->back()->with('success', 'Carrito vaciado.');
+    }
+
+    public function verCarrito()
+    {
+        $carrito = session()->get('carrito', []);
+        return view('webacademia.carrito', compact('carrito'));
+    }
+
+    public function checkout(Request $request)
+    {
+        // Aquí podrías integrar pasarela (Stripe, Redsys, etc.)
+        session()->forget('carrito');
+        return redirect()->route('webacademia.courses')->with('success', 'Compra completada. Gracias.');
+    }
+
 
 }

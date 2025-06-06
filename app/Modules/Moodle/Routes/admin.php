@@ -47,7 +47,7 @@ Route::prefix('moodle/admin')->name('moodle.admin.')->middleware(['web', 'auth']
 
     // Certificates
     Route::get('/certificates', [AdminController::class, 'certificates'])->name('certificates');
-    Route::delete('/certificates/{id}', [AdminController::class, 'destroyCertificate'])->name('certificates.destroy');
+    Route::delete('/certificates/{id}', [AdminController::class, 'deleteCertificate'])->name('certificates.destroy');
 
     // Settings
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings');

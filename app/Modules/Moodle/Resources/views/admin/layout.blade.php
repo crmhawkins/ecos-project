@@ -151,6 +151,11 @@ namespace App\Modules\Moodle\Resources\views\admin;
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('moodle.admin.categories') }}" class="{{ request()->routeIs('moodle.admin.categories') ? 'active' : '' }}">
+                        <i class="fas fa-folder-open me-2"></i> Categorías de Cursos
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('moodle.admin.enrollments') }}" class="{{ request()->routeIs('moodle.admin.enrollments') ? 'active' : '' }}">
                         <i class="fas fa-user-graduate"></i> Matriculaciones
                     </a>

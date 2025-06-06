@@ -42,9 +42,8 @@ namespace App\Modules\Moodle\Resources\views\admin;
         </div>
     </div>
     @endif
-
     <!-- Statistics -->
-    <div class="row">
+    {{-- <div class="row">
         <div class="col-md-3">
             <div class="stat-card">
                 <div class="stat-icon">
@@ -81,7 +80,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                 <div class="stat-label">Certificados Emitidos</div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <!-- Quick Actions -->
     <div class="card mt-4">
@@ -115,7 +114,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
     </div>
 
     <!-- Recent Activity -->
-    <div class="card mt-4">
+    {{-- <div class="card mt-4">
         <div class="card-header">
             <i class="fas fa-history me-2"></i> Actividad Reciente
         </div>
@@ -147,7 +146,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                 <p class="text-muted">No hay actividad reciente para mostrar.</p>
             @endif
         </div>
-    </div>
+    </div> --}}
 @endsection
 
 @section('scripts')
