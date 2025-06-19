@@ -659,6 +659,7 @@ class AdminController extends Controller
             "certificate_template" => config("moodle.certificates.template"),
             "signature_image" => config("moodle.certificates.signature_image"),
         ];
+        // dd($settings, $connectionStatus);
         return view("moodle::admin.settings", compact("settings", "connectionStatus"));
     }
 

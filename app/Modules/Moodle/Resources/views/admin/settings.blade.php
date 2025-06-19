@@ -292,7 +292,8 @@ namespace App\Modules\Moodle\Resources\views\admin;
                         alert('Conexión exitosa con la API de Moodle.');
                         location.reload();
                     } else {
-                        alert('Error al conectar con la API de Moodle: ' + response.message);
+                        console.log(response);
+                        alert('Error al conectar con la API de Moodle: ' + response);
                     }
                 },
                 error: function() {
