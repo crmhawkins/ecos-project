@@ -284,8 +284,8 @@ Route::prefix('crm')->group(function () {
 
         //Jornadas
         Route::get('/jornadas', [HorasController::class, 'indexHoras'])->name('horas.index');
-            Route::get('/jornadas/calendar/{id}', [HorasController::class, 'calendar'])->name('horas.calendar');
-            Route::get('/exportarjornadas', [HorasController::class, 'exportHoras'])->name('horas.export');
+        Route::get('/jornadas/calendar/{id}', [HorasController::class, 'calendar'])->name('horas.calendar');
+        Route::get('/exportarjornadas', [HorasController::class, 'exportHoras'])->name('horas.export');
 
         //Events(Eventos del to-do)
         Route::post('/event/store', [EventController::class, 'store'])->name('event.store');
@@ -296,7 +296,6 @@ Route::prefix('crm')->group(function () {
         Route::post('/message/store', [MessageController::class, 'store'])->name('message.store');
         Route::post('/mark-as-read/{todoId}', [MessageController::class,'markAsRead']);
         Route::post('/todos/getMessages/{todoId}', [MessageController::class, 'getMessages']);
-
 
         //Meetings(Reuniones)
         Route::get('/meeting', [CrmActivityMeetingController::class, 'index'])->name('reunion.index');
@@ -371,7 +370,6 @@ Route::prefix('crm')->group(function () {
         Route::post('/client/get-contacts', [ClientController::class, 'getContactsFromClient'])->name('cliente.getContacts');
         Route::post('/client/verificar-existente', [ClientController::class, 'verificarClienteExistente'])->name('cliente.verificarExistente');
 
-
         //Proveedores
         Route::get('/supplier', [SuppliersController::class, 'index'])->name('proveedores.index');
         Route::get('/supplier/create', [SuppliersController::class, 'create'])->name('proveedores.create');
@@ -390,10 +388,8 @@ Route::prefix('crm')->group(function () {
         Route::post('/budpetitionget/update/{id}', [PetitionController::class, 'update'])->name('peticion.update');
         Route::post('/petition/destroy', [PetitionController::class, 'destroy'])->name('peticion.delete');
 
-
         Route::get('/order', [OrdenesController::class, 'index'])->name('order.index');
         Route::get('/orderAll', [OrdenesController::class, 'indexAll'])->name('order.indexAll');
-
 
         // Budgets (PRESUPUESTOS)
         Route::get('/budgets', [BudgetController::class, 'index'])->name('presupuestos.index');
@@ -569,8 +565,6 @@ Route::prefix('crm')->group(function () {
         // web.php
         Route::post('/save-theme-preference', [UserController::class, 'saveThemePreference'])->name('saveThemePreference');
 
-
-
         // Ingresos (TESORERIA)
         Route::get('/ingresos', [TesoreriaController::class, 'indexIngresos'])->name('ingreso.index');
         Route::get('/ingreso/create', [TesoreriaController::class, 'createIngresos'])->name('ingreso.create');
@@ -596,7 +590,6 @@ Route::prefix('crm')->group(function () {
         Route::post('/gasto-asociado/store', [TesoreriaController::class, 'storeAssociatedExpenses'])->name('gasto-asociado.store');
         Route::post('/gasto-asociado/update/{id}', [TesoreriaController::class, 'updateAssociatedExpenses'])->name('gasto-asociado.update');
         Route::post('/gasto-asociado/destroy', [TesoreriaController::class, 'destroyAssociatedExpenses'])->name('gasto-asociado.delete');
-
 
         // Gastos sin clasificar (TESORERIA)
         Route::get('/gastos-sin-clasificar', [TesoreriaController::class, 'indexUnclassifiedExpensese'])->name('gasto-sin-clasificar.index');
@@ -677,7 +670,6 @@ Route::prefix('crm')->group(function () {
         Route::post('/configuracion/update/{id}', [SettingsController::class, 'update'])->name('configuracion.update');
         Route::post('/configuracion/store', [SettingsController::class, 'store'])->name('configuracion.store');
 
-
         Route::get('/cuentas-contables', [CuentasContableController::class, 'index'])->name('cuentasContables.index');
         Route::get('/cuentas-contables/create', [CuentasContableController::class, 'create'])->name('cuentasContables.create');
         Route::post('/cuentas-contables/store', [CuentasContableController::class, 'store'])->name('cuentasContables.store');
@@ -719,7 +711,6 @@ Route::prefix('crm')->group(function () {
         Route::post('/sub-grupo-contable/updated', [SubGrupoContabilidadController::class, 'updated'])->name('subGrupoContabilidad.updated');
         Route::delete('/sub-grupo-contable/destroy/{id}', [SubGrupoContabilidadController::class, 'destroy'])->name('subGrupoContabilidad.destroy');
 
-
         Route::get('/plan-contable', [PlanContableController::class, 'index'])->name('admin.planContable.index');
         Route::get('/plan-contable/json', [PlanContableController::class, 'json']);
 
@@ -733,7 +724,6 @@ Route::prefix('crm')->group(function () {
         Route::post('/diario-caja/{id}/update', [DiarioCajaController::class, 'update'])->name('diarioCaja.update');
         Route::post('/diario-caja/{id}/destroy', [DiarioCajaController::class, 'destroy'])->name('diarioCaja.destroy');
         Route::post('/diario-caja/{id}/destroy-linea', [DiarioCajaController::class, 'destroyDiarioCaja'])->name('diarioCaja.destroyDiarioCaja');
-
 
         Route::post('/save-order', [BudgetController::class, 'saveOrder'])->name('save.order');
 

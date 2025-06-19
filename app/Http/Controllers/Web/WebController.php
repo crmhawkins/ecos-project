@@ -7,6 +7,7 @@ use App\Models\Cursos\Cursos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Alumnos\Alumno;
+use App\Models\Carrito\ShoppingCartItem;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -114,54 +115,56 @@ class WebController extends Controller
         ]);
     }
 
+
     public function agregarAlCarrito($id)
     {
         $curso = Cursos::findOrFail($id);
+        $user = Auth::guard('alumno')->user();
 
-        $carrito = session()->get('carrito', []);
+        $item = ShoppingCartItem::firstOrNew([
+            'alumno_id' => $user->id,
+            'curso_id' => $curso->id,
+        ]);
 
-        if (isset($carrito[$id])) {
-            $carrito[$id]['cantidad']++;
-        } else {
-            $carrito[$id] = [
-                'id' => $curso->id,
-                'nombre' => $curso->name,
-                'precio' => $curso->precio ?? 0,
-                'cantidad' => 1,
-            ];
-        }
-
-        session()->put('carrito', $carrito);
+        $item->cantidad += 1;
+        $item->save();
 
         return redirect()->back()->with('success', 'Curso añadido al carrito.');
     }
 
     public function eliminarDelCarrito($id)
     {
-        $carrito = session()->get('carrito', []);
-        unset($carrito[$id]);
-        session()->put('carrito', $carrito);
+        $user = Auth::guard('alumno')->user();
+        ShoppingCartItem::where('alumno_id', $user->id)->where('curso_id', $id)->delete();
 
         return redirect()->back()->with('success', 'Curso eliminado del carrito.');
     }
 
-    public function vaciarCarrito()
+   public function vaciarCarrito()
     {
-        session()->forget('carrito');
+        $user = Auth::guard('alumno')->user();
+        ShoppingCartItem::where('alumno_id', $user->id)->delete();
+
         return redirect()->back()->with('success', 'Carrito vaciado.');
     }
 
     public function verCarrito()
     {
-        $carrito = session()->get('carrito', []);
+        $user = Auth::guard('alumno')->user();
+        $carrito = ShoppingCartItem::with('curso')->where('alumno_id', $user->id)->get();
+
         return view('webacademia.carrito', compact('carrito'));
     }
 
+
     public function checkout(Request $request)
     {
-        // Aquí podrías integrar pasarela (Stripe, Redsys, etc.)
-        session()->forget('carrito');
-        return redirect()->route('webacademia.courses')->with('success', 'Compra completada. Gracias.');
+        $user = Auth::guard('alumno')->user();
+
+        // Aquí puedes crear pedidos o procesar pagos
+        ShoppingCartItem::where('alumno_id', $user->id)->delete();
+
+        return redirect()->route('webacademia.courses')->with('success', 'Compra completada.');
     }
 
 
