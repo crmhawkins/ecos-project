@@ -69,7 +69,7 @@ class MoodleApiService
         $this->token = config('moodle.connection.token');
         $this->protocol = config('moodle.connection.protocol', 'rest');
         $this->format = config('moodle.connection.format', 'json');
-        $this->timeout = config('moodle.timeout', 30);
+        $this->timeout = config('moodle.timeout', 60); // Aumentado de 30 a 60 segundos
         $this->useCache = config('moodle.cache.enabled', true);
         $this->cacheTtl = config('moodle.cache.ttl', 3600);
     }
@@ -81,16 +81,17 @@ class MoodleApiService
      */
     protected function getEndpointUrl()
     {
-        switch ($this->protocol) {
-            case 'rest':
-                return "{$this->baseUrl}/webservice/rest/server.php";
-            case 'soap':
-                return "{$this->baseUrl}/webservice/soap/server.php";
-            case 'xmlrpc':
-                return "{$this->baseUrl}/webservice/xmlrpc/server.php";
-            default:
-                return "{$this->baseUrl}/webservice/rest/server.php";
-        }
+            $cleanBase = rtrim($this->baseUrl, '/');
+            switch ($this->protocol) {
+                case 'rest':
+                    return "{$cleanBase}/webservice/rest/server.php";
+                case 'soap':
+                    return "{$cleanBase}/webservice/soap/server.php";
+                case 'xmlrpc':
+                    return "{$cleanBase}/webservice/xmlrpc/server.php";
+                default:
+                    return "{$cleanBase}/webservice/rest/server.php";
+            }
     }
 
     /**
@@ -113,12 +114,12 @@ class MoodleApiService
 
         try {
             $response = $this->makeRequest($function, $params);
-            
+
             // Cache the response if caching is enabled
             if ($this->useCache) {
                 Cache::put($cacheKey, $response, $this->cacheTtl);
             }
-            
+
             return $response;
         } catch (Exception $e) {
             Log::error("Moodle API Error: {$e->getMessage()}", [
@@ -126,7 +127,7 @@ class MoodleApiService
                 'params' => $params,
                 'exception' => $e
             ]);
-            
+
             throw new Exception("Error calling Moodle API function '{$function}': {$e->getMessage()}");
         }
     }
@@ -142,30 +143,36 @@ class MoodleApiService
     protected function makeRequest($function, array $params = [])
     {
         $url = $this->getEndpointUrl();
-        
+
         $requestParams = [
             'wstoken' => $this->token,
             'wsfunction' => $function,
             'moodlewsrestformat' => $this->format,
         ];
-        
+
         $requestParams = array_merge($requestParams, $params);
-        
-        $response = Http::timeout($this->timeout)
+
+        // Usar un timeout más largo para funciones que pueden tardar más
+        $timeout = $this->timeout;
+        if ($function === 'core_user_get_users') {
+            $timeout = 120; // 2 minutos para la función de usuarios
+        }
+
+        $response = Http::timeout($timeout)
             ->asForm()
             ->post($url, $requestParams);
-            
+
         if ($response->successful()) {
             $data = $response->json();
-            
+
             // Check for Moodle API error
             if (isset($data['exception'])) {
                 throw new Exception($data['message'] ?? 'Unknown Moodle API error');
             }
-            
+
             return $data;
         }
-        
+
         throw new Exception("HTTP Error: {$response->status()} - {$response->body()}");
     }
 

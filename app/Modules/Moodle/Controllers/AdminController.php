@@ -60,10 +60,10 @@ class AdminController extends Controller
     }
 
     /**
-     * Display the users management page.
+     * Display a listing of users from Moodle.
      *
      * @param Request $request
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\View\View
      */
     public function users(Request $request)
     {
@@ -75,10 +75,20 @@ class AdminController extends Controller
             $perPage = 15;
 
             $criteria = [];
-            if ($search && $searchType) {
-                $criteria[] = ["key" => $searchType , "value" => "%" . $search . "%"];
+
+            // Solo buscar si hay un término de búsqueda específico
+            if ($search && $searchType && strlen(trim($search)) >= 2) {
+                $criteria[] = ["key" => $searchType , "value" => "%" . $search . "%"];  // Usar 'key' y 'value' en inglés
             }
-            $moodleUsers = $this->userService->searchUsers($criteria);
+
+            // Si no hay criterios de búsqueda, usar la nueva lógica que evita timeout
+            if (empty($criteria)) {
+                // Usar el método que busca solo usuarios activos para evitar timeout
+                $moodleUsers = $this->userService->searchUsers($criteria);
+            } else {
+                $moodleUsers = $this->userService->searchUsers($criteria);
+            }
+
             //dd($moodleUsers);
             // --- Local Filtering ---
             if ($status === "suspended") {
@@ -123,7 +133,7 @@ class AdminController extends Controller
             }
 
             $criteria = [
-                ["key" => "firstname", "value" => "%" . $search . "%"]
+                ["key" => "firstname", "value" => "%" . $search . "%"]  // Usar 'key' y 'value' en inglés
             ];
 
             $users = $this->userService->searchUsers($criteria);

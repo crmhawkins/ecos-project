@@ -21,7 +21,7 @@ return [
     ],
 
     // Default timeout for API requests in seconds
-    'timeout' => env('MOODLE_API_TIMEOUT', 30),
+    'timeout' => env('MOODLE_API_TIMEOUT', 60),
 
     // Cache settings
     'cache' => [

@@ -348,16 +348,22 @@ class MoodleUserService
     public function searchUsers(array $criteria): array
     {
         try {
-            // Si no se pasan criterios, usamos comodín para obtener todos
+            // Si no se pasan criterios, usar un criterio válido para evitar timeout
             if (empty($criteria)) {
+                // Usar un criterio que funcione con la API de Moodle
+                // Buscar usuarios con email que contenga '@' (todos los usuarios válidos)
                 $criteria = [
-                    ['key' => 'firstname', 'value' => '%']
+                    ['key' => 'email', 'value' => '%@%']  // Usuarios con email válido
                 ];
             }
 
-            $response = $this->apiService->call('core_user_get_users', [
-                'criteria' => $criteria
-            ]);
+            // Agregar límites para evitar cargar demasiados usuarios
+            $params = [
+                'criteria' => $criteria,  // Usar 'criteria' en inglés
+                'limitnum' => 100  // Limitar a 100 usuarios máximo
+            ];
+
+            $response = $this->apiService->call('core_user_get_users', $params);
             //dd($response);
             return $response['users'] ?? [];
         } catch (Exception $e) {
@@ -367,6 +373,51 @@ class MoodleUserService
             ]);
 
             throw new Exception("Error searching Moodle users: {$e->getMessage()}");
+        }
+    }
+
+    /**
+     * Search users with pagination to avoid timeouts
+     *
+     * @param array $criteria Array of search criteria
+     * @param int $page Page number (1-based)
+     * @param int $perPage Number of users per page
+     * @return array
+     * @throws Exception
+     */
+    public function searchUsersPaginated(array $criteria, int $page = 1, int $perPage = 50): array
+    {
+        try {
+            // Si no se pasan criterios, usamos un criterio más específico
+            if (empty($criteria)) {
+                $criteria = [
+                    ['key' => 'email', 'value' => '%@%']  // Usuarios con email válido
+                ];
+            }
+
+            // Agregar parámetros de paginación si la API de Moodle los soporta
+            $params = [
+                'criteria' => $criteria  // Usar 'criteria' en inglés
+            ];
+
+            // Intentar agregar límites si la API lo permite
+            if ($perPage > 0) {
+                $params['limitfrom'] = ($page - 1) * $perPage;
+                $params['limitnum'] = $perPage;
+            }
+
+            $response = $this->apiService->call('core_user_get_users', $params);
+
+            return $response['users'] ?? [];
+        } catch (Exception $e) {
+            Log::error("Moodle Search Users Paginated Error: {$e->getMessage()}", [
+                'criteria' => $criteria,
+                'page' => $page,
+                'perPage' => $perPage,
+                'exception' => $e
+            ]);
+
+            throw new Exception("Error searching Moodle users with pagination: {$e->getMessage()}");
         }
     }
 

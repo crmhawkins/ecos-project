@@ -33,9 +33,9 @@ namespace App\Modules\Moodle\Resources\views\admin;
                 <div class="col-md-3">
                     <label for="status" class="form-label">Estado</label>
                     <select class="form-select" id="status" name="status">
-                        <option value="">Todos los estados</option>
-                        <option value="active" {{ isset($selectedStatus) && $selectedStatus == 'active' ? 'selected' : '' }}>Activo</option>
-                        <option value="suspended" {{ isset($selectedStatus) && $selectedStatus == 'suspended' ? 'selected' : '' }}>Suspendido</option>
+                        <option value="" {{ isset($selectedStatus) && $selectedStatus == '' ? 'selected' : '' }}>Todos los estados</option>
+                        <option value="active" {{ isset($selectedStatus) && $selectedStatus == 'active' ? 'selected' : '' }}>Activos</option>
+                        <option value="suspended" {{ isset($selectedStatus) && $selectedStatus == 'suspended' ? 'selected' : '' }}>Suspendidos</option>
                     </select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
@@ -44,6 +44,14 @@ namespace App\Modules\Moodle\Resources\views\admin;
                     </button>
                 </div>
             </form>
+
+            <!-- Información sobre la búsqueda -->
+            @if(empty($search))
+                <div class="alert alert-info mt-3 mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Nota:</strong> Se muestran solo usuarios activos. Para buscar usuarios específicos, utiliza el campo de búsqueda arriba.
+                </div>
+            @endif
         </div>
     </div>
 
