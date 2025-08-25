@@ -33,6 +33,19 @@ namespace App\Modules\Moodle\Resources\views\admin;
         border: 1px solid #dee2e6;
         border-radius: 0.375rem;
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        z-index: 9999;
+    }
+    .select2-container--bootstrap-5 .select2-results__option {
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+    .select2-container--bootstrap-5 .select2-results__option:hover {
+        background-color: #f8f9fa;
+    }
+    .select2-container--bootstrap-5 .select2-search__field {
+        padding: 8px 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
     }
 </style>
 @endsection
@@ -310,26 +323,43 @@ namespace App\Modules\Moodle\Resources\views\admin;
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Initialize Select2 for course selection
-        $('.select2-course').select2({
+        // Initialize Select2 for course selection with a small delay to ensure DOM is ready
+        setTimeout(function() {
+            $('.select2-course').select2({
             theme: 'bootstrap-5',
             placeholder: 'Seleccione un curso',
             allowClear: true,
             width: '100%',
+            minimumResultsForSearch: 0, // Always show search box
+            closeOnSelect: true,
             language: {
                 noResults: function() {
                     return "No se encontraron cursos";
                 },
                 searching: function() {
                     return "Buscando...";
+                },
+                inputTooShort: function() {
+                    return "Escriba para buscar cursos";
                 }
             }
         });
+        }, 100); // Small delay to ensure DOM is ready
         
-        // Auto-submit form when course is selected
+        // Handle Select2 errors
+        $('.select2-course').on('select2:open', function() {
+            console.log('Select2 opened');
+        });
+        
+        $('.select2-course').on('select2:close', function() {
+            console.log('Select2 closed');
+        });
+        
+        // Show selected course info (optional - for user feedback)
         $('.select2-course').on('change', function() {
             if ($(this).val()) {
-                $(this).closest('form').submit();
+                var selectedText = $(this).find('option:selected').text();
+                console.log('Curso seleccionado:', selectedText);
             }
         });
         // User search functionality
