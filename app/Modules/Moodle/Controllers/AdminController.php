@@ -330,6 +330,46 @@ class AdminController extends Controller
     }
 
     /**
+     * Get enrolled users count for multiple courses (AJAX)
+     *
+     * @param  Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getMultipleEnrolledUsersCount(Request $request)
+    {
+        try {
+            $courseIds = $request->input('course_ids', []);
+            
+            if (empty($courseIds)) {
+                return response()->json(['success' => false, 'message' => 'Course IDs are required'], 400);
+            }
+
+            $results = [];
+            foreach ($courseIds as $courseId) {
+                try {
+                    $enrolledUsers = $this->enrollmentService->getEnrolledUsers($courseId);
+                    $count = is_array($enrolledUsers) ? count($enrolledUsers) : 0;
+                    $results[$courseId] = $count;
+                } catch (Exception $e) {
+                    Log::warning("Could not get enrolled users count for course {$courseId}: {$e->getMessage()}");
+                    $results[$courseId] = 0;
+                }
+            }
+
+            return response()->json([
+                'success' => true, 
+                'results' => $results
+            ]);
+        } catch (Exception $e) {
+            Log::error("Get Multiple Enrolled Users Count Error: {$e->getMessage()}", ['course_ids' => $request->input('course_ids')]);
+            return response()->json([
+                'success' => false, 
+                'message' => 'Error getting enrolled users counts: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Display the courses management page.
      *
      * @param Request $request

@@ -9,6 +9,34 @@ namespace App\Modules\Moodle\Resources\views\admin;
 @section('title', 'Gestión de Matriculaciones')
 @section('subtitle', 'Administrar matriculaciones de estudiantes en cursos')
 
+@section('css')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<style>
+    .select2-container--bootstrap-5 .select2-selection {
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        min-height: 38px;
+    }
+    .select2-container--bootstrap-5 .select2-selection--single {
+        padding: 0.375rem 0.75rem;
+    }
+    .select2-container--bootstrap-5 .select2-selection__rendered {
+        color: #212529;
+        line-height: 1.5;
+    }
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+        background-color: #0d6efd;
+        color: white;
+    }
+    .select2-container--bootstrap-5 .select2-dropdown {
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+</style>
+@endsection
+
 @section('content')
     <!-- Course Selection -->
     <div class="card mb-4">
@@ -19,16 +47,17 @@ namespace App\Modules\Moodle\Resources\views\admin;
             <form action="{{ route('moodle.admin.enrollments') }}" method="GET" class="row g-3">
                 <div class="col-md-8">
                     <label for="course_id" class="form-label">Curso</label>
-                    <select class="form-select" id="course_id" name="course_id" required>
+                    <select class="form-select select2-course" id="course_id" name="course_id" required>
                         <option value="">Seleccione un curso</option>
                         @if(isset($courses) && count($courses) > 0)
                             @foreach($courses as $course)
                                 <option value="{{ $course['id'] }}" {{ isset($selectedCourseId) && $selectedCourseId == $course['id'] ? 'selected' : '' }}>
-                                    {{ $course['fullname'] }}
+                                    {{ $course['fullname'] }} (ID: {{ $course['id'] }})
                                 </option>
                             @endforeach
                         @endif
                     </select>
+                    <small class="form-text text-muted">Escriba para buscar cursos por nombre o ID</small>
                 </div>
                 <div class="col-md-4 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100">
@@ -278,8 +307,31 @@ namespace App\Modules\Moodle\Resources\views\admin;
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $(document).ready(function() {
+        // Initialize Select2 for course selection
+        $('.select2-course').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Seleccione un curso',
+            allowClear: true,
+            width: '100%',
+            language: {
+                noResults: function() {
+                    return "No se encontraron cursos";
+                },
+                searching: function() {
+                    return "Buscando...";
+                }
+            }
+        });
+        
+        // Auto-submit form when course is selected
+        $('.select2-course').on('change', function() {
+            if ($(this).val()) {
+                $(this).closest('form').submit();
+            }
+        });
         // User search functionality
         $('#searchUserBtn').click(function() {
             const searchTerm = $('#user_search').val().trim();

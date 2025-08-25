@@ -56,10 +56,18 @@ namespace App\Modules\Moodle\Resources\views\admin;
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
                 <i class="fas fa-book me-2"></i> Cursos
+                <small class="text-muted ms-2" id="loading-progress" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando estudiantes... <span id="progress-text">0/0</span>
+                </small>
             </div>
-            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#createCourseModal">
-                <i class="fas fa-plus me-2"></i> Nuevo Curso
-            </button>
+            <div>
+                <button type="button" class="btn btn-info btn-sm me-2" id="reload-counts" title="Recargar números de estudiantes">
+                    <i class="fas fa-sync-alt"></i> Recargar
+                </button>
+                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#createCourseModal">
+                    <i class="fas fa-plus me-2"></i> Nuevo Curso
+                </button>
+            </div>
         </div>
         <div class="card-body">
             @if(isset($courses) && count($courses) > 0)
@@ -136,9 +144,49 @@ namespace App\Modules\Moodle\Resources\views\admin;
                 </div>
 
                 <!-- Pagination -->
-                <div class="d-flex justify-content-center mt-4">
-                    {{ $courses->links() }}
-                </div>
+                @if($courses->hasPages())
+                    <div class="d-flex justify-content-center mt-4">
+                        <nav aria-label="Navegación de páginas">
+                            <ul class="pagination">
+                                {{-- Previous Page Link --}}
+                                @if ($courses->onFirstPage())
+                                    <li class="page-item disabled">
+                                        <span class="page-link">« Anterior</span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $courses->previousPageUrl() }}" rel="prev">« Anterior</a>
+                                    </li>
+                                @endif
+                                
+                                {{-- Current Page Info --}}
+                                <li class="page-item disabled">
+                                    <span class="page-link">
+                                        Página {{ $courses->currentPage() }} de {{ $courses->lastPage() }}
+                                    </span>
+                                </li>
+                                
+                                {{-- Next Page Link --}}
+                                @if ($courses->hasMorePages())
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $courses->nextPageUrl() }}" rel="next">Siguiente »</a>
+                                    </li>
+                                @else
+                                    <li class="page-item disabled">
+                                        <span class="page-link">Siguiente »</span>
+                                    </li>
+                                @endif
+                            </ul>
+                        </nav>
+                    </div>
+                    
+                    {{-- Pagination Info --}}
+                    <div class="text-center mt-2">
+                        <small class="text-muted">
+                            Mostrando {{ $courses->firstItem() ?? 0 }} a {{ $courses->lastItem() ?? 0 }} de {{ $courses->total() }} resultados
+                        </small>
+                    </div>
+                @endif
             @else
                 <p class="text-muted">No se encontraron cursos.</p>
             @endif
@@ -410,10 +458,28 @@ namespace App\Modules\Moodle\Resources\views\admin;
 @section('scripts')
 <script>
     $(document).ready(function() {
-        // Load enrolled users count for each course
-        $('.enrolled-count').each(function() {
-            var $element = $(this);
+        // Load enrolled users count sequentially to avoid overwhelming the server
+        var enrolledElements = $('.enrolled-count').toArray();
+        var currentIndex = 0;
+        var delay = 500; // 500ms delay between requests
+        var totalElements = enrolledElements.length;
+        
+        // Show progress indicator
+        if (totalElements > 0) {
+            $('#loading-progress').show();
+            $('#progress-text').text('0/' + totalElements);
+        }
+        
+        function loadNextEnrolledCount() {
+            if (currentIndex >= enrolledElements.length) {
+                return; // All done
+            }
+            
+            var $element = $(enrolledElements[currentIndex]);
             var courseId = $element.data('course-id');
+            
+            // Update loading indicator
+            $element.html('<i class="fas fa-spinner fa-spin text-primary"></i> Cargando...');
             
             $.ajax({
                 url: '{{ route("moodle.admin.courses.enrolled-count") }}',
@@ -422,19 +488,60 @@ namespace App\Modules\Moodle\Resources\views\admin;
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
+                timeout: 10000, // 10 second timeout
                 success: function(response) {
                     if (response.success) {
-                        $element.text(response.count);
+                        $element.html('<span class="badge bg-success">' + response.count + '</span>');
                     } else {
-                        $element.text('Error');
-                        console.error('Error loading enrolled count:', response.message);
+                        $element.html('<span class="text-danger"><i class="fas fa-exclamation-triangle"></i> Error</span>');
+                        console.error('Error loading enrolled count for course ' + courseId + ':', response.message);
                     }
                 },
                 error: function(xhr, status, error) {
-                    $element.text('Error');
-                    console.error('AJAX Error loading enrolled count:', error);
+                    if (status === 'timeout') {
+                        $element.html('<span class="text-warning"><i class="fas fa-clock"></i> Timeout</span>');
+                    } else {
+                        $element.html('<span class="text-danger"><i class="fas fa-exclamation-triangle"></i> Error</span>');
+                    }
+                    console.error('AJAX Error loading enrolled count for course ' + courseId + ':', error);
+                },
+                complete: function() {
+                    // Update progress
+                    currentIndex++;
+                    $('#progress-text').text(currentIndex + '/' + totalElements);
+                    
+                    // Hide progress when done
+                    if (currentIndex >= totalElements) {
+                        setTimeout(function() {
+                            $('#loading-progress').fadeOut();
+                        }, 2000);
+                    } else {
+                        // Load next one after a delay
+                        setTimeout(loadNextEnrolledCount, delay);
+                    }
                 }
             });
+        }
+        
+        // Start loading after a short delay
+        setTimeout(loadNextEnrolledCount, 1000);
+        
+        // Reload button functionality
+        $('#reload-counts').click(function() {
+            // Reset all elements to loading state
+            $('.enrolled-count').html('<i class="fas fa-spinner fa-spin text-muted"></i> Cargando...');
+            
+            // Reset variables
+            currentIndex = 0;
+            enrolledElements = $('.enrolled-count').toArray();
+            totalElements = enrolledElements.length;
+            
+            // Show progress
+            $('#loading-progress').show();
+            $('#progress-text').text('0/' + totalElements);
+            
+            // Start loading again
+            setTimeout(loadNextEnrolledCount, 500);
         });
 
         // Load course content when viewing details
