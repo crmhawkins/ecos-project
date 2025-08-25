@@ -10,44 +10,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
 @section('subtitle', 'Administrar matriculaciones de estudiantes en cursos')
 
 @section('css')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
-<style>
-    .select2-container--bootstrap-5 .select2-selection {
-        border: 1px solid #dee2e6;
-        border-radius: 0.375rem;
-        min-height: 38px;
-    }
-    .select2-container--bootstrap-5 .select2-selection--single {
-        padding: 0.375rem 0.75rem;
-    }
-    .select2-container--bootstrap-5 .select2-selection__rendered {
-        color: #212529;
-        line-height: 1.5;
-    }
-    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
-        background-color: #0d6efd;
-        color: white;
-    }
-    .select2-container--bootstrap-5 .select2-dropdown {
-        border: 1px solid #dee2e6;
-        border-radius: 0.375rem;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        z-index: 9999;
-    }
-    .select2-container--bootstrap-5 .select2-results__option {
-        padding: 8px 12px;
-        cursor: pointer;
-    }
-    .select2-container--bootstrap-5 .select2-results__option:hover {
-        background-color: #f8f9fa;
-    }
-    .select2-container--bootstrap-5 .select2-search__field {
-        padding: 8px 12px;
-        border: 1px solid #dee2e6;
-        border-radius: 0.375rem;
-    }
-</style>
+<!-- Sin estilos especiales, volvemos al select normal -->
 @endsection
 
 @section('content')
@@ -60,7 +23,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
             <form action="{{ route('moodle.admin.enrollments') }}" method="GET" class="row g-3">
                 <div class="col-md-8">
                     <label for="course_id" class="form-label">Curso</label>
-                    <select class="form-select select2-course" id="course_id" name="course_id" required>
+                    <select class="form-select" id="course_id" name="course_id" required>
                         <option value="">Seleccione un curso</option>
                         @if(isset($courses) && count($courses) > 0)
                             @foreach($courses as $course)
@@ -70,7 +33,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                             @endforeach
                         @endif
                     </select>
-                    <small class="form-text text-muted">Escriba para buscar cursos por nombre o ID</small>
+                    <small class="form-text text-muted">Seleccione un curso para ver sus matriculaciones</small>
                 </div>
                 <div class="col-md-4 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100">
@@ -320,46 +283,12 @@ namespace App\Modules\Moodle\Resources\views\admin;
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Initialize Select2 for course selection with a small delay to ensure DOM is ready
-        setTimeout(function() {
-            $('.select2-course').select2({
-            theme: 'bootstrap-5',
-            placeholder: 'Seleccione un curso',
-            allowClear: true,
-            width: '100%',
-            minimumResultsForSearch: 0, // Always show search box
-            closeOnSelect: true,
-            language: {
-                noResults: function() {
-                    return "No se encontraron cursos";
-                },
-                searching: function() {
-                    return "Buscando...";
-                },
-                inputTooShort: function() {
-                    return "Escriba para buscar cursos";
-                }
-            }
-        });
-        }, 100); // Small delay to ensure DOM is ready
-        
-        // Handle Select2 errors
-        $('.select2-course').on('select2:open', function() {
-            console.log('Select2 opened');
-        });
-        
-        $('.select2-course').on('select2:close', function() {
-            console.log('Select2 closed');
-        });
-        
-        // Show selected course info (optional - for user feedback)
-        $('.select2-course').on('change', function() {
+        // Simple course selection - auto submit when changed
+        $('#course_id').change(function() {
             if ($(this).val()) {
-                var selectedText = $(this).find('option:selected').text();
-                console.log('Curso seleccionado:', selectedText);
+                $(this).closest('form').submit();
             }
         });
         // User search functionality
@@ -433,6 +362,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                 $('#searchUserBtn').click();
             }
         });
+    });
     });
 </script>
 @endsection
