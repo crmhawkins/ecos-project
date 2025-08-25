@@ -31,6 +31,7 @@ Route::prefix('moodle/admin')->name('moodle.admin.')->middleware(['web', 'auth']
 
     // Courses
     Route::get('/courses', [AdminController::class, 'courses'])->name('courses');
+    Route::get('/courses/enrolled-count', [AdminController::class, 'getEnrolledUsersCount'])->name('courses.enrolled-count');
     Route::post('/courses', [AdminController::class, 'storeCourse'])->name('courses.store');
     Route::put('/courses/{id}', [AdminController::class, 'updateCourse'])->name('courses.update');
     Route::delete('/courses/{id}', [AdminController::class, 'destroyCourse'])->name('courses.destroy');

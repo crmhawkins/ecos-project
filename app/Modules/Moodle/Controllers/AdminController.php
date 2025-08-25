@@ -297,6 +297,39 @@ class AdminController extends Controller
     }
 
     /**
+     * Get enrolled users count for a specific course (AJAX)
+     *
+     * @param  Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getEnrolledUsersCount(Request $request)
+    {
+        try {
+            $courseId = $request->input('course_id');
+            
+            if (!$courseId) {
+                return response()->json(['success' => false, 'message' => 'Course ID is required'], 400);
+            }
+
+            $enrolledUsers = $this->enrollmentService->getEnrolledUsers($courseId);
+            $count = is_array($enrolledUsers) ? count($enrolledUsers) : 0;
+
+            return response()->json([
+                'success' => true, 
+                'count' => $count,
+                'course_id' => $courseId
+            ]);
+        } catch (Exception $e) {
+            Log::error("Get Enrolled Users Count Error: {$e->getMessage()}", ['course_id' => $request->input('course_id')]);
+            return response()->json([
+                'success' => false, 
+                'message' => 'Error getting enrolled users count: ' . $e->getMessage(),
+                'count' => 0
+            ], 500);
+        }
+    }
+
+    /**
      * Display the courses management page.
      *
      * @param Request $request
@@ -314,15 +347,10 @@ class AdminController extends Controller
 
             $moodleCourses = $this->courseService->getAllCourses();
 
-            // Obtener el número de estudiantes matriculados para cada curso
+            // No obtener el número de estudiantes aquí para evitar timeouts
+            // Se obtendrá de forma diferida cuando se necesite
             foreach ($moodleCourses as &$course) {
-                try {
-                    $enrolledUsers = $this->enrollmentService->getEnrolledUsers($course['id']);
-                    $course['enrolleduserscount'] = is_array($enrolledUsers) ? count($enrolledUsers) : 0;
-                } catch (Exception $e) {
-                    Log::warning("Could not get enrolled users count for course {$course['id']}: {$e->getMessage()}");
-                    $course['enrolleduserscount'] = 0;
-                }
+                $course['enrolleduserscount'] = 'Cargando...';
             }
 
             // --- Local Filtering ---

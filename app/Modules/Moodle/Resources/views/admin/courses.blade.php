@@ -100,7 +100,11 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                             <span class="badge bg-secondary">Oculto</span>
                                         @endif
                                     </td>
-                                    <td>{{ $course['enrolleduserscount'] ?? 0 }}</td>
+                                    <td>
+                                        <span class="enrolled-count" data-course-id="{{ $course['id'] }}">
+                                            <i class="fas fa-spinner fa-spin text-muted"></i> Cargando...
+                                        </span>
+                                    </td>
                                     <td>
                                         <div class="btn-group" role="group">
                                             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editCourseModal{{ $course['id'] }}">
@@ -406,6 +410,33 @@ namespace App\Modules\Moodle\Resources\views\admin;
 @section('scripts')
 <script>
     $(document).ready(function() {
+        // Load enrolled users count for each course
+        $('.enrolled-count').each(function() {
+            var $element = $(this);
+            var courseId = $element.data('course-id');
+            
+            $.ajax({
+                url: '{{ route("moodle.admin.courses.enrolled-count") }}',
+                type: 'GET',
+                data: { course_id: courseId },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $element.text(response.count);
+                    } else {
+                        $element.text('Error');
+                        console.error('Error loading enrolled count:', response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $element.text('Error');
+                    console.error('AJAX Error loading enrolled count:', error);
+                }
+            });
+        });
+
         // Load course content when viewing details
         @if(isset($courses) && count($courses) > 0)
             @foreach($courses as $course)
