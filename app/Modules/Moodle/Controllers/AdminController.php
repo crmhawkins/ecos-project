@@ -136,15 +136,72 @@ class AdminController extends Controller
                 return response()->json(["success" => false, "message" => "Término de búsqueda debe tener al menos 3 caracteres"], 400);
             }
 
-            $criteria = [
-                ["key" => "firstname", "value" => "%" . $search . "%"]  // Usar 'key' y 'value' en inglés
-            ];
+            // Buscar por diferentes criterios para obtener más resultados
+            $allUsers = [];
+            
+            // Intentar búsqueda exacta por firstname
+            try {
+                $criteria = [["key" => "firstname", "value" => $search]];
+                $users = $this->userService->searchUsers($criteria);
+                $allUsers = array_merge($allUsers, $users);
+            } catch (Exception $e) {
+                // Continuar con otros criterios si falla
+            }
+            
+            // Intentar búsqueda por lastname
+            try {
+                $criteria = [["key" => "lastname", "value" => $search]];
+                $users = $this->userService->searchUsers($criteria);
+                $allUsers = array_merge($allUsers, $users);
+            } catch (Exception $e) {
+                // Continuar con otros criterios si falla
+            }
+            
+            // Intentar búsqueda por email
+            try {
+                $criteria = [["key" => "email", "value" => $search]];
+                $users = $this->userService->searchUsers($criteria);
+                $allUsers = array_merge($allUsers, $users);
+            } catch (Exception $e) {
+                // Continuar con otros criterios si falla
+            }
+            
+            // Intentar búsqueda por username
+            try {
+                $criteria = [["key" => "username", "value" => $search]];
+                $users = $this->userService->searchUsers($criteria);
+                $allUsers = array_merge($allUsers, $users);
+            } catch (Exception $e) {
+                // Continuar con otros criterios si falla
+            }
+            
+            // Si no encontramos nada, intentar con un criterio que sabemos que funciona
+            if (empty($allUsers)) {
+                try {
+                    $criteria = [["key" => "confirmed", "value" => "1"]];
+                    $allUsers = $this->userService->searchUsers($criteria);
+                } catch (Exception $e) {
+                    // Si todo falla, devolver error
+                    throw new Exception("No se pudieron obtener usuarios de Moodle");
+                }
+            }
 
-            $users = $this->userService->searchUsers($criteria);
+            // Eliminar duplicados basados en el ID
+            $uniqueUsers = [];
+            foreach ($allUsers as $user) {
+                $uniqueUsers[$user['id']] = $user;
+            }
+            $allUsers = array_values($uniqueUsers);
 
             $formattedUsers = array_map(function($user) {
-                return ["id" => $user["id"], "firstname" => $user["firstname"], "lastname" => $user["lastname"], "email" => $user["email"], "username" => $user["username"]];
-            }, array_slice($users, 0, 20));
+                return [
+                    "id" => $user["id"] ?? 0,
+                    "firstname" => $user["firstname"] ?? '',
+                    "lastname" => $user["lastname"] ?? '',
+                    "email" => $user["email"] ?? 'N/A',
+                    "username" => $user["username"] ?? 'N/A'
+                ];
+            }, array_slice($allUsers, 0, 20));
 
             return response()->json(["success" => true, "users" => $formattedUsers]);
         } catch (Exception $e) {

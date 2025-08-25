@@ -30,7 +30,9 @@ window.addEventListener('resize', (event) => {
     }
 });
 
-document.querySelector('.burger-btn').addEventListener('click', () => {
+const burgerBtn = document.querySelector('.burger-btn');
+if (burgerBtn) {
+    burgerBtn.addEventListener('click', () => {
     let sidebar = document.getElementById('sidebar');
     let overlay = document.getElementById('overlay');
     let main = document.getElementById('main');
@@ -62,8 +64,11 @@ document.querySelector('.burger-btn').addEventListener('click', () => {
     if(sidebar.classList.contains('active')){ sidebar.style.display = 'block'; } else {
         overlay.remove();
      }
-})
-document.querySelector('.sidebar-hide').addEventListener('click', () => {
+    });
+}
+const sidebarHide = document.querySelector('.sidebar-hide');
+if (sidebarHide) {
+    sidebarHide.addEventListener('click', () => {
     let sidebar = document.getElementById('sidebar');
     let overlay = document.getElementById('overlay');
     let main = document.getElementById('main');
@@ -77,7 +82,8 @@ document.querySelector('.sidebar-hide').addEventListener('click', () => {
             overlay.remove(); // Elimina el overlay del DOM
         }
     }
-})
+    });
+}
 
 
 // Perfect Scrollbar Init
@@ -89,4 +95,7 @@ if(typeof PerfectScrollbar == 'function') {
 }
 
 // Scroll into active sidebar
-document.querySelector('.sidebar-item.active').scrollIntoView(false)
+const activeSidebarItem = document.querySelector('.sidebar-item.active');
+if (activeSidebarItem) {
+    activeSidebarItem.scrollIntoView(false);
+}

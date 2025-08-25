@@ -297,29 +297,44 @@ namespace App\Modules\Moodle\Resources\views\admin;
                 url: '{{ route("moodle.admin.users.search") }}',
                 type: 'GET',
                 data: { search: searchTerm },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 success: function(response) {
+                    console.log('Search response:', response); // Debug
                     if (response.success) {
                         let html = '';
                         if (response.users && response.users.length > 0) {
                             response.users.forEach(function(user) {
                                 html += '<tr>';
                                 html += '<td><input type="radio" name="user_id" value="' + user.id + '" class="form-check-input user-select"></td>';
-                                html += '<td>' + user.firstname + ' ' + user.lastname + '</td>';
-                                html += '<td>' + user.email + '</td>';
-                                html += '<td>' + user.username + '</td>';
+                                html += '<td>' + (user.firstname || '') + ' ' + (user.lastname || '') + '</td>';
+                                html += '<td>' + (user.email || 'N/A') + '</td>';
+                                html += '<td>' + (user.username || 'N/A') + '</td>';
                                 html += '</tr>';
                             });
                         } else {
-                            html = '<tr><td colspan="4" class="text-center">No se encontraron usuarios.</td></tr>';
+                            html = '<tr><td colspan="4" class="text-center text-muted">No se encontraron usuarios con ese término de búsqueda.</td></tr>';
                         }
 
                         $('#userSearchResultsBody').html(html);
                     } else {
-                        $('#userSearchResultsBody').html('<tr><td colspan="4" class="text-center text-danger">' + response.message + '</td></tr>');
+                        $('#userSearchResultsBody').html('<tr><td colspan="4" class="text-center text-danger">' + (response.message || 'Error en la búsqueda') + '</td></tr>');
                     }
                 },
-                error: function() {
-                    $('#userSearchResultsBody').html('<tr><td colspan="4" class="text-center text-danger">Error al buscar usuarios. Por favor, inténtelo de nuevo.</td></tr>');
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', xhr, status, error); // Debug
+                    let errorMessage = 'Error al buscar usuarios. Por favor, inténtelo de nuevo.';
+                    
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    } else if (xhr.status === 401) {
+                        errorMessage = 'Sesión expirada. Por favor, recargue la página.';
+                    } else if (xhr.status === 500) {
+                        errorMessage = 'Error del servidor. Por favor, contacte al administrador.';
+                    }
+                    
+                    $('#userSearchResultsBody').html('<tr><td colspan="4" class="text-center text-danger">' + errorMessage + '</td></tr>');
                 }
             });
         });
