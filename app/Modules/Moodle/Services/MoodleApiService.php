@@ -156,6 +156,8 @@ class MoodleApiService
         $timeout = $this->timeout;
         if ($function === 'core_user_get_users') {
             $timeout = 120; // 2 minutos para la función de usuarios
+        } elseif ($function === 'core_enrol_get_enrolled_users') {
+            $timeout = 90; // 1.5 minutos para obtener usuarios matriculados
         }
 
         $response = Http::timeout($timeout)

@@ -314,6 +314,17 @@ class AdminController extends Controller
 
             $moodleCourses = $this->courseService->getAllCourses();
 
+            // Obtener el número de estudiantes matriculados para cada curso
+            foreach ($moodleCourses as &$course) {
+                try {
+                    $enrolledUsers = $this->enrollmentService->getEnrolledUsers($course['id']);
+                    $course['enrolleduserscount'] = is_array($enrolledUsers) ? count($enrolledUsers) : 0;
+                } catch (Exception $e) {
+                    Log::warning("Could not get enrolled users count for course {$course['id']}: {$e->getMessage()}");
+                    $course['enrolleduserscount'] = 0;
+                }
+            }
+
             // --- Local Filtering ---
             if ($search) {
                 $moodleCourses = array_filter($moodleCourses, function($course) use ($search) {
@@ -490,22 +501,41 @@ class AdminController extends Controller
             $courses = $this->courseService->getAllCourses(); // For dropdown
 
             if ($courseId) {
-                $enrolledUsersData = $this->enrollmentService->getEnrolledUsers($courseId);
-                // TODO: Consider pagination if the list is large
-                $collection = collect($enrolledUsersData);
+                try {
+                    $enrolledUsersData = $this->enrollmentService->getEnrolledUsers($courseId);
+                    
+                    // Si no hay datos o es un array vacío, crear una colección vacía
+                    if (empty($enrolledUsersData)) {
+                        $enrolledUsersData = [];
+                    }
+                    
+                    $collection = collect($enrolledUsersData);
 
-                // Paginate manually (10 per page, for example)
-                $perPage = 10;
-                $currentPage = LengthAwarePaginator::resolveCurrentPage();
-                $pagedData = $collection->slice(($currentPage - 1) * $perPage, $perPage)->values();
+                    // Paginate manually (10 per page, for example)
+                    $perPage = 10;
+                    $currentPage = LengthAwarePaginator::resolveCurrentPage();
+                    $pagedData = $collection->slice(($currentPage - 1) * $perPage, $perPage)->values();
 
-                $enrolledUsers = new LengthAwarePaginator(
-                    $pagedData,
-                    $collection->count(),
-                    $perPage,
-                    $currentPage,
-                    ['path' => $request->url(), 'query' => $request->query()]
-                );
+                    $enrolledUsers = new LengthAwarePaginator(
+                        $pagedData,
+                        $collection->count(),
+                        $perPage,
+                        $currentPage,
+                        ['path' => $request->url(), 'query' => $request->query()]
+                    );
+                } catch (Exception $e) {
+                    // Si hay un error, crear una paginación vacía
+                    $enrolledUsers = new LengthAwarePaginator(
+                        collect([]),
+                        0,
+                        10,
+                        1,
+                        ['path' => $request->url(), 'query' => $request->query()]
+                    );
+                    
+                    // Log el error pero no lanzar excepción
+                    Log::warning("Could not fetch enrolled users for course {$courseId}: {$e->getMessage()}");
+                }
             }
 
             // Fetch Moodle roles for enrollment modal

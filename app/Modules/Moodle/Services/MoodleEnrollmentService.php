@@ -137,6 +137,12 @@ class MoodleEnrollmentService
                 'exception' => $e
             ]);
 
+            // Si es un timeout, intentar con una estrategia diferente
+            if (strpos($e->getMessage(), 'timeout') !== false || strpos($e->getMessage(), 'timed out') !== false) {
+                Log::warning("Timeout detected for course {$courseId}, returning empty array");
+                return [];
+            }
+
             throw new Exception("Error getting enrolled users in Moodle course: {$e->getMessage()}");
         }
     }
