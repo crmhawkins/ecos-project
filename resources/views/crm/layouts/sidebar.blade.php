@@ -47,6 +47,7 @@
                     $CategoriasCursosActive = request()->routeIs('cursosCategoria.*');
                     $reservasActive = request()->routeIs('reservas.*');
                     $aulasActive = request()->routeIs('aulas.*');
+                    $builderActive = request()->routeIs('builder.*');
                     $ContabilidadActive = request()->routeIs('cuentasContables.*') || request()->routeIs('subCuentasContables.*') || request()->routeIs('subCuentasHijaContables.*') || request()->routeIs('grupoContabilidad.*') || request()->routeIs('subGrupoContabilidad.*') || request()->routeIs('admin.planContable.index');
                     $admin = (Auth::user()->access_level_id == 1);
                     $gerente = (Auth::user()->access_level_id == 2);
@@ -61,6 +62,12 @@
                     <a href="{{route('moodle.admin.dashboard')}}" class='sidebar-link'>
                         <img src="{{asset('assets/icons/Moodle.svg')}}" style="max-height: 20px;" alt="Moodle">
                         <span>Moodle</span>
+                    </a>
+                </li>
+                <li class="sidebar-item {{ $builderActive ? 'active' : '' }}">
+                    <a href="{{route('builder')}}" class='sidebar-link'>
+                        <i class="fa-solid fa-palette fs-5"></i>
+                        <span>Builder</span>
                     </a>
                 </li>
                 <li class="sidebar-item has-sub {{ $CursosActive ? 'active' : '' }}">
