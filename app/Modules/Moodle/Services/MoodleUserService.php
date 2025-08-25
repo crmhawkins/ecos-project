@@ -348,23 +348,21 @@ class MoodleUserService
     public function searchUsers(array $criteria): array
     {
         try {
-            // Si no se pasan criterios, usar un criterio válido para evitar timeout
+            // La API de Moodle requiere al menos un criterio válido
             if (empty($criteria)) {
-                // Usar un criterio que funcione con la API de Moodle
-                // Buscar usuarios con email que contenga '@' (todos los usuarios válidos)
+                // Si no hay criterios, obtener usuarios usando un criterio válido
+                // Usar el ID del usuario actual como punto de partida
                 $criteria = [
-                    ['key' => 'email', 'value' => '%@%']  // Usuarios con email válido
+                    ['key' => 'id', 'value' => '8813']  // Empezar con el usuario actual
                 ];
             }
 
-            // Agregar límites para evitar cargar demasiados usuarios
+            // Parámetros para la API
             $params = [
-                'criteria' => $criteria,  // Usar 'criteria' en inglés
-                'limitnum' => 100  // Limitar a 100 usuarios máximo
+                'criteria' => $criteria
             ];
 
             $response = $this->apiService->call('core_user_get_users', $params);
-            //dd($response);
             return $response['users'] ?? [];
         } catch (Exception $e) {
             Log::error("Moodle Search Users Error: {$e->getMessage()}", [
@@ -373,6 +371,62 @@ class MoodleUserService
             ]);
 
             throw new Exception("Error searching Moodle users: {$e->getMessage()}");
+        }
+    }
+
+    /**
+     * Get all users from Moodle
+     *
+     * @return array
+     */
+    public function getAllUsers(): array
+    {
+        try {
+            // Obtener todos los usuarios confirmados de una vez
+            $params = [
+                'criteria' => [['key' => 'confirmed', 'value' => '1']]
+            ];
+            
+            $response = $this->apiService->call('core_user_get_users', $params);
+            $allUsers = $response['users'] ?? [];
+
+            // Ordenar por ID
+            usort($allUsers, function($a, $b) {
+                return $a['id'] <=> $b['id'];
+            });
+
+            return $allUsers;
+        } catch (Exception $e) {
+            Log::error("Moodle Get All Users Error: {$e->getMessage()}", [
+                'exception' => $e
+            ]);
+
+            throw new Exception("Error getting all Moodle users: {$e->getMessage()}");
+        }
+    }
+
+    /**
+     * Get total count of users for pagination
+     *
+     * @return int
+     */
+    public function getTotalUsersCount(): int
+    {
+        try {
+            // Obtener todos los usuarios confirmados para contar
+            $params = [
+                'criteria' => [['key' => 'confirmed', 'value' => '1']]
+            ];
+            
+            $response = $this->apiService->call('core_user_get_users', $params);
+            $allUsers = $response['users'] ?? [];
+            
+            return count($allUsers);
+        } catch (Exception $e) {
+            Log::error("Moodle Get Total Users Count Error: {$e->getMessage()}", [
+                'exception' => $e
+            ]);
+            return 0;
         }
     }
 

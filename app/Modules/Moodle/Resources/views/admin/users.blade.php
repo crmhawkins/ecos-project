@@ -49,7 +49,12 @@ namespace App\Modules\Moodle\Resources\views\admin;
             @if(empty($search))
                 <div class="alert alert-info mt-3 mb-0">
                     <i class="fas fa-info-circle me-2"></i>
-                    <strong>Nota:</strong> Se muestran solo usuarios activos. Para buscar usuarios específicos, utiliza el campo de búsqueda arriba.
+                    <strong>Nota:</strong> Mostrando todos los usuarios disponibles ({{ $users->total() }} usuarios). Para buscar usuarios específicos, utiliza el campo de búsqueda arriba con al menos 2 caracteres.
+                </div>
+            @else
+                <div class="alert alert-success mt-3 mb-0">
+                    <i class="fas fa-search me-2"></i>
+                    <strong>Búsqueda:</strong> Mostrando resultados para "{{ $search }}" en el campo "{{ $searchType }}" ({{ $users->count() }} resultados).
                 </div>
             @endif
         </div>
@@ -83,10 +88,10 @@ namespace App\Modules\Moodle\Resources\views\admin;
                         <tbody>
                             @foreach($users as $user)
                                 <tr>
-                                    <td>{{ $user['id'] }}</td>
-                                    <td>{{ $user['firstname'] }} {{ $user['lastname'] }}</td>
-                                    <td>{{ $user['email'] }}</td>
-                                    <td>{{ $user['username'] }}</td>
+                                    <td>{{ $user['id'] ?? 'N/A' }}</td>
+                                    <td>{{ ($user['firstname'] ?? '') }} {{ ($user['lastname'] ?? '') }}</td>
+                                    <td>{{ $user['email'] ?? 'N/A' }}</td>
+                                    <td>{{ $user['username'] ?? 'N/A' }}</td>
                                     <td>{{ (isset($user['lastaccess']) && $user['lastaccess'] !== 0) ? date('d/m/Y H:i', $user['lastaccess']) : 'Nunca' }}</td>
                                     <td>
                                         @if(isset($user['suspended']) && $user['suspended'])
@@ -116,7 +121,47 @@ namespace App\Modules\Moodle\Resources\views\admin;
 
                 <!-- Pagination -->
                 <div class="d-flex justify-content-center mt-4">
-                    {{ $users->links() }}
+                    @if($users->hasPages())
+                        <nav aria-label="Navegación de páginas">
+                            <ul class="pagination">
+                                {{-- Previous Page Link --}}
+                                @if ($users->onFirstPage())
+                                    <li class="page-item disabled">
+                                        <span class="page-link">« Anterior</span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $users->previousPageUrl() }}" rel="prev">« Anterior</a>
+                                    </li>
+                                @endif
+
+                                {{-- Current Page Info --}}
+                                <li class="page-item disabled">
+                                    <span class="page-link">
+                                        Página {{ $users->currentPage() }} de {{ $users->lastPage() }}
+                                    </span>
+                                </li>
+
+                                {{-- Next Page Link --}}
+                                @if ($users->hasMorePages())
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $users->nextPageUrl() }}" rel="next">Siguiente »</a>
+                                    </li>
+                                @else
+                                    <li class="page-item disabled">
+                                        <span class="page-link">Siguiente »</span>
+                                    </li>
+                                @endif
+                            </ul>
+                        </nav>
+                        
+                        {{-- Pagination Info --}}
+                        <div class="text-center mt-2">
+                            <small class="text-muted">
+                                Mostrando {{ $users->firstItem() ?? 0 }} a {{ $users->lastItem() ?? 0 }} de {{ $users->total() }} resultados
+                            </small>
+                        </div>
+                    @endif
                 </div>
             @else
                 <p class="text-muted">No se encontraron usuarios.</p>
@@ -205,21 +250,21 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label for="firstname{{ $user['id'] }}" class="form-label">Nombre</label>
-                                        <input type="text" class="form-control" id="firstname{{ $user['id'] }}" name="firstname" value="{{ $user['firstname'] }}" required>
+                                        <input type="text" class="form-control" id="firstname{{ $user['id'] }}" name="firstname" value="{{ $user['firstname'] ?? '' }}" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="lastname{{ $user['id'] }}" class="form-label">Apellidos</label>
-                                        <input type="text" class="form-control" id="lastname{{ $user['id'] }}" name="lastname" value="{{ $user['lastname'] }}" required>
+                                        <input type="text" class="form-control" id="lastname{{ $user['id'] }}" name="lastname" value="{{ $user['lastname'] ?? '' }}" required>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label for="email{{ $user['id'] }}" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="email{{ $user['id'] }}" name="email" value="{{ $user['email'] }}" required>
+                                        <input type="email" class="form-control" id="email{{ $user['id'] }}" name="email" value="{{ $user['email'] ?? '' }}" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="username{{ $user['id'] }}" class="form-label">Nombre de usuario</label>
-                                        <input type="text" class="form-control" id="username{{ $user['id'] }}" name="username" value="{{ $user['username'] }}" readonly>
+                                        <input type="text" class="form-control" id="username{{ $user['id'] }}" name="username" value="{{ $user['username'] ?? '' }}" readonly>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -265,13 +310,13 @@ namespace App\Modules\Moodle\Resources\views\admin;
                                     @endif
                                 </div>
                                 <div class="col-md-9">
-                                    <h4>{{ $user['firstname'] }} {{ $user['lastname'] }}</h4>
-                                    <p class="text-muted">{{ $user['email'] }}</p>
+                                    <h4>{{ $user['firstname'] ?? 'N/A' }} {{ $user['lastname'] ?? 'N/A' }}</h4>
+                                    <p class="text-muted">{{ $user['email'] ?? 'N/A' }}</p>
 
                                     <div class="row mt-3">
                                         <div class="col-md-6">
-                                            <p><strong>ID:</strong> {{ $user['id'] }}</p>
-                                            <p><strong>Nombre de usuario:</strong> {{ $user['username'] }}</p>
+                                            <p><strong>ID:</strong> {{ $user['id'] ?? 'N/A' }}</p>
+                                            <p><strong>Nombre de usuario:</strong> {{ $user['username'] ?? 'N/A' }}</p>
                                         </div>
                                         <div class="col-md-6">
                                             <p><strong>Estado:</strong>

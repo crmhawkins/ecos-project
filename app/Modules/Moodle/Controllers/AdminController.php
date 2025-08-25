@@ -78,29 +78,32 @@ class AdminController extends Controller
 
             // Solo buscar si hay un término de búsqueda específico
             if ($search && $searchType && strlen(trim($search)) >= 2) {
-                $criteria[] = ["key" => $searchType , "value" => "%" . $search . "%"];  // Usar 'key' y 'value' en inglés
+                $criteria[] = ["key" => $searchType , "value" => trim($search)];  // Búsqueda exacta sin comodines
             }
 
-            // Si no hay criterios de búsqueda, usar la nueva lógica que evita timeout
+            // Si no hay criterios de búsqueda, obtener todos los usuarios
             if (empty($criteria)) {
-                // Usar el método que busca solo usuarios activos para evitar timeout
-                $moodleUsers = $this->userService->searchUsers($criteria);
+                $totalUsers = $this->userService->getTotalUsersCount();
+                $allUsers = $this->userService->getAllUsers(); // Obtener todos sin paginación
+                $infoMessage = "Mostrando todos los usuarios disponibles. Para buscar usuarios específicos, utiliza el campo de búsqueda arriba.";
             } else {
-                $moodleUsers = $this->userService->searchUsers($criteria);
+                $allUsers = $this->userService->searchUsers($criteria);
+                $totalUsers = count($allUsers);
+                $infoMessage = null;
             }
 
-            //dd($moodleUsers);
             // --- Local Filtering ---
             if ($status === "suspended") {
-                $moodleUsers = array_filter($moodleUsers, fn($user) => $user["suspended"] === true);
+                $allUsers = array_filter($allUsers, fn($user) => $user["suspended"] === true);
             } elseif ($status === "active") {
-                $moodleUsers = array_filter($moodleUsers, fn($user) => $user["suspended"] === false);
+                $allUsers = array_filter($allUsers, fn($user) => $user["suspended"] === false);
             }
 
-            $usersCollection = new Collection(array_values($moodleUsers));
+            // Aplicar paginación después del filtrado
+            $usersCollection = new Collection(array_values($allUsers));
             $paginatedUsers = new LengthAwarePaginator(
                 $usersCollection->forPage($page, $perPage),
-                $usersCollection->count(),
+                $totalUsers, // Usar el total real de usuarios
                 $perPage,
                 $page,
                 ["path" => $request->url(), "query" => $request->query()]
@@ -111,6 +114,7 @@ class AdminController extends Controller
                 "search" => $search,
                 "searchType" => $searchType,
                 "selectedStatus" => $status,
+                "infoMessage" => $infoMessage ?? null,
             ]);
         } catch (Exception $e) {
             Log::error("Admin Users Error: {" . $e->getMessage() . "}");
