@@ -1,14 +1,11 @@
-<?php
-
-namespace App\Modules\Moodle\Resources\views\admin;
-
-?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">   {{-- ver punto 2 --}}
+    
     <title>Panel de Administración - Módulo Moodle</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -125,10 +122,12 @@ namespace App\Modules\Moodle\Resources\views\admin;
             color: #6c757d;
             font-size: 0.9rem;
         }
-    </style>
-</head>
-<body>
-    <div class="sidebar">
+        </style>
+      @yield('css')                                          {{-- <—— AÑÁDELO AQUÍ --}}
+      
+    </head>
+    <body>
+        <div class="sidebar">
         <div class="sidebar-header">
             <h3>Módulo Moodle</h3>
             <small>Panel de Administración</small>
@@ -214,8 +213,8 @@ namespace App\Modules\Moodle\Resources\views\admin;
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     @yield('scripts')
 </body>
 </html>

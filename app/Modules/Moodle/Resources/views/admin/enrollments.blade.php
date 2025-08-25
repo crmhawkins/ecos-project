@@ -1,16 +1,47 @@
-<?php
-
-namespace App\Modules\Moodle\Resources\views\admin;
-
-?>
-
 @extends('moodle::admin.layout')
 
 @section('title', 'Gestión de Matriculaciones')
 @section('subtitle', 'Administrar matriculaciones de estudiantes en cursos')
 
 @section('css')
-<!-- Sin estilos especiales, volvemos al select normal -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container { 
+        width: 100% !important; 
+    }
+    .select2-container--default .select2-selection--single { 
+        height: 45px !important; 
+        border: 1px solid #dee2e6 !important; 
+        border-radius: 0.5rem !important; 
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered { 
+        line-height: 43px !important; 
+        padding-left: 16px !important; 
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { 
+        height: 43px !important; 
+    }
+    .select2-dropdown { 
+        border: 1px solid #dee2e6 !important; 
+        border-radius: 0.5rem !important; 
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; 
+    }
+    .select2-search--dropdown { 
+        padding: 12px !important; 
+    }
+    .select2-search--dropdown .select2-search__field { 
+        border: 1px solid #dee2e6 !important; 
+        border-radius: 0.375rem !important; 
+        padding: 8px 12px !important; 
+    }
+    .select2-results__option { 
+        padding: 12px 16px !important; 
+    }
+    .select2-container--default .select2-results__option--highlighted[aria-selected] { 
+        background-color: #0d6efd !important; 
+        color: white !important; 
+    }
+</style>
 @endsection
 
 @section('content')
@@ -23,7 +54,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
             <form action="{{ route('moodle.admin.enrollments') }}" method="GET" class="row g-3">
                 <div class="col-md-8">
                     <label for="course_id" class="form-label">Curso</label>
-                    <select class="form-select" id="course_id" name="course_id" required>
+                    <select class="form-select select2-course" id="course_id" name="course_id" required>
                         <option value="">Seleccione un curso</option>
                         @if(isset($courses) && count($courses) > 0)
                             @foreach($courses as $course)
@@ -33,7 +64,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
                             @endforeach
                         @endif
                     </select>
-                    <small class="form-text text-muted">Seleccione un curso para ver sus matriculaciones</small>
+                    <small class="form-text text-muted">Escriba para buscar cursos por nombre o ID</small>
                 </div>
                 <div class="col-md-4 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100">
@@ -166,7 +197,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
 
                             <div class="mb-3">
                                 <label for="role_id" class="form-label">Rol</label>
-                                <select class="form-select" id="role_id" name="role_id" required>
+                                <select class="form-select select2" id="role_id" name="role_id" required>
                                     <option value="5">Estudiante</option>
                                     <option value="3">Profesor</option>
                                     <option value="4">Profesor sin permiso de edición</option>
@@ -216,7 +247,7 @@ namespace App\Modules\Moodle\Resources\views\admin;
 
                                     <div class="mb-3">
                                         <label for="role_id{{ $user['id'] }}" class="form-label">Rol</label>
-                                        <select class="form-select" id="role_id{{ $user['id'] }}" name="role_id" required>
+                                        <select class="form-select select2" id="role_id{{ $user['id'] }}" name="role_id" required>
                                             @php
                                                 $currentRoleId = 5; // Default to student
                                                 if(isset($user['roles']) && count($user['roles']) > 0) {
@@ -283,14 +314,49 @@ namespace App\Modules\Moodle\Resources\views\admin;
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Simple course selection - auto submit when changed
-        $('#course_id').change(function() {
-            if ($(this).val()) {
-                $(this).closest('form').submit();
-            }
+        console.log('🔄 Inicializando Select2...');
+        
+        // Select de cursos (fuera de modal)
+        $('.select2-course').select2({
+            placeholder: 'Seleccione un curso',
+            allowClear: true,
+            width: '100%',
+            minimumResultsForSearch: 0
         });
+        
+        // Al abrir el modal de "Matricular usuario"
+        $('#enrollUserModal').on('shown.bs.modal', function () {
+            $(this).find('select.select2').each(function () {
+                if (!$(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2({
+                        width: '100%',
+                        dropdownParent: $('#enrollUserModal')
+                    });
+                }
+            });
+        });
+        
+        // Al abrir cada modal de "Editar matriculación"
+        @if(isset($enrolledUsers) && count($enrolledUsers) > 0)
+            @foreach($enrolledUsers as $user)
+                $('#editEnrollmentModal{{ $user['id'] }}').on('shown.bs.modal', function () {
+                    $(this).find('select.select2').each(function () {
+                        if (!$(this).hasClass('select2-hidden-accessible')) {
+                            $(this).select2({
+                                width: '100%',
+                                dropdownParent: $('#editEnrollmentModal{{ $user['id'] }}')
+                            });
+                        }
+                    });
+                });
+            @endforeach
+        @endif
+        
+        console.log('✅ Select2 inicializado');
+        
         // User search functionality
         $('#searchUserBtn').click(function() {
             const searchTerm = $('#user_search').val().trim();
@@ -362,7 +428,6 @@ namespace App\Modules\Moodle\Resources\views\admin;
                 $('#searchUserBtn').click();
             }
         });
-    });
     });
 </script>
 @endsection
