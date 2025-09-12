@@ -108,7 +108,9 @@ class MoodleApiService
         $cacheKey = "moodle_api_{$function}_" . md5(json_encode($params));
 
         // Return cached response if available and cache is enabled
-        if ($this->useCache && !$forceRefresh && Cache::has($cacheKey)) {
+        // Skip cache for enrollment functions to get real-time data
+        $skipCacheFunctions = ['core_enrol_get_enrolled_users', 'enrol_manual_enrol_users', 'enrol_manual_unenrol_users'];
+        if ($this->useCache && !$forceRefresh && Cache::has($cacheKey) && !in_array($function, $skipCacheFunctions)) {
             return Cache::get($cacheKey);
         }
 
@@ -116,7 +118,8 @@ class MoodleApiService
             $response = $this->makeRequest($function, $params);
 
             // Cache the response if caching is enabled
-            if ($this->useCache) {
+            // Skip cache for enrollment functions to get real-time data
+            if ($this->useCache && !in_array($function, $skipCacheFunctions)) {
                 Cache::put($cacheKey, $response, $this->cacheTtl);
             }
 
@@ -167,8 +170,21 @@ class MoodleApiService
         if ($response->successful()) {
             $data = $response->json();
 
+            // Log the response for debugging
+            Log::info("Moodle API Response for {$function}:", [
+                'function' => $function,
+                'params' => $params,
+                'response' => $data
+            ]);
+
             // Check for Moodle API error
             if (isset($data['exception'])) {
+                Log::error("Moodle API Exception: {$data['message']}", [
+                    'function' => $function,
+                    'params' => $params,
+                    'exception' => $data['exception'],
+                    'message' => $data['message'] ?? 'Unknown error'
+                ]);
                 throw new Exception($data['message'] ?? 'Unknown Moodle API error');
             }
 

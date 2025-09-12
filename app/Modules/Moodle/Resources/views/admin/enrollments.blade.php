@@ -419,6 +419,16 @@
         // Enable enroll button when a user is selected
         $(document).on('change', '.user-select', function() {
             $('#enrollBtn').prop('disabled', false);
+            
+            // Add hidden input with selected user ID
+            $('input[name="user_id"]').remove(); // Remove any existing hidden input
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'user_id',
+                value: $(this).val()
+            }).appendTo('form[action*="enroll"]');
+            
+            console.log('Usuario seleccionado:', $(this).val());
         });
 
         // Also trigger search when pressing Enter in the search field
@@ -427,6 +437,22 @@
                 e.preventDefault();
                 $('#searchUserBtn').click();
             }
+        });
+
+        // Debug form submission - Solo para el formulario de matriculación
+        $('form[action*="enrollments/enroll"]').on('submit', function(e) {
+            console.log('📤 Enviando formulario de matriculación...');
+            console.log('Datos del formulario:', $(this).serialize());
+            
+            // Verificar que user_id esté presente
+            const userId = $('input[name="user_id"]').val();
+            if (!userId) {
+                e.preventDefault();
+                alert('Por favor, seleccione un usuario antes de continuar.');
+                return false;
+            }
+            
+            console.log('✅ Usuario ID encontrado:', userId);
         });
     });
 </script>

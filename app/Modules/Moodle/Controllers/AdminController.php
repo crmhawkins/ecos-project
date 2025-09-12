@@ -570,11 +570,14 @@ class AdminController extends Controller
 
             if ($courseId) {
                 try {
+                    Log::info("Fetching enrolled users for course: {$courseId}");
                     $enrolledUsersData = $this->enrollmentService->getEnrolledUsers($courseId);
+                    Log::info("Enrolled users data received:", ['count' => count($enrolledUsersData), 'data' => $enrolledUsersData]);
                     
                     // Si no hay datos o es un array vacío, crear una colección vacía
                     if (empty($enrolledUsersData)) {
                         $enrolledUsersData = [];
+                        Log::warning("No enrolled users data received for course: {$courseId}");
                     }
                     
                     $collection = collect($enrolledUsersData);
@@ -606,17 +609,13 @@ class AdminController extends Controller
                 }
             }
 
-            // Fetch Moodle roles for enrollment modal
-            $moodleRoles = [];
-            try {
-                $rolesData = $this->apiService->call("core_role_get_roles");
-                if (is_array($rolesData)) {
-                    $assignableRoles = ["student", "teacher", "editingteacher"];
-                    $moodleRoles = array_filter($rolesData, fn($role) => in_array($role["shortname"], $assignableRoles));
-                }
-            } catch (Exception $roleEx) {
-                Log::error("Failed to fetch Moodle roles for enrollment: {" . $roleEx->getMessage() . "}");
-            }
+            // Use fixed roles instead of API call (core_role_get_roles doesn't exist)
+            $moodleRoles = [
+                ["id" => 5, "shortname" => "student", "name" => "Estudiante"],
+                ["id" => 3, "shortname" => "editingteacher", "name" => "Profesor"],
+                ["id" => 4, "shortname" => "teacher", "name" => "Profesor sin permiso de edición"],
+                ["id" => 1, "shortname" => "manager", "name" => "Gestor"]
+            ];
 
             return view("moodle::admin.enrollments", [
                 "enrolledUsers" => $enrolledUsers,
@@ -643,6 +642,15 @@ class AdminController extends Controller
      */
     public function enrollUser(Request $request)
     {
+        // Log all incoming data for debugging
+        Log::info("Enroll User Request Data:", [
+            'all_data' => $request->all(),
+            'course_id' => $request->input('course_id'),
+            'user_id' => $request->input('user_id'),
+            'role_id' => $request->input('role_id'),
+            'send_notification' => $request->input('send_notification')
+        ]);
+
         $validated = $request->validate([
             "course_id" => "required|integer",
             "user_id" => "required|integer",
@@ -650,12 +658,19 @@ class AdminController extends Controller
         ]);
 
         try {
+            Log::info("Attempting to enroll user:", $validated);
+            
             $this->enrollmentService->enrollUser(
                 $validated["user_id"],
                 $validated["course_id"],
                 $validated["role_id"]
             );
 
+            Log::info("User enrolled successfully:", $validated);
+            
+            // Pequeño delay para que Moodle procese la matriculación
+            sleep(1);
+            
             return redirect()->route("moodle.admin.enrollments", ["course_id" => $validated["course_id"]])
                              ->with("success", "Usuario matriculado correctamente.");
         } catch (Exception $e) {
