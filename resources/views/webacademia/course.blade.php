@@ -28,6 +28,47 @@
         border: none;
     }
 
+    /* Asegurar que el grid funcione correctamente */
+    #course-container {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -15px;
+        margin-right: -15px;
+    }
+
+    #course-container .course-item {
+        padding-left: 15px;
+        padding-right: 15px;
+        margin-bottom: 30px;
+    }
+
+    /* Responsive grid fixes */
+    @media (max-width: 991.98px) {
+        #course-container .course-item.col-lg-4 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        #course-container .course-item.col-lg-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+
+    /* Asegurar altura uniforme de las tarjetas */
+    .course-item {
+        display: flex;
+        align-items: stretch;
+    }
+
+    .course-card {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
     .search-bar .btn:hover {
         background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
     }
@@ -158,6 +199,13 @@
             <p>Explora nuestros <span><u>mejores cursos</u></span></p>
         </div>
         
+        @if(session('error'))
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="fa fa-exclamation-triangle"></i> {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        
         <!-- Barra de búsqueda y filtros -->
         <div class="row mb-4">
             <div class="col-lg-8">
@@ -273,7 +321,10 @@
             offset = 0;
             endReached = false;
             loading = false;
-            document.getElementById('course-container').innerHTML = '';
+            const container = document.getElementById('course-container');
+            container.innerHTML = '';
+            // Asegurar que el contenedor mantenga la clase 'row'
+            container.className = 'row';
             document.getElementById('loading').innerHTML = '<p>Cargando más cursos...</p>';
             hideNoResults();
         }
@@ -297,8 +348,39 @@
             loading = false;
             document.getElementById('loading').style.display = 'none';
             
+            console.log('Received data:', data);
+            
             if (data.count > 0) {
-                document.getElementById('course-container').insertAdjacentHTML('beforeend', data.html);
+                const container = document.getElementById('course-container');
+                console.log('Container before:', container.children.length, 'courses');
+                
+                // Crear un elemento temporal para parsear el HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = data.html;
+                
+                console.log('Parsed HTML children:', tempDiv.children.length);
+                
+                // Insertar cada elemento hijo directamente
+                while (tempDiv.firstChild) {
+                    container.appendChild(tempDiv.firstChild);
+                }
+                
+                console.log('Container after:', container.children.length, 'courses');
+                
+                // Forzar recalculo del layout y verificar grid
+                container.style.display = 'none';
+                container.offsetHeight; // Trigger reflow
+                container.style.display = 'flex';
+                
+                // Verificar que todas las tarjetas tengan las clases correctas
+                const courseItems = container.querySelectorAll('.course-item');
+                courseItems.forEach((item, index) => {
+                    if (!item.classList.contains('col-lg-4')) {
+                        console.warn('Course item missing col-lg-4 class:', item);
+                        item.classList.add('col-lg-4', 'col-md-6', 'col-sm-12');
+                    }
+                });
+                
                 offset += data.count;
                 
                 if (reset) {
@@ -324,6 +406,7 @@
     // Búsqueda por texto
     function performSearch() {
         searchTerm = document.getElementById('search-input').value.trim();
+        console.log('Performing search for:', searchTerm);
         loadCourses({ reset: true });
     }
 
@@ -383,10 +466,38 @@
         }
     });
 
-    // Inicializar contador de resultados
+    // Función para inicializar el grid correctamente
+    function initializeGrid() {
+        const container = document.getElementById('course-container');
+        if (container) {
+            // Asegurar que el contenedor tenga las clases correctas
+            container.className = 'row';
+            
+            // Aplicar estilos de flexbox
+            container.style.display = 'flex';
+            container.style.flexWrap = 'wrap';
+            container.style.marginLeft = '-15px';
+            container.style.marginRight = '-15px';
+            
+            console.log('Grid initialized with', container.children.length, 'courses');
+        }
+    }
+
+    // Inicializar contador de resultados y grid
     document.addEventListener('DOMContentLoaded', function() {
+        initializeGrid();
+        
         const initialCount = document.querySelectorAll('.course-item').length;
         updateResultsCount(initialCount, true);
+        
+        console.log('Page loaded with', initialCount, 'initial courses');
+        
+        // Solo cargar más cursos si hay menos de 9 cursos iniciales
+        if (initialCount < 9) {
+            setTimeout(() => {
+                loadCourses();
+            }, 500);
+        }
     });
 </script>
 @endsection

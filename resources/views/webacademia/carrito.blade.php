@@ -5,6 +5,317 @@
 @section('css')
 <link rel="stylesheet" href="{{ asset('assets/css/niceselect.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/css/shop.css') }}">
+<style>
+/* Estilos mejorados para el carrito */
+.shopping-cart {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 40px 0;
+}
+
+.shopping-summery {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.shopping-summery thead tr {
+    background: linear-gradient(135deg, #D93690 0%, #ff6b9d 100%);
+    color: white;
+}
+
+.shopping-summery thead th {
+    padding: 20px 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+}
+
+.shopping-summery tbody td {
+    padding: 25px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.shopping-summery tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.shopping-summery tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Imagen del curso mejorada */
+.course-image {
+    width: 100px;
+    height: 75px;
+    border-radius: 10px;
+    object-fit: cover;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.course-image:hover {
+    transform: scale(1.05);
+}
+
+.default-course-image {
+    width: 100px;
+    height: 75px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Información del producto */
+.product-name a {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.product-name a:hover {
+    color: #D93690;
+}
+
+.product-des {
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+/* Precio */
+.price span {
+    font-size: 18px;
+    font-weight: 600;
+    color: #D93690;
+}
+
+/* Controles de cantidad mejorados */
+.input-group {
+    width: 120px;
+    margin: 0 auto;
+}
+
+.input-group .btn {
+    background: linear-gradient(135deg, #D93690 0%, #ff6b9d 100%);
+    border: none;
+    color: white;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.input-group .btn:hover {
+    background: linear-gradient(135deg, #ff6b9d 0%, #D93690 100%);
+    transform: translateY(-2px);
+}
+
+.input-number {
+    width: 50px;
+    text-align: center;
+    border: 2px solid #e9ecef;
+    border-left: none;
+    border-right: none;
+    height: 35px;
+    font-weight: 600;
+}
+
+/* Total */
+.total-amount span {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* Botón eliminar mejorado */
+.btn-remove {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn-remove:hover {
+    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+}
+
+/* Carrito vacío */
+.empty-cart {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.empty-cart i {
+    font-size: 5rem;
+    color: #bdc3c7;
+    margin-bottom: 20px;
+}
+
+.empty-cart h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+/* Sección de totales mejorada */
+.total-amount {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.total-amount .right ul {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+.total-amount .right ul li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #dee2e6;
+    font-size: 16px;
+}
+
+.total-amount .right ul li:last-child {
+    border-bottom: none;
+    font-weight: 600;
+    font-size: 18px;
+    color: #D93690;
+    padding-top: 15px;
+    border-top: 2px solid #D93690;
+}
+
+/* Botones principales mejorados */
+.btn_one {
+    background: linear-gradient(135deg, #D93690 0%, #ff6b9d 100%);
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.btn_one:hover {
+    background: linear-gradient(135deg, #ff6b9d 0%, #D93690 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(217, 54, 144, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.btn_two {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+}
+
+.btn_two:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+/* Botón vaciar carrito mejorado */
+.btn-vaciar-carrito {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-vaciar-carrito:hover {
+    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
+    color: white;
+}
+
+.btn-vaciar-carrito i {
+    font-size: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .shopping-summery {
+        font-size: 14px;
+    }
+    
+    .shopping-summery thead th {
+        padding: 15px 10px;
+        font-size: 12px;
+    }
+    
+    .shopping-summery tbody td {
+        padding: 20px 10px;
+    }
+    
+    .course-image, .default-course-image {
+        width: 80px;
+        height: 60px;
+    }
+    
+    .btn_one, .btn_two {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+}
+</style>
 @endsection
 
 @section('content')
@@ -60,16 +371,20 @@
                         @forelse($carrito as $item)
                             <tr>
                                 <td class="image" data-title="No">
-                                    <img src="{{ $item->curso->image ? asset('storage/' . $item->curso->image) : asset('assets/images/default-course.jpg') }}" alt="{{ $item->curso->title }}" style="width: 80px; height: 60px; object-fit: cover;">
+                                    @if($item->curso->image && file_exists(storage_path('app/public/' . $item->curso->image)))
+                                        <img src="{{ asset('storage/' . $item->curso->image) }}" alt="{{ $item->curso->name ?? $item->curso->title }}" class="course-image">
+                                    @else
+                                        <img src="{{ asset('assets/images/default-course.svg') }}" alt="Curso por defecto" class="course-image">
+                                    @endif
                                 </td>
                                 <td class="product-des" data-title="Description">
                                     <p class="product-name">
                                         <a href="{{ route('webacademia.single_course', $item->curso->id) }}">
-                                            {{ $item->curso->title }}
+                                            {{ $item->curso->name ?? $item->curso->title }}
                                         </a>
                                     </p>
                                     <p class="product-des">
-                                        {{ Str::limit($item->curso->description, 100) }}
+                                        {{ Str::limit($item->curso->description ?? 'Curso completo con certificación oficial', 80) }}
                                     </p>
                                 </td>
                                 <td class="price" data-title="Price">
@@ -96,8 +411,8 @@
                                 <td class="action" data-title="Remove">
                                     <form method="POST" action="{{ route('carrito.eliminar', $item->curso->id) }}" style="display: inline;">
                                         @csrf
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este curso del carrito?')">
-                                            <i class="ti-trash remove-icon"></i>
+                                        <button type="submit" class="btn-remove" onclick="return confirm('¿Estás seguro de eliminar este curso del carrito?')" title="Eliminar curso">
+                                            <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </form>
                                 </td>
@@ -109,7 +424,9 @@
                                         <i class="ti-shopping-cart" style="font-size: 4rem; color: #ccc;"></i>
                                         <h4 class="mt-3">Tu carrito está vacío</h4>
                                         <p class="text-muted">¡Explora nuestros cursos y añade algunos a tu carrito!</p>
-                                        <a href="{{ route('webacademia.courses') }}" class="btn_one mt-3">Ver Cursos</a>
+                                        <a href="{{ route('webacademia.courses') }}" class="btn_one mt-3">
+                                            <i class="fas fa-graduation-cap"></i> Explorar Cursos
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -131,7 +448,8 @@
                                     <div class="coupon">
                                         <form method="POST" action="{{ route('carrito.vaciar') }}">
                                             @csrf
-                                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('¿Estás seguro de vaciar todo el carrito?')">
+                                            <button type="submit" class="btn-vaciar-carrito" onclick="return confirm('¿Estás seguro de vaciar todo el carrito?')">
+                                                <i class="fas fa-trash-alt"></i>
                                                 Vaciar Carrito
                                             </button>
                                         </form>
@@ -155,9 +473,13 @@
                                     <div class="button5">
                                         <form method="POST" action="{{ route('carrito.checkout') }}">
                                             @csrf
-                                            <button type="submit" class="btn_one">Proceder al Pago</button>
+                                            <button type="submit" class="btn_one">
+                                                <i class="fas fa-credit-card"></i> Proceder al Pago
+                                            </button>
                                         </form>
-                                        <a href="{{ route('webacademia.courses') }}" class="btn_two">Seguir Comprando</a>
+                                        <a href="{{ route('webacademia.courses') }}" class="btn_two">
+                                            <i class="fas fa-shopping-bag"></i> Seguir Comprando
+                                        </a>
                                     </div>
                                 </div>
                             </div>

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Alumnos\Alumno;
 use App\Models\Carrito\ShoppingCartItem;
+use App\Models\Company\CompanyDetails;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Modules\Moodle\Services\MoodleEnrollmentService;
@@ -21,22 +22,25 @@ class WebController extends Controller
 
     public function courses(Request $request)
     {
-        $coursesSyncService = app(CoursesSyncService::class);
-        
-        // Sincronizar cursos de Moodle (con caché para evitar llamadas frecuentes)
-        $lastSync = cache('courses_last_sync');
-        if (!$lastSync || now()->diffInMinutes($lastSync) > 30) {
-            $coursesSyncService->syncAllCourses();
-            cache(['courses_last_sync' => now()], 30 * 60); // Cache por 30 minutos
-        }
+        try {
+            // Comentamos temporalmente la sincronización automática para mejorar el rendimiento
+            // $coursesSyncService = app(CoursesSyncService::class);
+            
+            // // Sincronizar cursos de Moodle (con caché para evitar llamadas frecuentes)
+            // $lastSync = cache('courses_last_sync');
+            // if (!$lastSync || now()->diffInMinutes($lastSync) > 30) {
+            //     $coursesSyncService->syncAllCourses();
+            //     cache(['courses_last_sync' => now()], 30 * 60); // Cache por 30 minutos
+            // }
 
-        $offset = $request->input('offset', 0);
-        $categoryId = $request->input('category_id');
-        $search = $request->input('search');
+            $offset = $request->input('offset', 0);
+            $categoryId = $request->input('category_id');
+            $search = $request->input('search');
 
-        $query = Cursos::where('inactive', 0)
-            ->whereNotNull('moodle_id')
-            ->with('category');
+            $query = Cursos::where('inactive', 0)
+                ->whereNotNull('moodle_id')
+                ->with('category')
+                ->select('id', 'name', 'description', 'price', 'image', 'category_id', 'moodle_id', 'duracion', 'plazas', 'lecciones', 'certificado', 'created_at');
 
         if ($categoryId) {
             $query->where('category_id', $categoryId);
@@ -58,14 +62,33 @@ class WebController extends Controller
             ]);
         }
 
-        $initialCursos = $query->take(9)->orderBy('created_at', 'desc')->get();
-        $categorias = \App\Models\Cursos\Category::where('inactive', 0)->get();
-        
-        // Verificar si el usuario está logueado
-        $isLoggedIn = Auth::guard('alumno')->check();
-        $user = $isLoggedIn ? Auth::guard('alumno')->user() : null;
+            $initialCursos = $query->take(9)->orderBy('created_at', 'desc')->get();
+            $categorias = \App\Models\Cursos\Category::where('inactive', 0)->get();
+            
+            // Verificar si el usuario está logueado
+            $isLoggedIn = Auth::guard('alumno')->check();
+            $user = $isLoggedIn ? Auth::guard('alumno')->user() : null;
 
-        return view('webacademia.course', compact('initialCursos', 'categorias', 'isLoggedIn', 'user'));
+            return view('webacademia.course', compact('initialCursos', 'categorias', 'isLoggedIn', 'user'));
+            
+        } catch (\Exception $e) {
+            Log::error('Error loading courses page: ' . $e->getMessage());
+            
+            // En caso de error, mostrar cursos básicos sin sincronización
+            $initialCursos = Cursos::where('inactive', 0)
+                ->whereNotNull('moodle_id')
+                ->with('category')
+                ->take(9)
+                ->orderBy('created_at', 'desc')
+                ->get();
+            $categorias = \App\Models\Cursos\Category::where('inactive', 0)->get();
+            
+            $isLoggedIn = Auth::guard('alumno')->check();
+            $user = $isLoggedIn ? Auth::guard('alumno')->user() : null;
+
+            return view('webacademia.course', compact('initialCursos', 'categorias', 'isLoggedIn', 'user'))
+                ->with('error', 'Algunos cursos pueden no estar actualizados. Intenta recargar la página.');
+        }
     }
 
     public function singleCourse($id)
@@ -258,7 +281,8 @@ class WebController extends Controller
             return redirect()->route('carrito.ver')->with('error', 'Tu carrito está vacío.');
         }
 
-        return view('webacademia.checkout_carrito', compact('carrito'));
+        $configuracion = CompanyDetails::first();
+        return view('webacademia.checkout_carrito', compact('carrito', 'configuracion'));
     }
 
     public function procesarPago(Request $request)

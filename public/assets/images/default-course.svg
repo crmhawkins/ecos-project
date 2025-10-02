@@ -1,0 +1,46 @@
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="courseGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.7" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="300" fill="url(#courseGradient)" rx="15" ry="15"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="350" cy="50" r="30" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="50" cy="250" r="40" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="320" cy="220" r="20" fill="rgba(255,255,255,0.1)"/>
+  
+  <!-- Main graduation cap icon -->
+  <g transform="translate(200, 150)">
+    <!-- Cap base -->
+    <ellipse cx="0" cy="10" rx="60" ry="15" fill="url(#iconGradient)"/>
+    <!-- Cap top -->
+    <polygon points="-50,-20 50,-20 40,-5 -40,-5" fill="url(#iconGradient)"/>
+    <!-- Tassel -->
+    <line x1="45" y1="-12" x2="55" y2="-25" stroke="url(#iconGradient)" stroke-width="2"/>
+    <circle cx="55" cy="-25" r="3" fill="url(#iconGradient)"/>
+    <!-- Decorative lines -->
+    <line x1="-30" y1="-12" x2="30" y2="-12" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  </g>
+  
+  <!-- Course text -->
+  <text x="200" y="220" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="Arial, sans-serif" font-size="18" font-weight="600">
+    CURSO ONLINE
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="200" y="245" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-family="Arial, sans-serif" font-size="14">
+    Certificación Oficial
+  </text>
+  
+  <!-- Bottom decorative line -->
+  <line x1="120" y1="265" x2="280" y2="265" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round"/>
+</svg>

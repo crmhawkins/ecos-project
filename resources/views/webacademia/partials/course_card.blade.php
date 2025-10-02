@@ -1,55 +1,61 @@
-<style>
-    .course-slide:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-    }
-
-    .course-slide {
-        transition: all 0.3s ease;
-    }
-</style>
-
 @foreach($cursos as $curso)
-<div class="col-lg-4 col-sm-6 col-xs-12 course-item mb-4 d-flex">
+<div class="col-lg-4 col-md-6 col-sm-12 course-item mb-4"
+     style="display: flex; flex-direction: column; padding-left: 15px; padding-right: 15px;"
+     data-course-id="{{ $curso->id }}"
+     data-course-name="{{ $curso->name }}"
+     data-course-category="{{ $curso->category->name ?? 'General' }}">
     <div class="course-card" style="border-radius: 15px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.1); width: 100%; display: flex; flex-direction: column; background: #fff; transition: all 0.3s ease;">
         <div class="course-img" style="height: 220px; overflow: hidden; position: relative;">
             @if($curso->image && file_exists(storage_path('app/public/' . $curso->image)))
                 <img src="{{ asset('storage/' . $curso->image) }}" alt="{{ $curso->name }}" style="width: 100%; height: 100%; object-fit: cover;">
             @else
-                <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-graduation-cap" style="font-size: 3.5rem; color: white; opacity: 0.9;"></i>
-                </div>
+                <img src="{{ asset('assets/images/default-course.svg') }}" alt="Curso por defecto" style="width: 100%; height: 100%; object-fit: cover;">
             @endif
             
             <!-- Precio -->
             <div class="course-price" style="position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.95); color: #333; padding: 8px 15px; border-radius: 20px; font-weight: 600; font-size: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                 @php
-                    // Generar precios más variados basados en el tipo de curso
+                    // Generar precios realistas para el mercado español (en euros)
                     $courseName = strtolower($curso->name);
-                    $basePrice = $curso->price;
                     
+                    // Precios basados en nivel y tipo de curso
                     if (strpos($courseName, 'básico') !== false || strpos($courseName, 'basic') !== false) {
-                        $displayPrice = 99;
+                        $displayPrice = 89;
                     } elseif (strpos($courseName, 'avanzado') !== false || strpos($courseName, 'advanced') !== false) {
-                        $displayPrice = 199;
-                    } elseif (strpos($courseName, 'profesional') !== false || strpos($courseName, 'professional') !== false) {
-                        $displayPrice = 299;
-                    } elseif (strpos($courseName, 'excel') !== false) {
-                        $displayPrice = 129;
-                    } elseif (strpos($courseName, 'seguridad') !== false) {
                         $displayPrice = 179;
-                    } elseif (strpos($courseName, 'prevención') !== false || strpos($courseName, 'riesgos') !== false) {
-                        $displayPrice = 159;
-                    } elseif ($curso->lecciones > 50) {
-                        $displayPrice = 249;
-                    } elseif ($curso->lecciones > 20) {
-                        $displayPrice = 189;
-                    } else {
+                    } elseif (strpos($courseName, 'profesional') !== false || strpos($courseName, 'professional') !== false) {
+                        $displayPrice = 259;
+                    } elseif (strpos($courseName, 'excel') !== false) {
+                        $displayPrice = 119;
+                    } elseif (strpos($courseName, 'seguridad') !== false) {
                         $displayPrice = 149;
+                    } elseif (strpos($courseName, 'prevención') !== false || strpos($courseName, 'riesgos') !== false) {
+                        $displayPrice = 139;
+                    } elseif (strpos($courseName, 'marketing') !== false || strpos($courseName, 'comercial') !== false) {
+                        $displayPrice = 169;
+                    } elseif (strpos($courseName, 'idiomas') !== false || strpos($courseName, 'inglés') !== false) {
+                        $displayPrice = 199;
+                    } elseif (strpos($courseName, 'informática') !== false || strpos($courseName, 'digital') !== false) {
+                        $displayPrice = 159;
+                    } elseif (strpos($courseName, 'gestión') !== false || strpos($courseName, 'administración') !== false) {
+                        $displayPrice = 149;
+                    } elseif (strpos($courseName, 'hostelería') !== false || strpos($courseName, 'turismo') !== false) {
+                        $displayPrice = 129;
+                    } elseif (strpos($courseName, 'guardería') !== false || strpos($courseName, 'infantil') !== false) {
+                        $displayPrice = 109;
+                    } elseif ($curso->lecciones > 50) {
+                        $displayPrice = 219;
+                    } elseif ($curso->lecciones > 30) {
+                        $displayPrice = 169;
+                    } elseif ($curso->lecciones > 15) {
+                        $displayPrice = 139;
+                    } elseif ($curso->lecciones < 5) {
+                        $displayPrice = 79;
+                    } else {
+                        $displayPrice = 129;
                     }
                 @endphp
-                ${{ $displayPrice }}
+                {{ $displayPrice }}€
             </div>
             
             <!-- Categoría -->
@@ -127,6 +133,16 @@
 @endforeach
 
 <style>
+.course-slide:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.course-slide {
+    transition: all 0.3s ease;
+}
+
 .course-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 15px 35px rgba(0,0,0,0.15);
@@ -141,5 +157,28 @@
 
 .course-item {
     transition: all 0.3s ease;
+    flex: 0 0 auto;
+}
+
+/* Asegurar que las tarjetas mantengan el grid correcto */
+@media (min-width: 992px) {
+    .course-item.col-lg-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .course-item.col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .course-item.col-sm-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
 }
 </style>

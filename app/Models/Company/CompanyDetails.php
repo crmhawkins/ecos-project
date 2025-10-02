@@ -36,7 +36,10 @@ class CompanyDetails extends Model
         'linkedin',
         'pinterest',
         'certificado',
-        'contrasena'
+        'contrasena',
+        'terminos_condiciones',
+        'politica_privacidad',
+        'aviso_legal'
     ];
 
     /**

@@ -33,10 +33,13 @@ class SettingsController extends Controller
             'postCode' => 'nullable|string|max:255',
             'town' => 'nullable|string|max:255',
             'province' => 'nullable|string|max:255',
+            'terminos_condiciones' => 'nullable|string',
+            'politica_privacidad' => 'nullable|string',
+            'aviso_legal' => 'nullable|string',
         ]);
 
         $data = $request->only([
-            'price_hour', 'company_name', 'nif', 'address', 'bank_account_data', 'telephone', 'email','contrasena','postCode', 'town','province',
+            'price_hour', 'company_name', 'nif', 'address', 'bank_account_data', 'telephone', 'email','contrasena','postCode', 'town','province', 'terminos_condiciones', 'politica_privacidad', 'aviso_legal'
         ]);
 
         if ($request->hasFile('logo')) {
@@ -89,10 +92,13 @@ class SettingsController extends Controller
             'postCode' => 'nullable|string|max:255',
             'town' => 'nullable|string|max:255',
             'province' => 'nullable|string|max:255',
+            'terminos_condiciones' => 'nullable|string',
+            'politica_privacidad' => 'nullable|string',
+            'aviso_legal' => 'nullable|string',
         ]);
 
         $data = $request->only([
-            'price_hour', 'company_name', 'nif', 'address', 'bank_account_data', 'telephone', 'email', 'contrasena','postCode', 'town','province',
+            'price_hour', 'company_name', 'nif', 'address', 'bank_account_data', 'telephone', 'email', 'contrasena','postCode', 'town','province', 'terminos_condiciones', 'politica_privacidad', 'aviso_legal'
         ]);
 
          // Guardar logo

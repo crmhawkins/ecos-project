@@ -109,6 +109,33 @@
                                 </div> --}}
                             </div>
                         </div>
+
+                        <!-- Contenido Legal -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5>Contenido Legal</h5>
+                                <p class="text-muted mb-0">Gestiona los textos legales que aparecerán en la web</p>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="terminos_condiciones" class="form-label">Términos y Condiciones</label>
+                                    <textarea class="form-control" id="terminos_condiciones" name="terminos_condiciones" rows="8" placeholder="Introduce aquí los términos y condiciones...">{{ $configuracion->terminos_condiciones ?? '' }}</textarea>
+                                    <small class="form-text text-muted">Este texto aparecerá en el modal de términos y condiciones del checkout.</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="politica_privacidad" class="form-label">Política de Privacidad</label>
+                                    <textarea class="form-control" id="politica_privacidad" name="politica_privacidad" rows="8" placeholder="Introduce aquí la política de privacidad...">{{ $configuracion->politica_privacidad ?? '' }}</textarea>
+                                    <small class="form-text text-muted">Este texto aparecerá en el modal de política de privacidad del checkout.</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="aviso_legal" class="form-label">Aviso Legal</label>
+                                    <textarea class="form-control" id="aviso_legal" name="aviso_legal" rows="6" placeholder="Introduce aquí el aviso legal...">{{ $configuracion->aviso_legal ?? '' }}</textarea>
+                                    <small class="form-text text-muted">Este texto aparecerá en el modal de aviso legal.</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-12 col-lg-3">
                         <div class="card">

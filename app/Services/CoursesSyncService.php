@@ -29,6 +29,9 @@ class CoursesSyncService
         try {
             Log::info('Iniciando sincronización de cursos desde Moodle');
             
+            // Primero sincronizar categorías
+            $this->syncCategories();
+            
             // Obtener cursos de Moodle
             $moodleCourses = $this->moodleCourseService->getAllCourses();
             
@@ -222,42 +225,46 @@ class CoursesSyncService
     {
         $name = strtolower($courseName);
         
-        // Precios basados en nivel
+        // Precios realistas para el mercado español (en euros)
         if (strpos($name, 'básico') !== false || strpos($name, 'basic') !== false) {
-            return 99.99;
+            return 89.00;
         } elseif (strpos($name, 'avanzado') !== false || strpos($name, 'advanced') !== false) {
-            return 199.99;
+            return 179.00;
         } elseif (strpos($name, 'profesional') !== false || strpos($name, 'professional') !== false) {
-            return 299.99;
+            return 259.00;
         }
         
         // Precios basados en área temática
         elseif (strpos($name, 'excel') !== false) {
-            return 129.99;
+            return 119.00;
         } elseif (strpos($name, 'seguridad') !== false) {
-            return 179.99;
+            return 149.00;
         } elseif (strpos($name, 'prevención') !== false || strpos($name, 'riesgos') !== false) {
-            return 159.99;
+            return 139.00;
         } elseif (strpos($name, 'marketing') !== false || strpos($name, 'comercial') !== false) {
-            return 189.99;
+            return 169.00;
         } elseif (strpos($name, 'idiomas') !== false || strpos($name, 'inglés') !== false) {
-            return 219.99;
+            return 199.00;
         } elseif (strpos($name, 'informática') !== false || strpos($name, 'digital') !== false) {
-            return 169.99;
+            return 159.00;
         } elseif (strpos($name, 'gestión') !== false || strpos($name, 'administración') !== false) {
-            return 179.99;
+            return 149.00;
+        } elseif (strpos($name, 'hostelería') !== false || strpos($name, 'turismo') !== false) {
+            return 129.00;
+        } elseif (strpos($name, 'guardería') !== false || strpos($name, 'infantil') !== false) {
+            return 109.00;
         }
         
-        // Precios basados en duración (si está disponible)
+        // Precios basados en duración
         elseif (strpos($name, '120 horas') !== false || strpos($name, '100 horas') !== false) {
-            return 249.99;
+            return 219.00;
         } elseif (strpos($name, '60 horas') !== false || strpos($name, '80 horas') !== false) {
-            return 189.99;
+            return 169.00;
         } elseif (strpos($name, '20 horas') !== false || strpos($name, '30 horas') !== false) {
-            return 99.99;
+            return 89.00;
         }
         
-        return 149.99; // Precio por defecto
+        return 129.00; // Precio por defecto
     }
 
     /**
@@ -358,5 +365,84 @@ class CoursesSyncService
         }
 
         return null; // Sin imagen
+    }
+
+    /**
+     * Sincronizar categorías de Moodle
+     */
+    private function syncCategories()
+    {
+        try {
+            Log::info('Sincronizando categorías desde Moodle');
+            
+            // Obtener categorías de Moodle
+            $moodleCategories = $this->moodleCourseService->getCategories();
+            
+            if (empty($moodleCategories)) {
+                Log::warning('No se obtuvieron categorías desde Moodle');
+                return;
+            }
+
+            $syncedCount = 0;
+            $updatedCount = 0;
+
+            foreach ($moodleCategories as $moodleCategory) {
+                try {
+                    // Saltar la categoría "Miscellaneous" (ID 1) que es la categoría por defecto
+                    if ($moodleCategory['id'] == 1) {
+                        continue;
+                    }
+
+                    $result = $this->syncSingleCategory($moodleCategory);
+                    
+                    if ($result['created']) {
+                        $syncedCount++;
+                        Log::info("Categoría creada: {$moodleCategory['name']} (Moodle ID: {$moodleCategory['id']})");
+                    } else {
+                        $updatedCount++;
+                        Log::info("Categoría actualizada: {$moodleCategory['name']} (Moodle ID: {$moodleCategory['id']})");
+                    }
+                    
+                } catch (Exception $e) {
+                    Log::error("Error sincronizando categoría {$moodleCategory['name']}: " . $e->getMessage());
+                }
+            }
+
+            Log::info("Categorías sincronizadas. Creadas: {$syncedCount}, Actualizadas: {$updatedCount}");
+            
+        } catch (Exception $e) {
+            Log::error('Error en sincronización de categorías: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Sincronizar una categoría individual
+     */
+    private function syncSingleCategory($moodleCategory)
+    {
+        // Buscar si la categoría ya existe por nombre
+        $category = Category::where('name', $moodleCategory['name'])->first();
+
+        $categoryData = [
+            'name' => $moodleCategory['name'],
+            'inactive' => 0,
+            'image' => null, // Las categorías de Moodle no tienen imagen por defecto
+        ];
+
+        $created = false;
+
+        if ($category) {
+            // Actualizar categoría existente
+            $category->update($categoryData);
+        } else {
+            // Crear nueva categoría
+            $category = Category::create($categoryData);
+            $created = true;
+        }
+
+        return [
+            'category' => $category,
+            'created' => $created
+        ];
     }
 }
