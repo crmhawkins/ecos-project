@@ -475,4 +475,39 @@ class MoodleUserService
         }
     }
 
+    /**
+     * Create or update a user in Moodle
+     *
+     * @param array $userData User data
+     * @return int Moodle user ID
+     */
+    public function createOrUpdateUser(array $userData)
+    {
+        try {
+            // Buscar usuario existente por email
+            $existingUser = $this->getUserByEmail($userData['email']);
+            
+            if ($existingUser) {
+                // Usuario existe, actualizar datos
+                $this->updateUser($existingUser['id'], [
+                    'firstname' => $userData['firstname'],
+                    'lastname' => $userData['lastname'],
+                ]);
+                return $existingUser['id'];
+            } else {
+                // Usuario no existe, crear nuevo
+                $userData['password'] = $userData['password'] ?? 'TempPassword123!';
+                $newUser = $this->createUser($userData);
+                return $newUser['id'];
+            }
+        } catch (Exception $e) {
+            Log::error("Moodle Create Or Update User Error: {$e->getMessage()}", [
+                'userData' => $userData,
+                'exception' => $e
+            ]);
+
+            throw new Exception("Error creating or updating Moodle user: {$e->getMessage()}");
+        }
+    }
+
 }

@@ -10,19 +10,43 @@ use App\Models\Alumnos\Alumno;
 use App\Models\Carrito\ShoppingCartItem;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Modules\Moodle\Services\MoodleEnrollmentService;
+use App\Modules\Moodle\Services\MoodleUserService;
+use App\Services\CoursesSyncService;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class WebController extends Controller
 {
 
     public function courses(Request $request)
     {
+        $coursesSyncService = app(CoursesSyncService::class);
+        
+        // Sincronizar cursos de Moodle (con caché para evitar llamadas frecuentes)
+        $lastSync = cache('courses_last_sync');
+        if (!$lastSync || now()->diffInMinutes($lastSync) > 30) {
+            $coursesSyncService->syncAllCourses();
+            cache(['courses_last_sync' => now()], 30 * 60); // Cache por 30 minutos
+        }
+
         $offset = $request->input('offset', 0);
         $categoryId = $request->input('category_id');
+        $search = $request->input('search');
 
-        $query = Cursos::where('inactive', 0)->with('category');
+        $query = Cursos::where('inactive', 0)
+            ->whereNotNull('moodle_id')
+            ->with('category');
 
         if ($categoryId) {
             $query->where('category_id', $categoryId);
+        }
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
         }
 
         if ($request->ajax()) {
@@ -34,16 +58,64 @@ class WebController extends Controller
             ]);
         }
 
-        $initialCursos = $query->take(9)->get();
-        $categorias = \App\Models\Cursos\Category::all();
+        $initialCursos = $query->take(9)->orderBy('created_at', 'desc')->get();
+        $categorias = \App\Models\Cursos\Category::where('inactive', 0)->get();
+        
+        // Verificar si el usuario está logueado
+        $isLoggedIn = Auth::guard('alumno')->check();
+        $user = $isLoggedIn ? Auth::guard('alumno')->user() : null;
 
-        return view('webacademia.course', compact('initialCursos', 'categorias'));
+        return view('webacademia.course', compact('initialCursos', 'categorias', 'isLoggedIn', 'user'));
     }
 
     public function singleCourse($id)
     {
-        $curso = Cursos::find($id);
-        return view('webacademia.single_course',compact('curso'));
+        $coursesSyncService = app(CoursesSyncService::class);
+        
+        $curso = $coursesSyncService->getCourseDetails($id);
+        
+        if (!$curso) {
+            abort(404, 'Curso no encontrado');
+        }
+
+        // Verificar si el usuario está logueado
+        $isLoggedIn = Auth::guard('alumno')->check();
+        $user = $isLoggedIn ? Auth::guard('alumno')->user() : null;
+        
+        // Verificar si el usuario ya tiene este curso
+        $userHasCourse = false;
+        $isInCart = false;
+        
+        if ($isLoggedIn) {
+            // Verificar si ya compró el curso
+            $userHasCourse = DB::table('alumnos_cursos')
+                ->where('alumno_id', $user->id)
+                ->where('curso_id', $curso->id)
+                ->where('estado', 'activo')
+                ->exists();
+                
+            // Verificar si está en el carrito
+            $isInCart = ShoppingCartItem::where('alumno_id', $user->id)
+                ->where('curso_id', $curso->id)
+                ->exists();
+        }
+
+        // Obtener cursos relacionados
+        $cursosRelacionados = Cursos::where('inactive', 0)
+            ->whereNotNull('moodle_id')
+            ->where('category_id', $curso->category_id)
+            ->where('id', '!=', $curso->id)
+            ->limit(3)
+            ->get();
+
+        return view('webacademia.single_course', compact(
+            'curso', 
+            'isLoggedIn', 
+            'user', 
+            'userHasCourse', 
+            'isInCart', 
+            'cursosRelacionados'
+        ));
     }
 
     public function register(Request $request)
@@ -140,6 +212,24 @@ class WebController extends Controller
         return redirect()->back()->with('success', 'Curso eliminado del carrito.');
     }
 
+    public function actualizarCantidad(Request $request, $id)
+    {
+        $request->validate([
+            'cantidad' => 'required|integer|min:1|max:10'
+        ]);
+
+        $user = Auth::guard('alumno')->user();
+        $item = ShoppingCartItem::where('alumno_id', $user->id)->where('curso_id', $id)->first();
+
+        if ($item) {
+            $item->cantidad = $request->cantidad;
+            $item->save();
+            return redirect()->back()->with('success', 'Cantidad actualizada correctamente.');
+        }
+
+        return redirect()->back()->with('error', 'Curso no encontrado en el carrito.');
+    }
+
    public function vaciarCarrito()
     {
         $user = Auth::guard('alumno')->user();
@@ -160,11 +250,150 @@ class WebController extends Controller
     public function checkout(Request $request)
     {
         $user = Auth::guard('alumno')->user();
+        
+        // Obtener los cursos del carrito
+        $carrito = ShoppingCartItem::with('curso')->where('alumno_id', $user->id)->get();
+        
+        if ($carrito->isEmpty()) {
+            return redirect()->route('carrito.ver')->with('error', 'Tu carrito está vacío.');
+        }
 
-        // Aquí puedes crear pedidos o procesar pagos
-        ShoppingCartItem::where('alumno_id', $user->id)->delete();
+        return view('webacademia.checkout_carrito', compact('carrito'));
+    }
 
-        return redirect()->route('webacademia.courses')->with('success', 'Compra completada.');
+    public function procesarPago(Request $request)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'apellidos' => 'required|string|max:255',
+            'email' => 'required|email',
+            'telefono' => 'required|string',
+            'metodo_pago' => 'required|in:stripe,paypal,transferencia',
+            'acepto_terminos' => 'required|accepted',
+        ]);
+
+        $user = Auth::guard('alumno')->user();
+        
+        try {
+            // Obtener los cursos del carrito
+            $carrito = ShoppingCartItem::with('curso')->where('alumno_id', $user->id)->get();
+            
+            if ($carrito->isEmpty()) {
+                return redirect()->route('carrito.ver')->with('error', 'Tu carrito está vacío.');
+            }
+
+            // Calcular totales
+            $subtotal = $carrito->sum(function($item) {
+                return $item->curso->price * $item->cantidad;
+            });
+            $iva = $subtotal * 0.21;
+            $total = $subtotal + $iva;
+
+            // Procesar pago según el método seleccionado
+            $pagoExitoso = $this->procesarMetodoPago($request->metodo_pago, $total, $request->all());
+
+            if (!$pagoExitoso) {
+                return redirect()->back()->with('error', 'Error al procesar el pago. Por favor, inténtalo de nuevo.');
+            }
+
+            // Si el pago es exitoso, procesar matriculación
+            $enrollmentService = app(MoodleEnrollmentService::class);
+            $userService = app(MoodleUserService::class);
+            
+            // Crear o sincronizar usuario en Moodle
+            $moodleUserId = $userService->createOrUpdateUser([
+                'username' => $user->username,
+                'firstname' => $user->name,
+                'lastname' => $user->surname,
+                'email' => $user->email,
+            ]);
+
+            $enrolledCourses = [];
+            $failedEnrollments = [];
+
+            foreach ($carrito as $item) {
+                try {
+                    // Matricular en el curso de Moodle
+                    if ($item->curso->moodle_course_id) {
+                        $enrollmentService->enrollUser(
+                            $moodleUserId,
+                            $item->curso->moodle_course_id,
+                            5 // Rol de estudiante
+                        );
+                        $enrolledCourses[] = $item->curso->title;
+                    }
+
+                    // Registrar la compra en la base de datos
+                    DB::table('alumnos_cursos')->insert([
+                        'alumno_id' => $user->id,
+                        'curso_id' => $item->curso->id,
+                        'fecha_compra' => now(),
+                        'estado' => 'activo',
+                        'precio_pagado' => $item->curso->price * $item->cantidad,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+
+                } catch (\Exception $e) {
+                    Log::error("Error al matricular usuario {$user->id} en curso {$item->curso->id}: " . $e->getMessage());
+                    $failedEnrollments[] = $item->curso->title;
+                }
+            }
+
+            // Limpiar carrito después del pago exitoso
+            ShoppingCartItem::where('alumno_id', $user->id)->delete();
+
+            $message = 'Compra completada exitosamente.';
+            if (!empty($enrolledCourses)) {
+                $message .= ' Te has matriculado en: ' . implode(', ', $enrolledCourses);
+            }
+            if (!empty($failedEnrollments)) {
+                $message .= ' Hubo problemas con la matriculación en: ' . implode(', ', $failedEnrollments);
+            }
+
+            return redirect()->route('webacademia.perfil')->with('success', $message);
+
+        } catch (\Exception $e) {
+            Log::error("Error en procesarPago: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Hubo un error al procesar tu compra. Por favor, inténtalo de nuevo.');
+        }
+    }
+
+    private function procesarMetodoPago($metodo, $total, $datosFacturacion)
+    {
+        switch ($metodo) {
+            case 'stripe':
+                return $this->procesarPagoStripe($total, $datosFacturacion);
+            case 'paypal':
+                return $this->procesarPagoPaypal($total, $datosFacturacion);
+            case 'transferencia':
+                return $this->procesarPagoTransferencia($total, $datosFacturacion);
+            default:
+                return false;
+        }
+    }
+
+    private function procesarPagoStripe($total, $datos)
+    {
+        // Por ahora simulamos un pago exitoso
+        // Aquí integrarías con Stripe API
+        Log::info("Pago Stripe simulado por {$total}€", $datos);
+        return true;
+    }
+
+    private function procesarPagoPaypal($total, $datos)
+    {
+        // Por ahora simulamos un pago exitoso
+        // Aquí integrarías con PayPal API
+        Log::info("Pago PayPal simulado por {$total}€", $datos);
+        return true;
+    }
+
+    private function procesarPagoTransferencia($total, $datos)
+    {
+        // Para transferencia, siempre es exitoso (pago pendiente)
+        Log::info("Pago por transferencia registrado por {$total}€", $datos);
+        return true;
     }
 
 

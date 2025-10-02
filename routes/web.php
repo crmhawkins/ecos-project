@@ -144,14 +144,20 @@ Route::post('/weblogin', [WebController::class, 'login'])->name('webacademia.log
 Route::get('/webregister', function () { return view('webacademia.register');});
 Route::post('/webregister', [WebController::class, 'register'])->name('webacademia.register');
 
-Route::get('/perfil',function () { return view('webacademia.perfil');})->name('webacademia.perfil');
+Route::post('/weblogout', [WebController::class, 'logout'])->name('webacademia.logout');
 
-Route::prefix('carrito')->name('carrito.')->group(function () {
-    Route::get('/', [WebController::class, 'verCarrito'])->name('ver');
-    Route::post('/agregar/{id}', [WebController::class, 'agregarAlCarrito'])->name('agregar');
-    Route::post('/eliminar/{id}', [WebController::class, 'eliminarDelCarrito'])->name('eliminar');
-    Route::post('/vaciar', [WebController::class, 'vaciarCarrito'])->name('vaciar');
-    Route::post('/checkout', [WebController::class, 'checkout'])->name('checkout'); // Pago simulado por ahora
+Route::middleware(['auth:alumno'])->group(function () {
+    Route::get('/perfil',function () { return view('webacademia.perfil');})->name('webacademia.perfil');
+    
+    Route::prefix('carrito')->name('carrito.')->group(function () {
+        Route::get('/', [WebController::class, 'verCarrito'])->name('ver');
+        Route::post('/agregar/{id}', [WebController::class, 'agregarAlCarrito'])->name('agregar');
+        Route::post('/eliminar/{id}', [WebController::class, 'eliminarDelCarrito'])->name('eliminar');
+        Route::post('/actualizar/{id}', [WebController::class, 'actualizarCantidad'])->name('actualizar');
+        Route::post('/vaciar', [WebController::class, 'vaciarCarrito'])->name('vaciar');
+        Route::post('/checkout', [WebController::class, 'checkout'])->name('checkout');
+        Route::post('/procesar-pago', [WebController::class, 'procesarPago'])->name('procesar_pago');
+    });
 });
 
 
@@ -192,7 +198,7 @@ Route::prefix('crm')->group(function () {
 
 
 
-    Route::group(['middleware' => 'auth'], function () {
+    Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -208,7 +214,6 @@ Route::prefix('crm')->group(function () {
         Route::get('/products/edit/{id}', [ProductsController::class, 'edit'])->name('productos.edit');
         Route::post('/products/store', [ProductsController::class, 'store'])->name('productos.store');
         Route::post('/products/update/{id}', [ProductsController::class, 'update'])->name('productos.update');
-        Route::get('/products/show/{id}', [ProductsController::class, 'show'])->name('productos.show');
         Route::post('/products/destroy', [ProductsController::class, 'destroy'])->name('productos.delete');
 
         // products Categories (CATEGORIA DE PRODUCTOS)
@@ -226,7 +231,6 @@ Route::prefix('crm')->group(function () {
         Route::get('/cursos/edit/{id}', [CursosController::class, 'edit'])->name('cursos.edit');
         Route::post('/cursos/store', [CursosController::class, 'store'])->name('cursos.store');
         Route::post('/cursos/update/{id}', [CursosController::class, 'update'])->name('cursos.update');
-        Route::get('/cursos/show/{id}', [CursosController::class, 'show'])->name('cursos.show');
         Route::post('/cursos/destroy', [CursosController::class, 'destroy'])->name('cursos.delete');
 
         // Cursos Categories (CATEGORIA DE Cursos)

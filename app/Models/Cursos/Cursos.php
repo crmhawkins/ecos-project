@@ -15,18 +15,19 @@ class Cursos extends Model
 
     protected $fillable = [
         'name',
+        'title', // Alias para name
         'price',
         'category_id',
         'image',
         'description',
         'moodle_id',
+        'moodle_course_id', // Alias para moodle_id
         'inactive',
         'inicio',
         'duracion',
         'plazas',
         'lecciones',
         'certificado',
-
     ];
 
     protected $attributes = [
@@ -41,5 +42,28 @@ class Cursos extends Model
         return $this->belongsTo(Category::class);
     }
 
+    // Accessors para compatibilidad
+    public function getTitleAttribute()
+    {
+        return $this->attributes['title'] ?? $this->attributes['name'];
+    }
+
+    public function getMoodleCourseIdAttribute()
+    {
+        return $this->attributes['moodle_course_id'] ?? $this->attributes['moodle_id'];
+    }
+
+    // Mutators para compatibilidad
+    public function setTitleAttribute($value)
+    {
+        $this->attributes['name'] = $value;
+        $this->attributes['title'] = $value;
+    }
+
+    public function setMoodleCourseIdAttribute($value)
+    {
+        $this->attributes['moodle_id'] = $value;
+        $this->attributes['moodle_course_id'] = $value;
+    }
 }
 

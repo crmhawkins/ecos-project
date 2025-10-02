@@ -20,6 +20,10 @@ class user_access_level extends Seeder
             ['name' => 'Gestor'],
             ['name' => 'Personal'],
             ['name' => 'Comercial'],
+            ['name' => 'Marketing'],
+            ['name' => 'Soporte'],
+            ['name' => 'Recursos Humanos'],
+            ['name' => 'Solo Lectura'],
         ];
 
         foreach ($accesslevels as $level) {

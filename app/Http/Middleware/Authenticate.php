@@ -12,6 +12,21 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        return $request->expectsJson() ? null : route('login');
+        if ($request->expectsJson()) {
+            return null;
+        }
+
+        // Determinar la ruta de redirección basada en el contexto
+        if ($request->is('crm/*') || $request->is('moodle/*')) {
+            return route('login');
+        }
+
+        // Para rutas de la web academia
+        if ($request->is('weblogin') || $request->is('webregister') || $request->is('perfil') || $request->is('carrito/*')) {
+            return url('/weblogin');
+        }
+
+        // Por defecto, redirigir al login del CRM
+        return route('login');
     }
 }

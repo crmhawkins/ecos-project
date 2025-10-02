@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use App\Http\View\Composers\CartComposer;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,5 +26,8 @@ class AppServiceProvider extends ServiceProvider
         view()->share('isActive', function ($routePattern) {
             return Route::currentRouteNamed($routePattern) ? 'active' : '';
         });
+
+        // Registrar view composer para el carrito
+        view()->composer('webacademia.partials.navbar', CartComposer::class);
     }
 }
