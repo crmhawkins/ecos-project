@@ -78,14 +78,22 @@
 
                             <div class="col-sm-12 col-md-12">
                                 <div class="form-group mb-3">
-                                    <label for="concept">Imagen:</label>
-                                    <input type="file" class="form-control" id="image" name="image">
+                                    <label for="image">Imagen del curso:</label>
+                                    <small class="form-text text-muted mb-2">Sube una imagen representativa del curso (recomendado: 400x300px). Si no subes ninguna, se usará una imagen por defecto.</small>
+                                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                                    @if($servicio->image && file_exists(storage_path('app/public/' . $servicio->image)))
+                                        <div class="mt-2">
+                                            <small class="text-muted">Imagen actual:</small><br>
+                                            <img src="{{ asset('storage/' . $servicio->image) }}" alt="Imagen actual" style="max-width: 200px; height: auto; border-radius: 8px; border: 1px solid #ddd;">
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                             <div class="col-sm-12 col-md-12">
                                 <div class="form-group mb-3">
-                                    <label for="description">Descripción:</label>
-                                    <textarea class="form-control @error('description') is-invalid @enderror" name="description" id="description" rows="4">{{ old('description', $servicio->description) }}</textarea>
+                                    <label for="description">Descripción del curso:</label>
+                                    <small class="form-text text-muted mb-2">Esta descripción aparecerá en la página de detalle del curso. Puedes usar saltos de línea para organizar el contenido.</small>
+                                    <textarea class="form-control @error('description') is-invalid @enderror" name="description" id="description" rows="8" placeholder="Describe aquí los objetivos, contenido y beneficios del curso...">{{ old('description', $servicio->description) }}</textarea>
                                     @error('description')
                                     <span class="invalid-feedback d-block">{{ $message }}</span>
                                     @enderror

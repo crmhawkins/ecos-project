@@ -290,6 +290,30 @@
     font-size: 16px;
 }
 
+/* Botón explorar cursos más pequeño */
+.btn-explorar-cursos {
+    padding: 12px 24px !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, #D93690 0%, #ff6b9d 100%) !important;
+    border: none !important;
+    color: white !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-explorar-cursos:hover {
+    background: linear-gradient(135deg, #ff6b9d 0%, #D93690 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(217, 54, 144, 0.3) !important;
+    color: white !important;
+    text-decoration: none !important;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .shopping-summery {
@@ -313,6 +337,11 @@
     .btn_one, .btn_two {
         padding: 12px 20px;
         font-size: 14px;
+    }
+    
+    .btn-explorar-cursos {
+        padding: 10px 20px !important;
+        font-size: 13px !important;
     }
 }
 </style>
@@ -424,7 +453,7 @@
                                         <i class="ti-shopping-cart" style="font-size: 4rem; color: #ccc;"></i>
                                         <h4 class="mt-3">Tu carrito está vacío</h4>
                                         <p class="text-muted">¡Explora nuestros cursos y añade algunos a tu carrito!</p>
-                                        <a href="{{ route('webacademia.courses') }}" class="btn_one mt-3">
+                                        <a href="{{ route('webacademia.courses') }}" class="btn-explorar-cursos">
                                             <i class="fas fa-graduation-cap"></i> Explorar Cursos
                                         </a>
                                     </div>

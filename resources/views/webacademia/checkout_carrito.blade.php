@@ -91,58 +91,184 @@
 }
 
 .form-group label {
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 10px;
-    display: block;
-    font-size: 15px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-weight: 700 !important;
+    color: #2d3748 !important;
+    margin-bottom: 12px !important;
+    display: block !important;
+    font-size: 15px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    position: relative !important;
+    padding-left: 15px !important;
+}
+
+.form-group label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(135deg, #D93690 0%, #ff6b9d 100%);
+    border-radius: 2px;
 }
 
 .form-group label span {
-    color: #e74c3c;
-    font-size: 18px;
+    color: #e74c3c !important;
+    font-size: 18px !important;
+    margin-left: 4px !important;
 }
 
+/* Estilos mejorados para inputs */
+input[type="text"], 
+input[type="email"], 
+input[type="tel"], 
+select.form-control,
 .form-control {
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    padding: 16px 20px;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    background: #fafbfc;
-    width: 100%;
-    font-weight: 500;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 2px solid #e1e8ed !important;
+    border-radius: 15px !important;
+    padding: 18px 24px !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%) !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+    width: 100% !important;
+    outline: none !important;
+    color: #2d3748 !important;
 }
 
+input[type="text"]:focus, 
+input[type="email"]:focus, 
+input[type="tel"]:focus,
+select.form-control:focus,
 .form-control:focus {
-    border-color: #D93690;
-    box-shadow: 0 0 0 0.3rem rgba(217, 54, 144, 0.15);
-    background: white;
-    transform: translateY(-2px);
+    border-color: #D93690 !important;
+    box-shadow: 0 0 0 4px rgba(217, 54, 144, 0.12), 0 8px 30px rgba(217, 54, 144, 0.15) !important;
+    background: linear-gradient(145deg, #ffffff 0%, #fefeff 100%) !important;
+    transform: translateY(-3px) !important;
+}
+
+input[type="text"]:hover, 
+input[type="email"]:hover, 
+input[type="tel"]:hover,
+select.form-control:hover,
+.form-control:hover {
+    border-color: #cbd5e0 !important;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.12) !important;
+    transform: translateY(-1px) !important;
 }
 
 .form-control::placeholder {
-    color: #adb5bd;
-    font-weight: 400;
+    color: #a0aec0 !important;
+    font-weight: 400 !important;
+    font-style: italic !important;
 }
 
-/* Estilos especiales para inputs específicos */
-input[type="text"], input[type="email"], input[type="tel"] {
-    background: linear-gradient(145deg, #fafbfc 0%, #f8f9fa 100%);
+/* Efectos adicionales para inputs */
+.form-group {
+    position: relative;
 }
 
-input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus {
-    background: linear-gradient(145deg, #ffffff 0%, #fafbfc 100%);
+.form-group::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(135deg, #D93690 0%, #ff6b9d 100%);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+}
+
+.form-group:focus-within::after {
+    width: 100%;
+}
+
+/* Animación de entrada para inputs */
+@keyframes inputFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-group {
+    animation: inputFadeIn 0.6s ease-out;
+}
+
+/* Estilos para inputs válidos */
+.form-control:valid {
+    border-color: #48bb78 !important;
+}
+
+.form-control:valid:focus {
+    box-shadow: 0 0 0 4px rgba(72, 187, 120, 0.12), 0 8px 30px rgba(72, 187, 120, 0.15) !important;
+}
+
+/* Estilos para el contenedor de facturación */
+.col-lg-8 {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+    padding: 45px !important;
+    border-radius: 25px !important;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1) !important;
+    border: 1px solid #e2e8f0 !important;
+    margin-bottom: 30px !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.col-lg-8::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(135deg, #D93690 0%, #ff6b9d 50%, #667eea 100%);
+}
+
+/* Título principal mejorado */
+h2 {
+    color: #2d3748 !important;
+    font-weight: 800 !important;
+    font-size: 32px !important;
+    margin-bottom: 15px !important;
+    text-align: center !important;
+    background: linear-gradient(135deg, #D93690 0%, #667eea 100%);
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+/* Descripción mejorada */
+.col-lg-8 p {
+    color: #718096 !important;
+    font-size: 16px !important;
+    margin-bottom: 40px !important;
+    line-height: 1.6 !important;
+    text-align: center !important;
+    font-weight: 500 !important;
 }
 
 /* Select mejorado */
 select.form-control {
-    background: linear-gradient(145deg, #fafbfc 0%, #f8f9fa 100%);
-    cursor: pointer;
-    appearance: none;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%) !important;
+    cursor: pointer !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23D93690' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+    background-position: right 20px center !important;
+    background-repeat: no-repeat !important;
+    background-size: 16px 12px !important;
+    padding-right: 50px !important;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23D93690' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 15px center;
@@ -358,10 +484,108 @@ select.form-control:focus {
 }
 
 /* Responsive */
+/* Espaciado para la columna derecha */
+.col-lg-4 {
+    padding-right: 25px !important;
+    padding-left: 20px !important;
+}
+
+.order-summary, .payment-methods {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+}
+
+/* Asegurar que el contenedor principal tenga margen */
+.container-fluid {
+    padding-right: 20px !important;
+    padding-left: 20px !important;
+}
+
+/* Espaciado adicional para el row principal */
+.row.g-4 {
+    margin-right: -10px !important;
+    margin-left: -10px !important;
+}
+
+.row.g-4 > * {
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+}
+
 @media (max-width: 991.98px) {
     .order-details {
         padding-left: 0 !important;
         margin-top: 30px;
+    }
+    
+    .col-lg-4 {
+        padding-right: 15px !important;
+        padding-left: 15px !important;
+        margin-top: 30px !important;
+    }
+    
+    .col-lg-8 {
+        padding: 30px 20px !important;
+        margin-bottom: 20px !important;
+    }
+    
+    h2 {
+        font-size: 28px !important;
+    }
+    
+    .form-group label {
+        font-size: 14px !important;
+        padding-left: 12px !important;
+    }
+    
+    input[type="text"], 
+    input[type="email"], 
+    input[type="tel"], 
+    select.form-control,
+    .form-control {
+        padding: 16px 20px !important;
+        font-size: 16px !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .col-lg-8 {
+        padding: 25px 15px !important;
+        border-radius: 20px !important;
+    }
+    
+    .col-lg-4 {
+        padding-right: 15px !important;
+        padding-left: 15px !important;
+    }
+    
+    .container-fluid {
+        padding-right: 15px !important;
+        padding-left: 15px !important;
+    }
+    
+    h2 {
+        font-size: 24px !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .form-group {
+        margin-bottom: 25px !important;
+    }
+    
+    input[type="text"], 
+    input[type="email"], 
+    input[type="tel"], 
+    select.form-control,
+    .form-control {
+        padding: 14px 18px !important;
+        font-size: 15px !important;
+        border-radius: 12px !important;
+    }
+    
+    .form-group label {
+        font-size: 13px !important;
+        margin-bottom: 8px !important;
     }
 }
 
@@ -426,6 +650,29 @@ select.form-control:focus {
     border-radius: 15px;
     border: none;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* Asegurar que no queden overlays residuales */
+.modal-backdrop {
+    transition: opacity 0.15s linear;
+}
+
+.modal-backdrop.show {
+    opacity: 0.5;
+}
+
+/* Limpiar cualquier estado modal residual */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Estilos para evitar problemas con el backdrop */
+.modal {
+    z-index: 1050;
+}
+
+.modal-backdrop {
+    z-index: 1040;
 }
 </style>
 @endsection
@@ -575,7 +822,7 @@ select.form-control:focus {
                     </div>
 
                     <div class="col-lg-4 col-12">
-                        <div class="order-details" style="padding-left: 20px;">
+                        <div class="order-details">
                             <!-- Resumen del Pedido -->
                             <div class="order-summary">
                                 <h3>📦 Resumen del Pedido</h3>
@@ -644,7 +891,7 @@ select.form-control:focus {
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="terminosModalLabel">📋 Términos y Condiciones</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" onclick="closeModal('#terminosModal')" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 @if($configuracion && $configuracion->terminos_condiciones)
@@ -654,7 +901,7 @@ select.form-control:focus {
                 @endif
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('#terminosModal')">Cerrar</button>
             </div>
         </div>
     </div>
@@ -666,7 +913,7 @@ select.form-control:focus {
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="privacidadModalLabel">🔒 Política de Privacidad</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" onclick="closeModal('#privacidadModal')" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 @if($configuracion && $configuracion->politica_privacidad)
@@ -676,7 +923,7 @@ select.form-control:focus {
                 @endif
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('#privacidadModal')">Cerrar</button>
             </div>
         </div>
     </div>
@@ -804,13 +1051,114 @@ document.querySelectorAll('[data-bs-toggle="modal"]').forEach(trigger => {
     trigger.addEventListener('click', function(e) {
         e.preventDefault();
         const targetModal = this.getAttribute('data-bs-target');
-        const modal = new bootstrap.Modal(document.querySelector(targetModal));
+        const modalElement = document.querySelector(targetModal);
+        const modal = new bootstrap.Modal(modalElement);
         modal.show();
+        
+        // Asegurar que el modal se cierre correctamente
+        modalElement.addEventListener('hidden.bs.modal', function () {
+            // Remover cualquier backdrop que pueda quedar
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => backdrop.remove());
+            
+            // Restaurar el scroll del body
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        });
     });
+});
+
+// Función para cerrar modales manualmente
+function closeModal(modalId) {
+    const modalElement = document.querySelector(modalId);
+    const modal = bootstrap.Modal.getInstance(modalElement);
+    if (modal) {
+        modal.hide();
+    }
+    
+    // Limpiar cualquier backdrop residual
+    setTimeout(() => {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    }, 300);
+}
+
+// Limpiar modales al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Remover cualquier backdrop residual
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => backdrop.remove());
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
 });
 </script>
 
 <!-- SweetAlert2 para mejores alertas -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Script para limpiar modales inmediatamente -->
+<script>
+// Ejecutar inmediatamente para limpiar cualquier estado modal residual
+(function() {
+    // Remover backdrops residuales
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => backdrop.remove());
+    
+    // Limpiar clases del body
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+    
+    // Cerrar cualquier modal abierto
+    const modals = document.querySelectorAll('.modal.show');
+    modals.forEach(modal => {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+        modal.removeAttribute('aria-modal');
+    });
+})();
+
+// También ejecutar cuando la página esté completamente cargada
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    }, 100);
+});
+
+// Limpiar overlay al hacer clic en cualquier parte de la página
+document.addEventListener('click', function(e) {
+    // Si hay un backdrop visible pero no hay modal abierto, limpiarlo
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    const openModals = document.querySelectorAll('.modal.show');
+    
+    if (backdrops.length > 0 && openModals.length === 0) {
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    }
+});
+
+// Limpiar con la tecla Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    }
+});
+</script>
 
 @endsection

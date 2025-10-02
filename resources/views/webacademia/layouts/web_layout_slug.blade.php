@@ -42,7 +42,7 @@
         <div class="loader-section section-right"></div>
     </div>
 	<!-- END PRELOADER -->
-<main style="margin-top: 90px;">
+<main style="margin-top: 110px;">
   @if(!empty($contentView))
         @include($contentView)
     @endif
