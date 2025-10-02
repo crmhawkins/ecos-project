@@ -148,6 +148,7 @@ Route::post('/weblogout', [WebController::class, 'logout'])->name('webacademia.l
 
 Route::middleware(['auth:alumno'])->group(function () {
     Route::get('/perfil',function () { return view('webacademia.perfil');})->name('webacademia.perfil');
+    Route::put('/perfil', [WebController::class, 'updatePerfil'])->name('webacademia.perfil.update');
     
     Route::prefix('carrito')->name('carrito.')->group(function () {
         Route::get('/', [WebController::class, 'verCarrito'])->name('ver');

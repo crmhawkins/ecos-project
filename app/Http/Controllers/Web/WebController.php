@@ -16,6 +16,7 @@ use App\Modules\Moodle\Services\MoodleUserService;
 use App\Services\CoursesSyncService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class WebController extends Controller
 {
@@ -420,5 +421,53 @@ class WebController extends Controller
         return true;
     }
 
+    public function updatePerfil(Request $request)
+    {
+        try {
+            $alumno = auth('alumno')->user();
+            
+            // Validar los datos
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'surname' => 'required|string|max:255',
+                'email' => 'required|email|unique:alumnos,email,' . $alumno->id,
+                'phone' => 'nullable|string|max:20',
+                'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            ]);
+
+            // Actualizar datos básicos
+            $alumno->name = $request->name;
+            $alumno->surname = $request->surname;
+            $alumno->email = $request->email;
+            $alumno->phone = $request->phone;
+
+            // Manejar la subida del avatar
+            if ($request->hasFile('avatar')) {
+                // Eliminar avatar anterior si existe
+                if ($alumno->avatar && Storage::disk('public')->exists($alumno->avatar)) {
+                    Storage::disk('public')->delete($alumno->avatar);
+                }
+
+                // Subir nuevo avatar
+                $avatarPath = $request->file('avatar')->store('avatars', 'public');
+                $alumno->avatar = $avatarPath;
+            }
+
+            $alumno->save();
+
+            return redirect()->route('webacademia.perfil')->with('success', '¡Perfil actualizado correctamente!');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput()
+                ->with('error', 'Por favor, corrige los errores en el formulario.');
+        } catch (\Exception $e) {
+            Log::error("Error actualizando perfil: " . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Hubo un error al actualizar tu perfil. Por favor, inténtalo de nuevo.');
+        }
+    }
 
 }

@@ -279,6 +279,44 @@
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
+/* Alertas personalizadas */
+.alert {
+    border-radius: 15px;
+    border: none;
+    padding: 20px 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    font-weight: 500;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    color: white;
+}
+
+.alert i {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.alert ul {
+    margin-left: 20px;
+}
+
+.btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+}
+
+.btn-close:hover {
+    opacity: 1;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .perfil-hero {
@@ -296,6 +334,11 @@
     .curso-meta {
         flex-direction: column;
         align-items: flex-start;
+    }
+    
+    .alert {
+        padding: 15px 20px;
+        font-size: 14px;
     }
 }
 </style>
@@ -331,7 +374,34 @@
             <div class="col-lg-6 mb-5">
                 <div class="perfil-card">
                     <h4>✏️ Editar mis datos</h4>
-                    {{-- <form action="{{ route('alumno.perfil.update') }}" method="POST" enctype="multipart/form-data"> --}}
+                    
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle"></i> {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle"></i> {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle"></i> <strong>Por favor, corrige los siguientes errores:</strong>
+                            <ul class="mb-0 mt-2">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+                    
+                    <form action="{{ route('webacademia.perfil.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -375,7 +445,7 @@
                                 💾 Guardar cambios
                             </button>
                         </div>
-                    {{-- </form> --}}
+                    </form>
                 </div>
             </div>
 
