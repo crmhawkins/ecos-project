@@ -39,6 +39,7 @@ class WebController extends Controller
             $search = $request->input('search');
 
             $query = Cursos::where('inactive', 0)
+                ->where('published', 1)
                 ->whereNotNull('moodle_id')
                 ->with('category')
                 ->select('id', 'name', 'description', 'price', 'image', 'category_id', 'moodle_id', 'duracion', 'plazas', 'lecciones', 'certificado', 'created_at');
@@ -77,6 +78,7 @@ class WebController extends Controller
             
             // En caso de error, mostrar cursos básicos sin sincronización
             $initialCursos = Cursos::where('inactive', 0)
+                ->where('published', 1)
                 ->whereNotNull('moodle_id')
                 ->with('category')
                 ->take(9)
@@ -126,6 +128,7 @@ class WebController extends Controller
 
         // Obtener cursos relacionados
         $cursosRelacionados = Cursos::where('inactive', 0)
+            ->where('published', 1)
             ->whereNotNull('moodle_id')
             ->where('category_id', $curso->category_id)
             ->where('id', '!=', $curso->id)
@@ -144,35 +147,88 @@ class WebController extends Controller
 
     public function register(Request $request)
     {
-        $request->validate([
-            'username' => 'required|unique:alumnos',
-            'name' => 'required',
-            'surname' => 'required',
-            'email' => 'required|email|unique:alumnos',
-            'password' => 'required|min:6',
-        ],[
-            'name.required' => 'El nombre es requerido para continuar',
-            'surname.required' => 'Los apellidos son requeridos para continuar',
-            'username.required' => 'El nombre de usuario es requerido para continuar',
-            'username.unique' => 'El nombre de usuario ya existe',
-            'email.required' => 'El email es requerido para continuar',
-            'email.email' => 'El email debe ser un email valido',
-            'email.unique' => 'El email ya existe',
-            'password.required' => 'El password es requerido para continuar',
-            'password.min' => 'El password debe contener al menos 6 caracteres para continuar',
-        ]);
+        try {
+            $request->validate([
+                'username' => 'required|string|min:3|max:50|unique:alumnos|regex:/^[a-zA-Z0-9_]+$/',
+                'name' => 'required|string|min:2|max:100|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+                'surname' => 'required|string|min:2|max:100|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+                'email' => 'required|email|max:255|unique:alumnos',
+                'password' => 'required|string|min:8|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/',
+                'password_confirmation' => 'required|string|min:8',
+            ],[
+                'name.required' => 'El nombre es obligatorio',
+                'name.min' => 'El nombre debe tener al menos 2 caracteres',
+                'name.max' => 'El nombre no puede tener más de 100 caracteres',
+                'name.regex' => 'El nombre solo puede contener letras y espacios',
+                
+                'surname.required' => 'Los apellidos son obligatorios',
+                'surname.min' => 'Los apellidos deben tener al menos 2 caracteres',
+                'surname.max' => 'Los apellidos no pueden tener más de 100 caracteres',
+                'surname.regex' => 'Los apellidos solo pueden contener letras y espacios',
+                
+                'username.required' => 'El nombre de usuario es obligatorio',
+                'username.min' => 'El nombre de usuario debe tener al menos 3 caracteres',
+                'username.max' => 'El nombre de usuario no puede tener más de 50 caracteres',
+                'username.unique' => 'Este nombre de usuario ya está en uso',
+                'username.regex' => 'El nombre de usuario solo puede contener letras, números y guiones bajos',
+                
+                'email.required' => 'El email es obligatorio',
+                'email.email' => 'El email debe tener un formato válido',
+                'email.max' => 'El email no puede tener más de 255 caracteres',
+                'email.unique' => 'Este email ya está registrado',
+                
+                'password.required' => 'La contraseña es obligatoria',
+                'password.min' => 'La contraseña debe tener al menos 8 caracteres',
+                'password.confirmed' => 'Las contraseñas no coinciden',
+                'password.regex' => 'La contraseña debe contener al menos una mayúscula, una minúscula y un número',
+                
+                'password_confirmation.required' => 'Debes confirmar tu contraseña',
+                'password_confirmation.min' => 'La confirmación debe tener al menos 8 caracteres',
+            ]);
 
-        $alumno = Alumno::create([
-            'username' => $request->username,
-            'name' => $request->name,
-            'surname' => $request->surname,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+            // Limpiar y preparar los datos
+            $userData = [
+                'username' => trim(strtolower($request->username)),
+                'name' => trim(ucwords(strtolower($request->name))),
+                'surname' => trim(ucwords(strtolower($request->surname))),
+                'email' => trim(strtolower($request->email)),
+                'password' => Hash::make($request->password),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
 
-        Auth::guard('alumno')->login($alumno);
+            $alumno = Alumno::create($userData);
 
-        return redirect()->route('webacademia.perfil');
+            // Log del registro exitoso
+            Log::info("Nuevo alumno registrado", [
+                'id' => $alumno->id,
+                'username' => $alumno->username,
+                'email' => $alumno->email,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
+
+            Auth::guard('alumno')->login($alumno);
+
+            return redirect()->route('webacademia.perfil')->with('success', '¡Bienvenido! Tu cuenta ha sido creada exitosamente.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput($request->except('password', 'password_confirmation'))
+                ->with('error', 'Por favor, corrige los errores en el formulario.');
+        } catch (\Exception $e) {
+            Log::error("Error en registro de alumno: " . $e->getMessage(), [
+                'email' => $request->email ?? 'N/A',
+                'username' => $request->username ?? 'N/A',
+                'ip' => $request->ip(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect()->back()
+                ->withInput($request->except('password', 'password_confirmation'))
+                ->with('error', 'Hubo un error al crear tu cuenta. Por favor, inténtalo de nuevo.');
+        }
     }
 
     public function login(Request $request)

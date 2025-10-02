@@ -23,6 +23,7 @@ class Cursos extends Model
         'moodle_id',
         'moodle_course_id', // Alias para moodle_id
         'inactive',
+        'published',
         'inicio',
         'duracion',
         'plazas',
@@ -32,6 +33,13 @@ class Cursos extends Model
 
     protected $attributes = [
         'inactive' => 0,
+        'published' => false,
+    ];
+
+    protected $casts = [
+        'published' => 'boolean',
+        'inactive' => 'boolean',
+        'certificado' => 'boolean',
     ];
     protected $dates = [
         'created_at', 'updated_at', 'deleted_at','inicio'

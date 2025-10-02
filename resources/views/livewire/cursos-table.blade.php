@@ -59,6 +59,7 @@
                             'categoria_nombre' => 'CATEGORIA',
                             'price' => 'PRECIO',
                             'inactive' => 'VISIBLE',
+                            'published' => 'PUBLICADO',
                         ] as $field => $label)
                             <th class="px-3" style="font-size:0.75rem">
                                 <a href="#" wire:click.prevent="sortBy('{{ $field }}')">
@@ -80,6 +81,17 @@
                             <td >{{optional($servicio->category)->name}}</td>
                             <td><strong>{{ number_format($servicio->price, 2, ',', '') }} €</strong></td>
                             <td>{{$servicio->inactive ? 'No' : 'Si'}}</td>
+                            <td>
+                                @if($servicio->published)
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-globe"></i> Sí
+                                    </span>
+                                @else
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-eye-slash"></i> No
+                                    </span>
+                                @endif
+                            </td>
                             <td >
                                 @if ($servicio->image)
                                     <img class="img-fluid" src="{{url($servicio->image)}}" alt="cursos" style="width: 40px; height: 40px; border-radius:40%;">

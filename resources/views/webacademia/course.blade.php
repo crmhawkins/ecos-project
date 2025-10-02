@@ -493,7 +493,9 @@
         console.log('Page loaded with', initialCount, 'initial courses');
         
         // Solo cargar más cursos si hay menos de 9 cursos iniciales
+        // Pero establecer el offset inicial para evitar duplicados
         if (initialCount < 9) {
+            offset = initialCount; // Establecer offset para evitar duplicados
             setTimeout(() => {
                 loadCourses();
             }, 500);

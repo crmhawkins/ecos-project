@@ -29,6 +29,7 @@ class CursosController extends Controller
             'price' => 'required',
             'category_id' => 'required',
             'inactive' => 'nullable',
+            'published' => 'nullable',
             'description' => 'nullable',
             'inicio' => 'nullable',
             'duracion' => 'nullable',
@@ -42,6 +43,14 @@ class CursosController extends Controller
             'category_id.required' => 'La categoria es requerida para continuar',
             'price.required' => 'El precio es requerido para continuar',
         ]);
+
+        // Manejar checkboxes
+        if(!isset($data['inactive'])){
+            $data['inactive'] = 0;
+        }
+        if(!isset($data['published'])){
+            $data['published'] = 0;
+        }
 
         if($request->hasFile('image')){
             $imagen = $request->file('image')->store('public/products');
@@ -77,6 +86,7 @@ class CursosController extends Controller
             'price' => 'required',
             'category_id' => 'required',
             'inactive' => 'nullable',
+            'published' => 'nullable',
             'description' => 'nullable',
             'inicio' => 'nullable',
             'duracion' => 'nullable',
@@ -90,9 +100,14 @@ class CursosController extends Controller
             'price.required' => 'El precio es requerido para continuar',
         ]);
 
+        // Manejar checkboxes
         if(!isset($data['inactive'])){
             $data['inactive'] = 0;
         }
+        if(!isset($data['published'])){
+            $data['published'] = 0;
+        }
+
         if($request->hasFile('image')){
             $imagen = $request->file('image')->store('public/products');
             $data['image'] = Storage::url($imagen);

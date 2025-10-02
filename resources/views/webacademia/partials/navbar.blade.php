@@ -44,7 +44,7 @@
             </div>
 
             <!-- Carrito + botones (solo escritorio) -->
-            <div class="col-lg-4 col-md-12 mt-3 mt-lg-0 d-none d-lg-flex flex-row justify-content-end align-items-center">
+            <div class="col-lg-4 col-md-12 mt-3 mt-lg-0 d-none d-lg-flex flex-row justify-content-end align-items-center" style="gap: 8px;">
                 @auth('alumno')
                     <!-- Usuario autenticado -->
                     <div class="home_lc me-3">
@@ -70,14 +70,14 @@
                     </div>
                 @else
                     <!-- Usuario no autenticado -->
-                    <div class="home_lc me-3">
+                    <div class="home_lc me-2">
                         <a href="{{ route('carrito.ver') }}" class="hlc">
                             <i class="ti-shopping-cart-full"></i>
                             <span class="gactive">{{ $cartCount ?? 0 }}</span>
                         </a>
                     </div>
                     <div class="call_to_action">
-                        <a href="{{ url('/weblogin') }}" class="btn_one me-2">Iniciar Sesión</a>
+                        <a href="{{ url('/weblogin') }}" class="btn_one">Iniciar Sesión</a>
                         <a href="{{ url('/webregister') }}" class="btn_two">Registro</a>
                     </div>
                 @endauth
@@ -229,6 +229,58 @@
         background: none;
     }
 
+    /* Ajustar tamaño de botones de autenticación */
+    .call_to_action .btn_one,
+    .call_to_action .btn_two {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        border-radius: 15px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        transition: all 0.3s ease !important;
+        min-width: 80px !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+        margin: 0 2px !important;
+    }
+    
+    /* Contenedor de botones para mantenerlos en una fila */
+    .call_to_action {
+        display: flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .call_to_action .btn_one {
+        background: linear-gradient(135deg, #D93690 0%, #ff6b9d 100%) !important;
+        color: white !important;
+        border: 2px solid transparent !important;
+        box-shadow: 0 4px 12px rgba(217, 54, 144, 0.3) !important;
+    }
+
+    .call_to_action .btn_one:hover {
+        background: linear-gradient(135deg, #ff6b9d 0%, #D93690 100%) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 16px rgba(217, 54, 144, 0.4) !important;
+        color: white !important;
+        text-decoration: none !important;
+    }
+
+    .call_to_action .btn_two {
+        background: transparent !important;
+        color: #D93690 !important;
+        border: 2px solid #D93690 !important;
+    }
+
+    .call_to_action .btn_two:hover {
+        background: #D93690 !important;
+        color: white !important;
+        transform: translateY(-1px) !important;
+        text-decoration: none !important;
+    }
+
     @media (max-width: 991px) {
         #in4wk {
             flex-direction: column;
@@ -257,6 +309,14 @@
 
         .home_lc {
             margin-bottom: 10px;
+        }
+        
+        /* Botones en móvil también con tamaño ajustado */
+        #in4wk .btn_one,
+        #in4wk .btn_two {
+            padding: 10px 20px !important;
+            font-size: 14px !important;
+            border-radius: 20px !important;
         }
     }
 </style>

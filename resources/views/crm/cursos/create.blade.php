@@ -152,6 +152,16 @@
                                     <label class="form-check-label" for="inactive">Ocultar</label>
                                 </div>
                             </div>
+
+                            <div class="col-md-6 d-flex align-items-center">
+                                <div class="form-check form-switch mt-4">
+                                    <input class="form-check-input" type="checkbox" id="published" name="published" value="1" {{ old('published') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="published">
+                                        <i class="fas fa-globe text-success me-2"></i>Publicar en Web
+                                    </label>
+                                    <small class="form-text text-muted d-block">Si está marcado, el curso aparecerá en la web pública</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group mt-5">
