@@ -1,183 +1,413 @@
-@extends('crm.layouts.app')
+@extends('crm.layouts.clean_app')
 
 @section('titulo', 'Crear Curso')
 
 @section('css')
-<link rel="stylesheet" href="{{asset('assets/vendors/choices.js/choices.min.css')}}" />
+<style>
+    .form-header-gradient {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 24px 32px;
+        border-radius: 16px 16px 0 0;
+        margin: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .form-header-gradient h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .form-header-gradient .btn-back {
+        background: white;
+        color: var(--primary-color);
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+    .form-header-gradient .btn-back:hover {
+        background: #f0f0f0;
+        color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .form-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        margin-bottom: 24px;
+        border: 1px solid var(--border-color);
+    }
+    .form-body {
+        padding: 32px;
+    }
+    .form-section-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid rgba(var(--primary-color-rgb, 217, 54, 144), 0.1);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .form-group {
+        margin-bottom: 24px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+    }
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: var(--transition);
+        background: white;
+        color: var(--text-primary);
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 217, 54, 144), 0.1);
+    }
+    .form-control::placeholder {
+        color: var(--text-secondary);
+        opacity: 0.7;
+    }
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+    }
+    .checkbox-group input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-color);
+    }
+    .file-upload-wrapper {
+        border: 2px dashed var(--border-color);
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+    .file-upload-wrapper:hover {
+        border-color: var(--primary-color);
+        background-color: rgba(var(--primary-color-rgb, 217, 54, 144), 0.05);
+    }
+    .file-upload-wrapper input[type="file"] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+    .file-upload-wrapper i {
+        font-size: 2.5rem;
+        color: var(--text-secondary);
+        margin-bottom: 10px;
+    }
+    .file-upload-wrapper p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+    .image-preview {
+        margin-top: 20px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 10px;
+        display: inline-block;
+        max-width: 100%;
+    }
+    .image-preview img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+    }
+    .btn-group-form {
+        display: flex;
+        gap: 12px;
+        padding: 24px 32px;
+        background: var(--bg-light);
+        border-top: 1px solid var(--border-color);
+        border-radius: 0 0 16px 16px;
+        justify-content: flex-end;
+    }
+    .btn-submit {
+        background: var(--primary-color);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+    .btn-submit:hover {
+        background: #c2185b;
+        color: white;
+    }
+    .btn-cancel {
+        background: var(--text-secondary);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+    .btn-cancel:hover {
+        background: #4b5563;
+        color: white;
+        text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        .form-body {
+            padding: 24px;
+        }
+        .form-header-gradient {
+            padding: 18px 24px;
+        }
+        .form-header-gradient h1 {
+            font-size: 1.5rem;
+        }
+        .btn-group-form {
+            flex-direction: column;
+            padding: 18px 24px;
+        }
+    }
+</style>
 @endsection
 
 @section('content')
- <div class="page-heading card" style="box-shadow: none !important" >
-    <div class="page-title card-body">
-        <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Crear Curso</h3>
-                <p class="text-subtitle text-muted">Formulario para registrar un curso</p>
-            </div>
+<div class="container-fluid">
+    @if(session('success'))
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
+        </div>
+    @endif
 
-            <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{route('dashboard')}}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{route('cursos.index')}}">Cursos</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Crear Producto</li>
-                    </ol>
-                </nav>
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Error:</strong>
+            <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('cursos.store') }}" enctype="multipart/form-data">
+        @csrf
+        
+        <div class="form-container">
+            <div class="form-header-gradient">
+                <h1><i class="fas fa-plus-circle"></i> Crear Nuevo Curso</h1>
+                <a href="{{ route('cursos.index') }}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Volver al Listado
+                </a>
+            </div>
+            
+            <div class="form-body">
+                <h3 class="form-section-title"><i class="fas fa-book"></i> Información Básica</h3>
+                
+                <div class="form-group">
+                    <label for="titulo">Título del Curso <span style="color: red;">*</span></label>
+                    <input type="text" name="titulo" id="titulo" class="form-control" 
+                           value="{{ old('titulo') }}" placeholder="Título del curso" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <textarea name="descripcion" id="descripcion" class="form-control" 
+                              placeholder="Descripción detallada del curso">{{ old('descripcion') }}</textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="categoria_id">Categoría <span style="color: red;">*</span></label>
+                        <select name="categoria_id" id="categoria_id" class="form-control" required>
+                            <option value="">Selecciona una categoría</option>
+                            @foreach($categorias as $categoria)
+                                <option value="{{ $categoria->id }}" {{ old('categoria_id') == $categoria->id ? 'selected' : '' }}>
+                                    {{ $categoria->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="precio">Precio (€)</label>
+                        <input type="number" name="precio" id="precio" class="form-control" 
+                               value="{{ old('precio', 0) }}" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="duracion">Duración (horas)</label>
+                        <input type="number" name="duracion" id="duracion" class="form-control" 
+                               value="{{ old('duracion') }}" min="1" placeholder="Número de horas">
+                    </div>
+                    <div class="form-group">
+                        <label for="nivel">Nivel</label>
+                        <select name="nivel" id="nivel" class="form-control">
+                            <option value="">Selecciona un nivel</option>
+                            <option value="Principiante" {{ old('nivel') == 'Principiante' ? 'selected' : '' }}>Principiante</option>
+                            <option value="Intermedio" {{ old('nivel') == 'Intermedio' ? 'selected' : '' }}>Intermedio</option>
+                            <option value="Avanzado" {{ old('nivel') == 'Avanzado' ? 'selected' : '' }}>Avanzado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="imagen">Imagen del Curso</label>
+                    <div class="file-upload-wrapper" id="fileUploadWrapper">
+                        <input type="file" name="imagen" id="imagen" accept="image/*">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Arrastra y suelta una imagen aquí o haz clic para seleccionar</p>
+                    </div>
+                    <div id="imagePreview" class="image-preview" style="display: none;">
+                        <img src="#" alt="Previsualización de imagen" style="max-width: 300px; height: auto;">
+                    </div>
+                </div>
+
+                <h3 class="form-section-title"><i class="fas fa-cog"></i> Configuración</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fecha_inicio">Fecha de Inicio</label>
+                        <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" 
+                               value="{{ old('fecha_inicio') }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="fecha_fin">Fecha de Fin</label>
+                        <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" 
+                               value="{{ old('fecha_fin') }}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="requisitos">Requisitos Previos</label>
+                    <textarea name="requisitos" id="requisitos" class="form-control" 
+                              placeholder="Conocimientos o requisitos necesarios para el curso">{{ old('requisitos') }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="objetivos">Objetivos del Curso</label>
+                    <textarea name="objetivos" id="objetivos" class="form-control" 
+                              placeholder="Qué aprenderán los estudiantes al completar este curso">{{ old('objetivos') }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="published" id="published" value="1" {{ old('published') ? 'checked' : '' }}>
+                        <label for="published">Publicar curso en la web</label>
+                    </div>
+                    <small style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 5px; display: block;">
+                        Si está marcado, el curso será visible en la página web pública
+                    </small>
+                </div>
             </div>
         </div>
-    </div>
 
-    <section class="section mt-4">
-        <div class="card">
-            <div class="card-body">
-                <form action="{{route('cursos.store')}}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="bloque-formulario">
-                        <div class="row">
-                            <div class="col-sm-12 col-md-12">
-                                <div class="form-group mb-3">
-                                    <label for="name">Nombre:</label>
-                                    <input placeholder="Titulo del curso" type="text" class="form-control @error('name') is-invalid @enderror" id="name" value="{{ old('name') }}" name="name">
-                                    @error('name')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-sm-12 col-md-12">
-                                <div class="form-group mb-3">
-                                    <label class="mb-2 text-left" for="category_id">Categoria</label>
-                                    <div class="flex flex-row align-items-start mb-0">
-                                        <select id="category_id" class="choices w-100 form-select  @error('category_id') is-invalid @enderror" name="category_id">
-                                            <option value="">Seleccione una Categoria</option>
-                                            @foreach ($categorias as $categoria)
-                                                <option {{old('category_id') == $categoria->id ? 'selected' : '' }} value="{{ $categoria->id }}">{{ $categoria->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    @error('category_id')
-                                    <p class="invalid-feedback d-block" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </p>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-sm-12 col-md-12">
-                                <div class="form-group mb-3">
-                                    <label for="price">Precio:</label>
-                                    <input placeholder="Precio..." type="text" class="form-control @error('price') is-invalid @enderror" id="precio" value="{{ old('price') }}" name="price" step="0.01">
-                                    @error('price')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-sm-12 col-md-12">
-                                <div class="form-group mb-3">
-                                    <label for="concept">Imagen:</label>
-                                    {{-- imput de archivo  --}}
-                                    <input type="file" class="form-control" id="image" name="image">
-                                </div>
-                            </div>
-
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label for="description">Descripción:</label>
-                                    <textarea class="form-control @error('description') is-invalid @enderror" name="description" id="description" rows="4">{{ old('description') }}</textarea>
-                                    @error('description')
-                                    <span class="invalid-feedback d-block">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="inicio">Fecha de Inicio:</label>
-                                    <input type="date" class="form-control @error('inicio') is-invalid @enderror" name="inicio" id="inicio" value="{{ old('inicio') }}">
-                                    @error('inicio')
-                                    <span class="invalid-feedback d-block">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="duracion">Duración (horas):</label>
-                                    <input type="text" class="form-control @error('duracion') is-invalid @enderror" name="duracion" id="duracion" value="{{ old('duracion') }}">
-                                    @error('duracion')
-                                    <span class="invalid-feedback d-block">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="plazas">Plazas:</label>
-                                    <input type="number" class="form-control @error('plazas') is-invalid @enderror" name="plazas" id="plazas" value="{{ old('plazas') }}">
-                                    @error('plazas')
-                                    <span class="invalid-feedback d-block">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="lecciones">Lecciones:</label>
-                                    <input type="number" class="form-control @error('lecciones') is-invalid @enderror" name="lecciones" id="lecciones" value="{{ old('lecciones') }}">
-                                    @error('lecciones')
-                                    <span class="invalid-feedback d-block">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="certificado">¿Incluye Certificación?</label>
-                                    <select name="certificado" id="certificado" class="form-select @error('certificado') is-invalid @enderror">
-                                        <option value="">Seleccione...</option>
-                                        <option value="1" {{ old('certificado') == '1' ? 'selected' : '' }}>Sí</option>
-                                        <option value="0" {{ old('certificado') == '0' ? 'selected' : '' }}>No</option>
-                                    </select>
-                                    @error('certificado')
-                                    <span class="invalid-feedback d-block">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 d-flex align-items-center">
-                                <div class="form-check form-switch mt-4">
-                                    <input class="form-check-input" type="checkbox" id="inactive" name="inactive" value="1" {{ old('inactive') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="inactive">Ocultar</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 d-flex align-items-center">
-                                <div class="form-check form-switch mt-4">
-                                    <input class="form-check-input" type="checkbox" id="published" name="published" value="1" {{ old('published') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="published">
-                                        <i class="fas fa-globe text-success me-2"></i>Publicar en Web
-                                    </label>
-                                    <small class="form-text text-muted d-block">Si está marcado, el curso aparecerá en la web pública</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group mt-5">
-                        <button type="submit" class="btn btn-success w-100 text-uppercase">
-                            {{ __('Registrar') }}
-                        </button>
-                    </div>
-                </form>
-            </div>
+        <div class="btn-group-form" style="background: white; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border-color);">
+            <a href="{{ route('cursos.index') }}" class="btn-cancel">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> Crear Curso
+            </button>
         </div>
-    </section>
+    </form>
 </div>
 
-@endsection
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Preview de imagen
+    const imagenInput = document.getElementById('imagen');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = imagePreview.querySelector('img');
 
-@section('scripts')
-<script src="{{asset('assets/vendors/choices.js/choices.min.js')}}"></script>
+    imagenInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            imagePreview.style.display = 'none';
+        }
+    });
 
+    // Validación de fechas
+    const fechaInicio = document.getElementById('fecha_inicio');
+    const fechaFin = document.getElementById('fecha_fin');
+    
+    fechaInicio.addEventListener('change', function() {
+        if (fechaFin.value && fechaInicio.value > fechaFin.value) {
+            alert('La fecha de inicio no puede ser posterior a la fecha de fin');
+            fechaInicio.value = '';
+        }
+    });
+    
+    fechaFin.addEventListener('change', function() {
+        if (fechaInicio.value && fechaFin.value < fechaInicio.value) {
+            alert('La fecha de fin no puede ser anterior a la fecha de inicio');
+            fechaFin.value = '';
+        }
+    });
+});
+</script>
 @endsection

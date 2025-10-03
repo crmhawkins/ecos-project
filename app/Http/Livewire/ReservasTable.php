@@ -78,19 +78,6 @@ class ReservasTable extends Component
         $this->reservaSeleccionada = Reservas::findOrFail($id);
         $this->dispatch('mostrarModalDetalle');
     }
-    public function rechazarReserva($id)
-    {
-        $reserva = Reservas::findOrFail($id);
-        $reserva->estado = 'rechazada';
-        $reserva->save();
-        $sesiones = $reserva->sesiones;
-        if ($sesiones) {
-            foreach ($sesiones as $sesion) {
-                $sesion->delete();
-            }
-        }
-        $this->actualizarServicios();
-    }
 
     public function Observaciones($id)
     {
@@ -145,6 +132,42 @@ class ReservasTable extends Component
         return collect($diasArray)
             ->map(fn($d) => $mapaDias[$d] ?? $d)
             ->implode(', ');
+    }
+
+    public function delete($id)
+    {
+        try {
+            $reserva = Reservas::findOrFail($id);
+            $reserva->delete();
+            
+            session()->flash('success', 'Reserva eliminada exitosamente.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al eliminar la reserva: ' . $e->getMessage());
+        }
+    }
+
+    public function confirmarReserva($id)
+    {
+        try {
+            $reserva = Reservas::findOrFail($id);
+            $reserva->update(['estado' => 'confirmada']);
+            
+            session()->flash('success', 'Reserva confirmada exitosamente.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al confirmar la reserva: ' . $e->getMessage());
+        }
+    }
+
+    public function rechazarReserva($id)
+    {
+        try {
+            $reserva = Reservas::findOrFail($id);
+            $reserva->update(['estado' => 'cancelada']);
+            
+            session()->flash('success', 'Reserva rechazada exitosamente.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al rechazar la reserva: ' . $e->getMessage());
+        }
     }
 
 }

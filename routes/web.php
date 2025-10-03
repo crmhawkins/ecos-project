@@ -59,6 +59,8 @@ use App\Http\Controllers\Tesoreria\IvaController;
 use App\Http\Controllers\Users\DepartamentController;
 use App\Http\Controllers\Users\PositionController;
 use App\Http\Controllers\Web\WebController;
+use App\Http\Controllers\Blog\BlogController;
+use App\Http\Controllers\Alumnos\AlumnosController;
 use App\Http\Controllers\Builder\BuilderController;
 
 Route::get('/builder',[BuilderController::class, 'index'])->name('builder');
@@ -88,9 +90,8 @@ Route::get('/blog_single', function () {
     return view('webacademia.blog_single');
 });
 
-Route::get('/blog', function () {
-    return view('webacademia.blog');
-});
+Route::get('/blog', [WebController::class, 'blog'])->name('webacademia.blog');
+Route::get('/blog/{slug}', [WebController::class, 'blogShow'])->name('webacademia.blog.show');
 
 Route::get('/cart', function () {
     return view('webacademia.cart');
@@ -208,6 +209,31 @@ Route::prefix('crm')->group(function () {
         Route::post('/alert/update', [AlertController::class, 'updateStatusAlert'])->name('alert.update');
         Route::post('/alert/postpone', [AlertController::class, 'postpone'])->name('alert.postpone');
 
+        // Blog Management (GESTIÓN DE BLOG)
+        Route::prefix('blog')->name('crm.blog.')->group(function () {
+            Route::get('/', [BlogController::class, 'index'])->name('index');
+            Route::get('/create', [BlogController::class, 'create'])->name('create');
+            Route::post('/', [BlogController::class, 'store'])->name('store');
+            Route::get('/{blogPost}', [BlogController::class, 'show'])->name('show');
+            Route::get('/{blogPost}/edit', [BlogController::class, 'edit'])->name('edit');
+            Route::put('/{blogPost}', [BlogController::class, 'update'])->name('update');
+            Route::delete('/{blogPost}', [BlogController::class, 'destroy'])->name('destroy');
+            Route::patch('/{blogPost}/toggle-published', [BlogController::class, 'togglePublished'])->name('toggle-published');
+        });
+
+        // Alumnos Management (GESTIÓN DE ALUMNOS)
+        Route::prefix('alumnos')->name('crm.alumnos.')->group(function () {
+            Route::get('/', [AlumnosController::class, 'index'])->name('index');
+            Route::get('/create', [AlumnosController::class, 'create'])->name('create');
+            Route::post('/', [AlumnosController::class, 'store'])->name('store');
+            Route::get('/{alumno}', [AlumnosController::class, 'show'])->name('show');
+            Route::get('/{alumno}/edit', [AlumnosController::class, 'edit'])->name('edit');
+            Route::put('/{alumno}', [AlumnosController::class, 'update'])->name('update');
+            Route::delete('/{alumno}', [AlumnosController::class, 'destroy'])->name('destroy');
+            Route::patch('/{alumno}/sync-moodle', [AlumnosController::class, 'syncMoodle'])->name('sync-moodle');
+            Route::post('/{alumno}/sync', [AlumnosController::class, 'syncMoodle'])->name('sync');
+        });
+
         // Products (PRODUCTOS)
         Route::get('/products', [ProductsController::class, 'index'])->name('productos.index');
         Route::get('/products/create', [ProductsController::class, 'create'])->name('productos.create');
@@ -238,6 +264,7 @@ Route::prefix('crm')->group(function () {
         Route::get('/cursos-categories', [CursosCategoriesController::class, 'index'])->name('cursosCategoria.index');
         Route::get('/cursos-categories/create', [CursosCategoriesController::class, 'create'])->name('cursosCategoria.create');
         Route::post('/cursos-categories/store', [CursosCategoriesController::class, 'store'])->name('cursosCategoria.store');
+        Route::get('/cursos-categories/{id}', [CursosCategoriesController::class, 'show'])->name('cursosCategoria.show');
         Route::get('/cursos-categories/edit/{id}', [CursosCategoriesController::class, 'edit'])->name('cursosCategoria.edit');
         Route::post('/cursos-categories/update/{id}', [CursosCategoriesController::class, 'update'])->name('cursosCategoria.update');
         Route::post('/cursos-categories/destroy', [CursosCategoriesController::class, 'destroy'])->name('cursosCategoria.delete');
@@ -245,6 +272,7 @@ Route::prefix('crm')->group(function () {
         //Aulas
         Route::get('/aulas', [AulasController::class, 'index'])->name('aulas.index');
         Route::get('/aulas/create', [AulasController::class, 'create'])->name('aulas.create');
+        Route::get('/aulas/{id}', [AulasController::class, 'show'])->name('aulas.show');
         Route::get('/aulas/edit/{id}', [AulasController::class, 'edit'])->name('aulas.edit');
         Route::post('/aulas/store', [AulasController::class, 'store'])->name('aulas.store');
         Route::post('/aulas/update/{id}', [AulasController::class, 'update'])->name('aulas.update');
@@ -257,9 +285,13 @@ Route::prefix('crm')->group(function () {
         Route::post('/reservas/store', [ReservasController::class, 'store'])->name('reservas.store');
         Route::post('/reservas/update/{id}', [ReservasController::class, 'update'])->name('reservas.update');
         Route::post('/reservas/destroy', [ReservasController::class, 'destroy'])->name('reservas.delete');
+        Route::get('/reservas/show/{id}', [ReservasController::class, 'show'])->name('reservas.show');
         Route::get('/reservas/asignar/{id}', [ReservasController::class, 'asignarVista'])->name('reservas.asignarVista');
         Route::post('/reservas/asignar', [ReservasController::class, 'asignarAula'])->name('reservas.asignar');
-        Route::view('/calendario-mensual', 'crm.reservas.calendario')->name('calendario.mensual');
+        
+        // Calendario de reservas
+        Route::get('/calendario', [ReservasController::class, 'calendario'])->name('calendario.index');
+        Route::get('/calendario/api/{year}/{month}', [ReservasController::class, 'getReservasCalendario'])->name('calendario.api');
         Route::get('/api/eventos', [ReservasController::class, 'eventosMensuales'])->name('api.calendario.eventos');
         Route::post('/api/evento-actualizar', [ReservasController::class, 'actualizarEvento']);
 
@@ -738,5 +770,23 @@ Route::prefix('crm')->group(function () {
         Route::group(['prefix' => 'laravel-filemanager'], function () {
             \UniSharp\LaravelFilemanager\Lfm::routes();
         });
+    });
+
+    // Empresa Management (GESTIÓN DE EMPRESA)
+    Route::prefix('empresa')->name('empresa.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Empresa\EmpresaController::class, 'index'])->name('index');
+        Route::get('/edit', [App\Http\Controllers\Empresa\EmpresaController::class, 'edit'])->name('edit');
+        Route::put('/update', [App\Http\Controllers\Empresa\EmpresaController::class, 'update'])->name('update');
+    });
+
+    // User Profile Management (GESTIÓN DE PERFIL DE USUARIO)
+    Route::prefix('user')->name('user.')->group(function () {
+        Route::get('/profile', [App\Http\Controllers\User\ProfileController::class, 'index'])->name('profile');
+        Route::get('/profile/edit', [App\Http\Controllers\User\ProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/profile/update', [App\Http\Controllers\User\ProfileController::class, 'update'])->name('profile.update');
+        
+        // User Settings Management (GESTIÓN DE CONFIGURACIONES DE USUARIO)
+        Route::get('/settings', [App\Http\Controllers\User\UserSettingsController::class, 'index'])->name('settings');
+        Route::put('/settings/update', [App\Http\Controllers\User\UserSettingsController::class, 'update'])->name('settings.update');
     });
 });

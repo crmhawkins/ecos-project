@@ -1,123 +1,530 @@
-@extends('crm.layouts.app')
+@extends('crm.layouts.clean_app')
 
-@section('titulo', 'Pedir Aula')
+@section('titulo', 'Crear Reserva')
 
 @section('css')
-<link rel="stylesheet" href="{{asset('assets/vendors/choices.js/choices.min.css')}}" />
+<style>
+    .form-header-gradient {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 24px 32px;
+        border-radius: 16px 16px 0 0;
+        margin: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .form-header-gradient h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .form-header-gradient .btn-back {
+        background: white;
+        color: var(--primary-color);
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+    .form-header-gradient .btn-back:hover {
+        background: #f0f0f0;
+        color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .form-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        margin-bottom: 24px;
+        border: 1px solid var(--border-color);
+    }
+    .form-body {
+        padding: 32px;
+    }
+    .form-section-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid rgba(var(--primary-color-rgb, 217, 54, 144), 0.1);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .form-group {
+        margin-bottom: 24px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+    }
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: var(--transition);
+        background: white;
+        color: var(--text-primary);
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 217, 54, 144), 0.1);
+    }
+    .form-control::placeholder {
+        color: var(--text-secondary);
+        opacity: 0.7;
+    }
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+    .form-row-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 24px;
+    }
+    .aula-selector {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+        margin-top: 10px;
+    }
+    .aula-option {
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        cursor: pointer;
+        transition: var(--transition);
+        background: white;
+        position: relative;
+    }
+    .aula-option:hover {
+        border-color: var(--primary-color);
+        background: rgba(var(--primary-color-rgb, 217, 54, 144), 0.05);
+    }
+    .aula-option.selected {
+        border-color: var(--primary-color);
+        background: rgba(var(--primary-color-rgb, 217, 54, 144), 0.1);
+    }
+    .aula-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+    .aula-option .aula-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    .aula-option .aula-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    .aula-option .aula-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 1.1rem;
+    }
+    .aula-option .aula-details {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    .aula-option .aula-capacity {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 8px;
+        color: var(--info-color);
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    .priority-selector {
+        display: flex;
+        gap: 12px;
+        margin-top: 10px;
+    }
+    .priority-option {
+        flex: 1;
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        background: white;
+        position: relative;
+    }
+    .priority-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+    .priority-option.low {
+        color: var(--success-color);
+    }
+    .priority-option.medium {
+        color: var(--warning-color);
+    }
+    .priority-option.high {
+        color: var(--danger-color);
+    }
+    .priority-option:hover {
+        border-color: currentColor;
+        background: rgba(currentColor, 0.05);
+    }
+    .priority-option.selected {
+        border-color: currentColor;
+        background: rgba(currentColor, 0.1);
+        font-weight: 600;
+    }
+    .btn-group-form {
+        display: flex;
+        gap: 12px;
+        padding: 24px 32px;
+        background: var(--bg-light);
+        border-top: 1px solid var(--border-color);
+        border-radius: 0 0 16px 16px;
+        justify-content: flex-end;
+    }
+    .btn-submit {
+        background: var(--primary-color);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+    .btn-submit:hover {
+        background: #c2185b;
+        color: white;
+    }
+    .btn-cancel {
+        background: var(--text-secondary);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+    .btn-cancel:hover {
+        background: #4b5563;
+        color: white;
+        text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+        .form-row, .form-row-3 {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        .form-body {
+            padding: 24px;
+        }
+        .form-header-gradient {
+            padding: 18px 24px;
+        }
+        .form-header-gradient h1 {
+            font-size: 1.5rem;
+        }
+        .btn-group-form {
+            flex-direction: column;
+            padding: 18px 24px;
+        }
+        .aula-selector {
+            grid-template-columns: 1fr;
+        }
+        .priority-selector {
+            flex-direction: column;
+        }
+    }
+</style>
 @endsection
 
 @section('content')
-<div class="page-heading card" style="box-shadow: none !important">
-    <div class="page-title card-body">
-        <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Pedir Aula</h3>
-                <p class="text-subtitle text-muted">Formulario para registrar la reserva de un aula</p>
-            </div>
-
-            <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{route('dashboard')}}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{route('reservas.index')}}">Reservas</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Pedir Aula</li>
-                    </ol>
-                </nav>
-            </div>
+<div class="container-fluid">
+    @if(session('success'))
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
         </div>
-    </div>
+    @endif
 
-    <section class="section mt-4">
-        <div class="card">
-            <div class="card-body">
-                <form action="{{ route('reservas.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Error:</strong>
+            <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="curso">Nombre del Curso</label>
-                            <input type="text" name="curso" class="form-control" value="{{ old('curso') }}" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="profesor">Profesor</label>
-                            <input type="text" name="profesor" class="form-control" value="{{ old('profesor') }}" required>
-                        </div>
+    <form method="POST" action="{{ route('reservas.store') }}">
+        @csrf
+        
+        <div class="form-container">
+            <div class="form-header-gradient">
+                <h1><i class="fas fa-plus-circle"></i> Crear Nueva Reserva</h1>
+                <a href="{{ route('reservas.index') }}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Volver al Listado
+                </a>
+            </div>
+            
+            <div class="form-body">
+                <h3 class="form-section-title"><i class="fas fa-info-circle"></i> Información de la Reserva</h3>
+                
+                <div class="form-group">
+                    <label for="titulo">Título de la Reserva <span style="color: red;">*</span></label>
+                    <input type="text" name="titulo" id="titulo" class="form-control" 
+                           value="{{ old('titulo') }}" placeholder="Ej: Reunión de equipo, Clase de matemáticas" required>
+                </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label for="contacto_profesor">Contacto</label>
-                            <input type="text" name="contacto_profesor" value="{{ old('contacto_profesor') }}" class="form-control" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="alumnos">Nº de Alumnos</label>
-                            <input type="number" name="alumnos" value="{{ old('alumnos') }}" class="form-control" required>
-                        </div>
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <textarea name="descripcion" id="descripcion" class="form-control" 
+                              placeholder="Descripción detallada del evento o actividad">{{ old('descripcion') }}</textarea>
+                </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label for="fecha_inicio">Fecha de Inicio</label>
-                            <input type="date" name="fecha_inicio" class="form-control" value="{{ old('fecha_inicio') }}" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="fecha_fin">Fecha de Fin</label>
-                            <input type="date" name="fecha_fin" class="form-control" value="{{ old('fecha_fin') }}" required>
-                        </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="solicitante">Solicitante <span style="color: red;">*</span></label>
+                        <input type="text" name="solicitante" id="solicitante" class="form-control" 
+                               value="{{ old('solicitante', Auth::user()->name ?? '') }}" placeholder="Nombre del solicitante" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email_contacto">Email de Contacto</label>
+                        <input type="email" name="email_contacto" id="email_contacto" class="form-control" 
+                               value="{{ old('email_contacto', Auth::user()->email ?? '') }}" placeholder="correo@ejemplo.com">
+                    </div>
+                </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label for="dias">Días de la Semana</label>
-                            <select name="dias[]" class="form-control choices" multiple required>
-                                <option value="Monday" {{ in_array('Monday', old('dias', [])) ? 'selected' : '' }}>Lunes</option>
-                                <option value="Tuesday"  {{ in_array('Tuesday', old('dias', [])) ? 'selected' : '' }}>Martes</option>
-                                <option value="Wednesday"  {{ in_array('Wednesday', old('dias', [])) ? 'selected' : '' }}>Miércoles</option>
-                                <option value="Thursday"  {{ in_array('Thursday', old('dias', [])) ? 'selected' : '' }}>Jueves</option>
-                                <option value="Friday"  {{ in_array('Friday', old('dias', [])) ? 'selected' : '' }}>Viernes</option>
-                            </select>
+                <h3 class="form-section-title"><i class="fas fa-calendar-alt"></i> Fechas y Horarios</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fecha_inicio">Fecha de Inicio <span style="color: red;">*</span></label>
+                        <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" 
+                               value="{{ old('fecha_inicio') }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fecha_fin">Fecha de Fin</label>
+                        <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" 
+                               value="{{ old('fecha_fin') }}">
+                        <small style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 5px; display: block;">
+                            Dejar vacío si es un evento de un solo día
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hora_inicio">Hora de Inicio <span style="color: red;">*</span></label>
+                        <input type="time" name="hora_inicio" id="hora_inicio" class="form-control" 
+                               value="{{ old('hora_inicio') }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hora_fin">Hora de Fin <span style="color: red;">*</span></label>
+                        <input type="time" name="hora_fin" id="hora_fin" class="form-control" 
+                               value="{{ old('hora_fin') }}" required>
+                    </div>
+                </div>
+
+                <h3 class="form-section-title"><i class="fas fa-door-open"></i> Selección de Aula</h3>
+                
+                <div class="form-group">
+                    <label>Aula Solicitada <span style="color: red;">*</span></label>
+                    <div class="aula-selector">
+                        @if(isset($aulas))
+                            @foreach($aulas as $aula)
+                                <div class="aula-option" data-aula="{{ $aula->id }}">
+                                    <input type="radio" name="aula_id" value="{{ $aula->id }}" 
+                                           {{ old('aula_id') == $aula->id ? 'checked' : '' }} required>
+                                    <div class="aula-header">
+                                        <div class="aula-icon">
+                                            <i class="fas fa-chalkboard"></i>
+                                        </div>
+                                        <div class="aula-name">{{ $aula->nombre }}</div>
+                                    </div>
+                                    <div class="aula-details">
+                                        {{ $aula->descripcion ?? 'Aula disponible para reservas' }}
+                                    </div>
+                                    <div class="aula-capacity">
+                                        <i class="fas fa-users"></i>
+                                        Capacidad: {{ $aula->capacidad }} personas
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <p style="color: var(--text-secondary); font-style: italic;">No hay aulas disponibles</p>
+                        @endif
+                    </div>
+                </div>
+
+                <h3 class="form-section-title"><i class="fas fa-cog"></i> Configuración Adicional</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="numero_asistentes">Número de Asistentes</label>
+                        <input type="number" name="numero_asistentes" id="numero_asistentes" class="form-control" 
+                               value="{{ old('numero_asistentes') }}" min="1" placeholder="Ej: 25">
+                    </div>
+                    <div class="form-group">
+                        <label for="estado">Estado Inicial</label>
+                        <select name="estado" id="estado" class="form-control">
+                            <option value="pendiente" {{ old('estado') == 'pendiente' ? 'selected' : '' }}>Pendiente de Aprobación</option>
+                            <option value="confirmada" {{ old('estado') == 'confirmada' ? 'selected' : '' }}>Confirmada</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Prioridad de la Reserva</label>
+                    <div class="priority-selector">
+                        <div class="priority-option low" data-priority="baja">
+                            <input type="radio" name="prioridad" value="baja" {{ old('prioridad', 'media') == 'baja' ? 'checked' : '' }}>
+                            <i class="fas fa-arrow-down"></i>
+                            <div>Baja</div>
                         </div>
-
-                        <div class="col-md-6 row">
-                            <div class="col-md-6 mb-3">
-                                <label for="horario">Horario inicio</label>
-                                <input type="time" name="hora_inicio" class="form-control" value="{{ old('hora_inicio') }}" required>
-                            </div> <div class="col-md-6 mb-3">
-                                <label for="horario">Horario fin</label>
-                                <input type="time" name="hora_fin" class="form-control" value="{{ old('hora_fin') }}" required>
-                            </div>
+                        <div class="priority-option medium selected" data-priority="media">
+                            <input type="radio" name="prioridad" value="media" {{ old('prioridad', 'media') == 'media' ? 'checked' : '' }}>
+                            <i class="fas fa-minus"></i>
+                            <div>Media</div>
                         </div>
-
-
-                        <div class="col-md-6 mb-3">
-                            <label for="archivo">Archivo</label>
-                            <input type="file" name="archivo" class="form-control">
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label><input type="checkbox" name="informatica" {{ old('informatica') ? 'checked' : '' }}> Aula Informática</label><br>
-                            <label><input type="checkbox" name="homologada" {{ old('homologada') ? 'checked' : '' }}> Aula Homologada</label>
-                        </div>
-
-                        <div class="col-md-12 mb-3">
-                            <label for="observaciones">Observaciones</label>
-                            <textarea name="observaciones" class="form-control" rows="3" value="{{ old('observaciones') }}"></textarea>
+                        <div class="priority-option high" data-priority="alta">
+                            <input type="radio" name="prioridad" value="alta" {{ old('prioridad') == 'alta' ? 'checked' : '' }}>
+                            <i class="fas fa-arrow-up"></i>
+                            <div>Alta</div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="form-group mt-4">
-                        <button type="submit" class="btn btn-primary w-100">Enviar Solicitud</button>
-                    </div>
+                <div class="form-group">
+                    <label for="equipamiento_requerido">Equipamiento Requerido</label>
+                    <textarea name="equipamiento_requerido" id="equipamiento_requerido" class="form-control" 
+                              placeholder="Ej: Proyector, sistema de audio, ordenadores...">{{ old('equipamiento_requerido') }}</textarea>
+                </div>
 
-                </form>
+                <div class="form-group">
+                    <label for="observaciones">Observaciones</label>
+                    <textarea name="observaciones" id="observaciones" class="form-control" 
+                              placeholder="Notas adicionales, requisitos especiales, etc.">{{ old('observaciones') }}</textarea>
+                </div>
             </div>
         </div>
-    </section>
+
+        <div class="btn-group-form" style="background: white; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border-color);">
+            <a href="{{ route('reservas.index') }}" class="btn-cancel">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> Crear Reserva
+            </button>
+        </div>
+    </form>
 </div>
-@endsection
 
-@section('scripts')
-<script src="{{asset('assets/vendors/choices.js/choices.min.js')}}"></script>
 <script>
-    new Choices('.choices', {
-        removeItemButton: true,
-        placeholder: true,
-        placeholderValue: 'Selecciona...',
-        searchPlaceholderValue: 'Buscar...',
+document.addEventListener('DOMContentLoaded', function() {
+    // Selector de aulas
+    const aulaOptions = document.querySelectorAll('.aula-option');
+    aulaOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            aulaOptions.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            this.querySelector('input[type="radio"]').checked = true;
+        });
     });
+
+    // Selector de prioridad
+    const priorityOptions = document.querySelectorAll('.priority-option');
+    priorityOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            priorityOptions.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            this.querySelector('input[type="radio"]').checked = true;
+        });
+    });
+
+    // Validación de fechas
+    const fechaInicio = document.getElementById('fecha_inicio');
+    const fechaFin = document.getElementById('fecha_fin');
+    
+    fechaInicio.addEventListener('change', function() {
+        if (fechaFin.value && fechaInicio.value > fechaFin.value) {
+            alert('La fecha de inicio no puede ser posterior a la fecha de fin');
+            fechaInicio.value = '';
+        }
+    });
+    
+    fechaFin.addEventListener('change', function() {
+        if (fechaInicio.value && fechaFin.value < fechaInicio.value) {
+            alert('La fecha de fin no puede ser anterior a la fecha de inicio');
+            fechaFin.value = '';
+        }
+    });
+
+    // Validación de horarios
+    const horaInicio = document.getElementById('hora_inicio');
+    const horaFin = document.getElementById('hora_fin');
+    
+    function validarHorarios() {
+        if (horaInicio.value && horaFin.value && horaInicio.value >= horaFin.value) {
+            alert('La hora de inicio debe ser anterior a la hora de fin');
+            horaFin.value = '';
+        }
+    }
+    
+    horaInicio.addEventListener('change', validarHorarios);
+    horaFin.addEventListener('change', validarHorarios);
+
+    // Establecer fecha mínima como hoy
+    const today = new Date().toISOString().split('T')[0];
+    fechaInicio.setAttribute('min', today);
+    fechaFin.setAttribute('min', today);
+});
 </script>
 @endsection

@@ -42,6 +42,22 @@ class SuppliersController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $proveedor = Supplier::find($id);
+        if (!$proveedor) {
+            session()->flash('toast', [
+                'icon' => 'error',
+                'mensaje' => 'El proveedor no existe'
+            ]);
+            return redirect()->route('proveedores.index');
+        }
+        return view('crm.suppliers.show', compact('proveedor'));
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)

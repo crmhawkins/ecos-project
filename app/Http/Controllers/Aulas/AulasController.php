@@ -10,62 +10,89 @@ class AulasController extends Controller
 {
     public function index()
     {
-        return view('crm.aulas.index');
+        // Estadísticas para la vista usando campos disponibles
+        $totalAulas = Aulas::count();
+        $aulasDisponibles = Aulas::where('inactive', 0)->count(); // Activas = no inactivas
+        $aulasOcupadas = Aulas::where('inactive', 1)->count(); // Inactivas = ocupadas/en mantenimiento
+        $aulasMantenimiento = 0; // No hay campo específico, usar 0 por ahora
+        
+        return view('crm.aulas.index', compact('totalAulas', 'aulasDisponibles', 'aulasOcupadas', 'aulasMantenimiento'));
     }
 
     public function create() {
         return view('crm.aulas.create');
     }
 
-
-    public function store(Request $request) {
-        // Validamos los campos
-        $data = $this->validate($request, [
-            'name' => 'required|max:255',
-            'inactive' => 'nullable',
-        ], [
-            'name.required' => 'El nombre es requerido para continuar',
-            'name.max' => 'El nombre no pueder tener mas de 255 caracteres',
-
-        ]);
-
-        $servicioCreado = Aulas::create($data);
-
-        return redirect()->route('aulas.edit', $servicioCreado->id)->with('toast', [
-                'icon' => 'success',
-                'mensaje' => 'El servicio creado con exito'
-        ]);
-    }
-
-    public function edit(string $id){
-        $servicio = Aulas::find($id);
-        if (!$servicio) {
+    public function show(string $id) {
+        $aula = Aulas::find($id);
+        if (!$aula) {
             session()->flash('toast', [
                 'icon' => 'error',
-                'mensaje' => 'El servicio no existe'
+                'mensaje' => 'El aula no existe'
             ]);
             return redirect()->route('aulas.index');
         }
-        return view('crm.aulas.edit', compact('servicio'));
+        return view('crm.aulas.show', compact('aula'));
+    }
+
+
+    public function store(Request $request) {
+        // Validamos los campos disponibles en el modelo
+        $data = $this->validate($request, [
+            'name' => 'required|max:255',
+            'inactive' => 'nullable|boolean',
+        ], [
+            'name.required' => 'El nombre del aula es requerido',
+            'name.max' => 'El nombre no puede tener más de 255 caracteres',
+        ]);
+
+        // Mapear los campos del formulario a los campos del modelo
+        $aulaData = [
+            'name' => $data['name'],
+            'inactive' => $data['inactive'] ?? 0,
+        ];
+
+        $aulaCreada = Aulas::create($aulaData);
+
+        return redirect()->route('aulas.index')->with('success', 'Aula creada exitosamente');
+    }
+
+    public function edit(string $id){
+        $aula = Aulas::find($id);
+        if (!$aula) {
+            session()->flash('toast', [
+                'icon' => 'error',
+                'mensaje' => 'El aula no existe'
+            ]);
+            return redirect()->route('aulas.index');
+        }
+        return view('crm.aulas.edit', compact('aula'));
     }
 
     public function update(string $id ,Request $request) {
-        $servicio = Aulas::find($id);
+        $aula = Aulas::find($id);
+
+        if (!$aula) {
+            return redirect()->route('aulas.index')->with('error', 'Aula no encontrada');
+        }
 
         $data = $this->validate($request, [
             'name' => 'required|max:255',
-            'inactive' => 'nullable',
+            'inactive' => 'nullable|boolean',
         ], [
-            'name.required' => 'El nombre es requerido para continuar',
-            'name.max' => 'El nombre no pueder tener mas de 255 caracteres',
+            'name.required' => 'El nombre del aula es requerido',
+            'name.max' => 'El nombre no puede tener más de 255 caracteres',
         ]);
 
-        $servicio->update($data);
+        // Mapear los campos del formulario a los campos del modelo
+        $aulaData = [
+            'name' => $data['name'],
+            'inactive' => $data['inactive'] ?? 0,
+        ];
 
-        return redirect()->route('aulas.index')->with('toast', [
-                'icon' => 'success',
-                'mensaje' => 'El servicio actualizado con exito'
-        ]);
+        $aula->update($aulaData);
+
+        return redirect()->route('aulas.index')->with('success', 'Aula actualizada exitosamente');
     }
 
     public function destroy(Request $request) {

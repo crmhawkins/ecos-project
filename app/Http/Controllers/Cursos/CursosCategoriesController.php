@@ -11,11 +11,31 @@ class CursosCategoriesController extends Controller
 {
     public function index()
     {
-        return view('crm.cursos-categories.index');
+        // Estadísticas para la vista
+        $totalCategorias = Category::count();
+        $totalCursos = \App\Models\Cursos\Cursos::count();
+        $categoriasActivas = Category::where('inactive', 0)->count();
+        
+        // Obtener categorías paginadas para la paginación
+        $categorias = Category::paginate(10);
+        
+        return view('crm.cursos-categories.index', compact('totalCategorias', 'totalCursos', 'categoriasActivas', 'categorias'));
     }
 
     public function create() {
         return view('crm.cursos-categories.create');
+    }
+
+    public function show(string $id) {
+        $categoria = Category::find($id);
+        if (!$categoria) {
+            session()->flash('toast', [
+                'icon' => 'error',
+                'mensaje' => 'La categoría no existe'
+            ]);
+            return redirect()->route('cursosCategoria.index');
+        }
+        return view('crm.cursos-categories.show', compact('categoria'));
     }
 
     public function store(Request $request) {

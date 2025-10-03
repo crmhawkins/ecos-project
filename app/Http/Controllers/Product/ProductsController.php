@@ -21,6 +21,18 @@ class ProductsController extends Controller
         return view('crm.products.create', compact('categorias'));
     }
 
+    public function show(string $id) {
+        $producto = Product::find($id);
+        if (!$producto) {
+            session()->flash('toast', [
+                'icon' => 'error',
+                'mensaje' => 'El producto no existe'
+            ]);
+            return redirect()->route('productos.index');
+        }
+        return view('crm.products.show', compact('producto'));
+    }
+
 
     public function store(Request $request) {
         // Validamos los campos

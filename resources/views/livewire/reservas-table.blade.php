@@ -1,169 +1,149 @@
 <div>
-    {{-- Filtros --}}
-    <div class="filtros row mb-4">
-        <div class="col-md-6">
-            <div class="flex flex-row justify-start">
-                <div class="mr-3">
-                    <label for="">Nº</label>
-                    <select wire:change="aplicarFiltro()" wire:model="perPage" class="form-select">
-                        <option value="10">10 por página</option>
-                        <option value="25">25 por página</option>
-                        <option value="15">50 por página</option>
-                        <option value="all">Todo</option>
-                    </select>
-                </div>
-                <div class="w-75">
-                    <label for="">Buscar</label>
-                    <input
-                        wire:model="buscar"
-                        x-data="{ enterPresionado: false }"
-                        @keydown.enter="
-                            enterPresionado = true;
-                            $wire.aplicarFiltro();
-                        "
-                        @blur="
-                            if (!enterPresionado) $wire.aplicarFiltro();
-                            enterPresionado = false;
-                        "
-                        type="text"
-                        id="inputBuscar"
-                        class="form-control w-100"
-                        placeholder="Escriba la palabra a buscar..."
-                    >                 </div>
-            </div>
-        </div>
-
-
     @if ( $servicios )
 
-        {{-- Tabla --}}
-        <div class="table-responsive">
-             <table class="table table-hover">
-                <thead class="header-table">
-                    <tr>
-                        @foreach ([
-                            'curso' => 'CURSO',
-                            'profesor' => 'PROFESOR',
-                            'fecha_inicio' => 'FECHA DE INICIO',
-                            'estado' => 'ESTADO',
-                        ] as $field => $label)
-                            <th class="px-3" style="font-size:0.75rem">
-                                <a href="#" wire:click.prevent="sortBy('{{ $field }}')">
-                                    {{ $label }}
-                                    @if ($sortColumn == $field)
-                                        <span>{!! $sortDirection == 'asc' ? '&#9650;' : '&#9660;' !!}</span>
-                                    @endif
-                                </a>
-                            </th>
-                        @endforeach
-                        <th class="text-center" style="font-size:0.75rem">ACCIONES</th>
-                </thead>
-                <tbody>
-                    {{-- Recorremos los servicios --}}
-                    @foreach ( $servicios as $servicio )
-                        <tr class="clickable-row" data-href="{{route('reservas.edit', $servicio->id)}}">
-                            <td class="px-3">{{$servicio->curso}}</td>
-                            <td class="px-3">{{$servicio->profesor}}</td>
-                            <td class="px-3">{{$servicio->fecha_inicio}}</td>
-                            <td class="px-3"><span class="badge {{ $servicio->estado == 'pendiente' ? 'text-bg-secondary' : ($servicio->estado == 'aceptada' ? 'text-bg-success' : ($servicio->estado == 'rechazada' ? 'text-bg-danger' : 'text-bg-secondary')) }}">{{ucfirst($servicio->estado)}}</span></td>
-                            <td class="flex flex-row justify-evenly align-middle" style="min-width: 120px">
-                                <button class="btn btn-secondary" wire:click="verDetalle({{ $servicio->id }})">Ver Detalles</button>
-                                @if ($servicio->estado != 'aceptada')
-                                <a class="btn btn-success" href="{{route('reservas.asignarVista', $servicio->id)}}">Aceptar</a>
-                                @endif
-                                <button class="btn btn-danger" wire:click="rechazarReserva({{ $servicio->id }})">Rechazar</button>
-                                <button class="btn btn-warning" wire:click="Observaciones({{ $servicio->id }})">Observaciones</button>
-                            </td>
+        <!-- Tabla moderna -->
+        <div class="table-card">
+            <div class="table-responsive">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            @foreach ([
+                                'titulo' => 'TÍTULO',
+                                'aula_id' => 'AULA',
+                                'solicitante' => 'SOLICITANTE',
+                                'fecha_inicio' => 'FECHA INICIO',
+                                'fecha_fin' => 'FECHA FIN',
+                                'estado' => 'ESTADO',
+                            ] as $field => $label)
+                                <th>
+                                    <a href="#" wire:click.prevent="sortBy('{{ $field }}')" class="sort-link">
+                                        {{ $label }}
+                                        @if ($sortColumn == $field)
+                                            <i class="fas fa-sort-{{ $sortDirection == 'asc' ? 'up' : 'down' }}"></i>
+                                        @else
+                                            <i class="fas fa-sort"></i>
+                                        @endif
+                                    </a>
+                                </th>
+                            @endforeach
+                            <th class="text-center">ACCIONES</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            {{-- Si los servicios vienen vacio --}}
-            @if( count($servicios) == 0 )
-                <div class="text-center py-4">
-                    <h3 class="text-center fs-3">No se encontraron registros de <strong>Aulas</strong></h3>
-                </div>
-            @endif
-
-            {{-- Paginacion --}}
-            @if($perPage !== 'all')
-                {{ $servicios->links() }}
-            @endif
+                    </thead>
+                    <tbody>
+                        @foreach ($servicios as $reserva)
+                            <tr class="table-row">
+                                <td class="course-cell">
+                                    <div class="course-info">
+                                        <strong>{{ $reserva->titulo }}</strong>
+                                        @if($reserva->descripcion)
+                                            <small class="course-description">{{ Str::limit($reserva->descripcion, 100) }}</small>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td>
+                                    @if($reserva->aula)
+                                        <span class="category-badge">{{ $reserva->aula->name }}</span>
+                                    @else
+                                        <span class="category-badge">Sin Aula</span>
+                                    @endif
+                                </td>
+                                <td class="requester-cell">
+                                    <div class="requester-name">{{ $reserva->solicitante }}</div>
+                                    @if($reserva->email_contacto)
+                                        <div class="requester-email">{{ $reserva->email_contacto }}</div>
+                                    @endif
+                                </td>
+                                <td class="date-cell">{{ $reserva->fecha_inicio ? \Carbon\Carbon::parse($reserva->fecha_inicio)->format('d/m/Y H:i') : 'N/A' }}</td>
+                                <td class="date-cell">{{ $reserva->fecha_fin ? \Carbon\Carbon::parse($reserva->fecha_fin)->format('d/m/Y H:i') : 'N/A' }}</td>
+                                <td class="status-cell">
+                                    @php
+                                        $estadoClass = match($reserva->estado) {
+                                            'confirmada' => 'status-confirmada',
+                                            'pendiente' => 'status-pendiente',
+                                            'cancelada' => 'status-cancelada',
+                                            default => 'status-pendiente'
+                                        };
+                                        $estadoIcon = match($reserva->estado) {
+                                            'confirmada' => 'check-circle',
+                                            'pendiente' => 'clock',
+                                            'cancelada' => 'times-circle',
+                                            default => 'clock'
+                                        };
+                                        $estadoText = match($reserva->estado) {
+                                            'confirmada' => 'Confirmada',
+                                            'pendiente' => 'Pendiente',
+                                            'cancelada' => 'Cancelada',
+                                            default => 'Pendiente'
+                                        };
+                                    @endphp
+                                    <span class="status-badge {{ $estadoClass }}">
+                                        <i class="fas fa-{{ $estadoIcon }}"></i>
+                                        {{ $estadoText }}
+                                    </span>
+                                </td>
+                                <td class="actions-cell">
+                                    <div class="action-buttons">
+                                        <a href="{{ route('reservas.show', $reserva->id) }}" class="btn-action btn-view" title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('reservas.edit', $reserva->id) }}" class="btn-action btn-edit" title="Editar reserva">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        @if($reserva->estado == 'pendiente')
+                                            <button wire:click="confirmarReserva({{ $reserva->id }})" class="btn-action btn-confirm" title="Confirmar reserva">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button wire:click="rechazarReserva({{ $reserva->id }})" class="btn-action btn-reject" title="Rechazar reserva">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        @endif
+                                        <button @click="reservaToDelete = {{ $reserva->id }}; showDeleteModal = true" class="btn-action btn-delete" title="Eliminar reserva">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
+
+
     @else
-        <div class="text-center py-4">
-            <h3 class="text-center fs-3">No se encontraron registros de <strong>Aulas</strong></h3>
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <h3>No hay reservas disponibles</h3>
+            <p>No se encontraron reservas que coincidan con los filtros aplicados.</p>
+            <a href="{{ route('reservas.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Crear Primera Reserva
+            </a>
         </div>
     @endif
-    {{-- {{$users}} --}}
-    <!-- Modal Detalle -->
-<div wire:ignore.self class="modal fade" id="detalleReservaModal" tabindex="-1" aria-labelledby="detalleReservaLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Detalles de la Reserva</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        @if ($reservaSeleccionada)
-        <table class="table table-bordered">
-          <tr><th>Nombre Curso</th><td>{{ $reservaSeleccionada->curso }}</td></tr>
-          <tr><th>Nombre Profesor</th><td>{{ $reservaSeleccionada->profesor }}</td></tr>
-          <tr><th>Datos Profesor</th><td>{{ $reservaSeleccionada->contacto_profesor }}</td></tr>
-          <tr><th>Horario</th><td> {{ $this->traducirDiasFormateados($reservaSeleccionada->dias) }} de {{ $reservaSeleccionada->hora_inicio }} - {{ $reservaSeleccionada->hora_fin }} </td></tr>
-          <tr><th>Fecha Inicio</th><td>{{ $reservaSeleccionada->fecha_inicio }}</td></tr>
-          <tr><th>Fecha Fin</th><td>{{ $reservaSeleccionada->fecha_fin }}</td></tr>
-          <tr><th>Numero Alumno</th><td>{{ $reservaSeleccionada->alumnos }}</td></tr>
-          <tr><th>Aula Infor</th><td>{{ $reservaSeleccionada->informatica ? 'sí' : 'no' }}</td></tr>
-          <tr><th>Aula Homologada</th><td>{{ $reservaSeleccionada->homologada ? 'sí' : 'no' }}</td></tr>
-          <tr><th>Notas</th><td>{{ $reservaSeleccionada->observaciones }}</td></tr>
-          <tr><th>Contacto Solicitante</th><td>{{ $reservaSeleccionada->contacto_profesor }}</td></tr>
-        </table>
-        @endif
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-      </div>
-    </div>
-  </div>
-</div>
-<div wire:ignore.self class="modal fade" id="ModalObservaciones" tabindex="-1" aria-labelledby="ModalObservaciones" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+
+    <!-- Modal de confirmación de eliminación -->
+    <div x-data="{ showDeleteModal: false, reservaToDelete: null }" x-show="showDeleteModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Observaciones</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <h3><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h3>
+                <button @click="showDeleteModal = false" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <div class="modal-body">
-            @if ($reservaSeleccionada)
-            <textarea class="form-control" name="observaciones" id="observaciones" cols="30" rows="10" wire:model="observaciones"></textarea>
-            @endif
+                <p>¿Estás seguro de que deseas eliminar esta reserva?</p>
+                <p><strong>Esta acción no se puede deshacer.</strong></p>
             </div>
-            <div class="modal-footer">
-            @if ($reservaSeleccionada)
-                <button type="button" class="btn btn-primary" wire:click="guardarObservaciones({{ $reservaSeleccionada->id }}) " data-bs-dismiss="modal">Guardar</button>
-            @endif
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <div class="modal-actions">
+                <button @click="showDeleteModal = false" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button x-show="reservaToDelete" wire:click="delete(reservaToDelete)" @click="showDeleteModal = false" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
             </div>
         </div>
     </div>
 </div>
-</div>
-@section('scripts')
-
-
-    @include('crm.partials.toast')
-
-<script>
-    window.addEventListener('mostrarModalDetalle', () => {
-        console.log('Evento recibido desde Livewire 3');
-        const modal = new bootstrap.Modal(document.getElementById('detalleReservaModal'));
-        modal.show();
-    });
-    window.addEventListener('mostrarModalObservaciones', () => {
-        const modal = new bootstrap.Modal(document.getElementById('ModalObservaciones'));
-        modal.show();
-    });
-
-</script>
-@endsection

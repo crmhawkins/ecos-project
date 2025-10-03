@@ -50,6 +50,11 @@ class Cursos extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function alumnos()
+    {
+        return $this->belongsToMany(\App\Models\Alumnos\Alumno::class, 'alumnos_cursos', 'curso_id', 'alumno_id');
+    }
+
     // Accessors para compatibilidad
     public function getTitleAttribute()
     {

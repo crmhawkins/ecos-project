@@ -73,4 +73,16 @@ class CursosCategoriesTable extends Component
     {
         $this->resetPage();
     }
+
+    public function delete($id)
+    {
+        try {
+            $categoria = Category::findOrFail($id);
+            $categoria->delete();
+            
+            session()->flash('success', 'Categoría eliminada exitosamente.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al eliminar la categoría: ' . $e->getMessage());
+        }
+    }
 }

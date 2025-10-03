@@ -312,6 +312,100 @@
     }
 }
 
+/* Estilos para checkboxes */
+.checkbox-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.form-check-input {
+    width: 20px !important;
+    height: 20px !important;
+    margin: 0 !important;
+    margin-top: 2px !important;
+    border: 2px solid #D93690 !important;
+    border-radius: 4px !important;
+    background: white !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    flex-shrink: 0 !important;
+}
+
+.form-check-input:checked {
+    background: #D93690 !important;
+    border-color: #D93690 !important;
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 3px rgba(217, 54, 144, 0.2) !important;
+    outline: none !important;
+}
+
+.form-check-label {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    color: #4a5568 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    flex: 1 !important;
+    margin: 0 !important;
+}
+
+.privacy-link {
+    color: #D93690;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.privacy-link:hover {
+    color: #8B5CF6;
+    text-decoration: underline;
+}
+
+.required {
+    color: #e53e3e;
+    font-weight: bold;
+}
+
+/* Modal de política de privacidad */
+.modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #D93690 0%, #8B5CF6 100%);
+    color: white;
+    border-radius: 15px 15px 0 0;
+    border: none;
+    padding: 20px 30px;
+}
+
+.modal-title {
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+.modal-body {
+    padding: 30px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    border: none;
+    padding: 20px 30px;
+    background: #f8fafc;
+    border-radius: 0 0 15px 15px;
+}
+
 /* Animaciones */
 @keyframes fadeInUp {
     from {
@@ -513,6 +607,43 @@
                             @enderror
                         </div>
 
+                        <!-- Política de Privacidad (Obligatorio) -->
+                        <div class="form-group">
+                            <div class="checkbox-container">
+                                <input type="checkbox" 
+                                       class="form-check-input @error('privacy_policy') is-invalid @enderror" 
+                                       name="privacy_policy" 
+                                       id="privacy_policy"
+                                       value="1"
+                                       required>
+                                <label for="privacy_policy" class="form-check-label">
+                                    <i class="fas fa-shield-alt"></i>
+                                    Acepto la <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal" class="privacy-link">Política de Privacidad</a> <span class="required">*</span>
+                                </label>
+                            </div>
+                            @error('privacy_policy')
+                                <div class="alert alert-danger mt-2">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <!-- Marketing (Opcional) -->
+                        <div class="form-group">
+                            <div class="checkbox-container">
+                                <input type="checkbox" 
+                                       class="form-check-input" 
+                                       name="marketing_consent" 
+                                       id="marketing_consent"
+                                       value="1">
+                                <label for="marketing_consent" class="form-check-label">
+                                    <i class="fas fa-bullhorn"></i>
+                                    Deseo recibir información sobre cursos, promociones y novedades por email
+                                </label>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <button class="btn_one" type="submit" id="submitBtn">
                                 <i class="fas fa-user-plus"></i> Crear Cuenta
@@ -690,5 +821,58 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+<!-- Modal de Política de Privacidad -->
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="privacyModalLabel">
+                    <i class="fas fa-shield-alt"></i>
+                    Política de Privacidad
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <h6><i class="fas fa-info-circle"></i> Información que recopilamos</h6>
+                <p>Recopilamos información que nos proporcionas directamente, como cuando te registras, te inscribes en un curso, o te comunicas con nosotros.</p>
+                
+                <h6><i class="fas fa-user"></i> Datos personales</h6>
+                <p>Nombre, dirección de correo electrónico, número de teléfono, información de facturación y cualquier otra información que elijas proporcionar.</p>
+                
+                <h6><i class="fas fa-graduation-cap"></i> Información académica</h6>
+                <p>Registros de cursos, calificaciones, certificados y otra información relacionada con tu experiencia educativa.</p>
+                
+                <h6><i class="fas fa-cog"></i> Cómo utilizamos tu información</h6>
+                <p>Utilizamos tu información para proporcionar, mantener y mejorar nuestros servicios educativos, procesar pagos, comunicarnos contigo y cumplir con nuestras obligaciones legales.</p>
+                
+                <h6><i class="fas fa-share-alt"></i> Compartir información</h6>
+                <p>No vendemos, alquilamos ni compartimos tu información personal con terceros, excepto en las circunstancias descritas en esta política.</p>
+                
+                <h6><i class="fas fa-lock"></i> Seguridad</h6>
+                <p>Implementamos medidas de seguridad técnicas y organizativas para proteger tu información personal contra acceso no autorizado, alteración, divulgación o destrucción.</p>
+                
+                <h6><i class="fas fa-envelope"></i> Comunicaciones</h6>
+                <p>Podemos enviarte comunicaciones relacionadas con tu cuenta, cursos y servicios. Puedes optar por no recibir ciertos tipos de comunicaciones.</p>
+                
+                <h6><i class="fas fa-edit"></i> Tus derechos</h6>
+                <p>Tienes derecho a acceder, actualizar, corregir o eliminar tu información personal. También puedes retirar tu consentimiento en cualquier momento.</p>
+                
+                <h6><i class="fas fa-phone"></i> Contacto</h6>
+                <p>Si tienes preguntas sobre esta política de privacidad, puedes contactarnos en <strong>info@ecosformacion.com</strong></p>
+                
+                <p><small class="text-muted">Última actualización: {{ date('d/m/Y') }}</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    <i class="fas fa-check"></i> Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @endsection

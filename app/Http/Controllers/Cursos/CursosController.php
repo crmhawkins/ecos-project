@@ -13,12 +13,32 @@ class CursosController extends Controller
     public function index()
     {
         $servicios = Cursos::paginate(2);
-        return view('crm.cursos.index', compact('servicios'));
+        
+        // Estadísticas para la vista
+        $totalCursos = Cursos::count();
+        $cursosPublicados = Cursos::where('published', 1)->count();
+        $cursosBorrador = Cursos::where('published', 0)->count();
+        $totalCategorias = Category::where('inactive', 0)->count();
+        $categorias = Category::where('inactive', 0)->get();
+        
+        return view('crm.cursos.index', compact('servicios', 'totalCursos', 'cursosPublicados', 'cursosBorrador', 'totalCategorias', 'categorias'));
     }
 
     public function create() {
         $categorias = Category::where('inactive',0)->get();
         return view('crm.cursos.create', compact('categorias'));
+    }
+
+    public function show(string $id) {
+        $curso = Cursos::with('alumnos')->find($id);
+        if (!$curso) {
+            session()->flash('toast', [
+                'icon' => 'error',
+                'mensaje' => 'El curso no existe'
+            ]);
+            return redirect()->route('cursos.index');
+        }
+        return view('crm.cursos.show', compact('curso'));
     }
 
 
@@ -66,16 +86,16 @@ class CursosController extends Controller
     }
 
     public function edit(string $id){
-        $servicio = Cursos::find($id);
+        $curso = Cursos::find($id);
         $categorias = Category::where('inactive',0)->get();
-        if (!$servicio) {
+        if (!$curso) {
             session()->flash('toast', [
                 'icon' => 'error',
-                'mensaje' => 'El servicio no existe'
+                'mensaje' => 'El curso no existe'
             ]);
             return redirect()->route('cursos.index');
         }
-        return view('crm.cursos.edit', compact('servicio','categorias'));
+        return view('crm.cursos.edit', compact('curso','categorias'));
     }
 
     public function update(string $id ,Request $request) {

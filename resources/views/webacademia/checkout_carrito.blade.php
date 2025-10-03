@@ -694,17 +694,17 @@ body.modal-open {
                 </nav>
             </div>
 
-            @if(session('error'))
+        @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin: 20px 40px 0;">
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
-            <form method="POST" action="{{ route('carrito.procesar_pago') }}" id="checkout-form">
-                @csrf
+        <form method="POST" action="{{ route('carrito.procesar_pago') }}" id="checkout-form">
+            @csrf
                 <div class="row g-4">
-                    <div class="col-lg-8 col-12">
+                <div class="col-lg-8 col-12">
                         <div class="form-section">
                             <h2>📋 Datos de Facturación</h2>
                             <p>Por favor, completa los datos para procesar tu compra de forma segura</p>
@@ -809,22 +809,22 @@ body.modal-open {
                             </div>
                         </div>
 
-                            <!-- Términos y Condiciones -->
+                        <!-- Términos y Condiciones -->
                             <div class="terms-section">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="acepto_terminos" id="acepto_terminos" required>
-                                    <label class="form-check-label" for="acepto_terminos">
+                            <input class="form-check-input" type="checkbox" name="acepto_terminos" id="acepto_terminos" required>
+                            <label class="form-check-label" for="acepto_terminos">
                                         ✅ Acepto los <a href="#" data-bs-toggle="modal" data-bs-target="#terminosModal">términos y condiciones</a> y la <a href="#" data-bs-toggle="modal" data-bs-target="#privacidadModal">política de privacidad</a>
-                                    </label>
+                            </label>
                                 </div>
                             </div>
-                        </div>
                     </div>
+                </div>
 
-                    <div class="col-lg-4 col-12">
-                        <div class="order-details">
-                            <!-- Resumen del Pedido -->
-                            <div class="order-summary">
+                <div class="col-lg-4 col-12">
+                    <div class="order-details">
+                        <!-- Resumen del Pedido -->
+                        <div class="order-summary">
                                 <h3>📦 Resumen del Pedido</h3>
                             
                             @foreach($carrito as $item)
@@ -869,10 +869,10 @@ body.modal-open {
                                 <strong style="color: #D93690; font-size: 1.2em;">{{ number_format($total, 2) }}€</strong>
                             </div>
 
-                                <button type="submit" class="btn_one w-100" id="btn-pagar">
+                            <button type="submit" class="btn_one w-100" id="btn-pagar">
                                     🔒 Procesar Pago Seguro
-                                </button>
-                                
+                            </button>
+                            
                                 <div class="security-badge">
                                     <i class="fa fa-shield-alt"></i> Pago 100% seguro y encriptado
                                 </div>

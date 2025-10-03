@@ -17,6 +17,7 @@ use App\Services\CoursesSyncService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Blog\BlogPost;
 
 class WebController extends Controller
 {
@@ -155,6 +156,8 @@ class WebController extends Controller
                 'email' => 'required|email|max:255|unique:alumnos',
                 'password' => 'required|string|min:8|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/',
                 'password_confirmation' => 'required|string|min:8',
+                'privacy_policy' => 'required|accepted',
+                'marketing_consent' => 'sometimes|boolean',
             ],[
                 'name.required' => 'El nombre es obligatorio',
                 'name.min' => 'El nombre debe tener al menos 2 caracteres',
@@ -184,6 +187,10 @@ class WebController extends Controller
                 
                 'password_confirmation.required' => 'Debes confirmar tu contraseña',
                 'password_confirmation.min' => 'La confirmación debe tener al menos 8 caracteres',
+                
+                'privacy_policy.required' => 'Debes aceptar la política de privacidad para continuar',
+                'privacy_policy.accepted' => 'Debes aceptar la política de privacidad para continuar',
+                'marketing_consent.boolean' => 'El consentimiento de marketing debe ser verdadero o falso',
             ]);
 
             // Limpiar y preparar los datos
@@ -524,6 +531,37 @@ class WebController extends Controller
                 ->withInput()
                 ->with('error', 'Hubo un error al actualizar tu perfil. Por favor, inténtalo de nuevo.');
         }
+    }
+
+    // Métodos para el blog
+    public function blog()
+    {
+        $posts = BlogPost::published()
+                        ->with('author')
+                        ->orderBy('published_at', 'desc')
+                        ->paginate(12);
+
+        return view('webacademia.blog', compact('posts'));
+    }
+
+    public function blogShow($slug)
+    {
+        $post = BlogPost::where('slug', $slug)
+                       ->published()
+                       ->with('author')
+                       ->firstOrFail();
+
+        // Incrementar vistas
+        $post->incrementViews();
+
+        // Obtener artículos relacionados
+        $relatedPosts = BlogPost::published()
+                               ->where('category', $post->category)
+                               ->where('id', '!=', $post->id)
+                               ->limit(3)
+                               ->get();
+
+        return view('webacademia.blog-single', compact('post', 'relatedPosts'));
     }
 
 }

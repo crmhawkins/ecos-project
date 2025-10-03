@@ -629,4 +629,8 @@ class TesoreriaController extends Controller
     public function showIngresos(){
         return view('crm.tesoreria.ingresos.index');
     }
+
+    public function showGastos(){
+        return view('crm.tesoreria.gastos.index');
+    }
 }

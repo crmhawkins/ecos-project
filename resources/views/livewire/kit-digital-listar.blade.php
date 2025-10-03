@@ -292,143 +292,39 @@
             <h3 class="text-center fs-3">No se encontraron registros de <strong>DOMINIOS</strong></h3>
         </div>
     @endif
-    <style>
-        /* Estilos específicos para la tabla */
-    .table-responsive {
-        overflow-x: auto; /* Asegura un desplazamiento suave en pantallas pequeñas */
-        overflow-y: hidden; /* Asegura un desplazamiento suave en pantallas pequeñas */
-    }
-
-    .header-table th {
-        vertical-align: bottom; /* Alinea el texto de los encabezados en la parte inferior */
-        white-space: nowrap; /* Evita que los encabezados se rompan en líneas */
-        font-size: 0.85rem; /* Ajusta el tamaño del texto para los encabezados */
-    }
-
-    .table td, .table th {
-        padding: 0.5rem; /* Ajusta el padding para las celdas */
-    }
-
-    .long-text {
-        max-width: 250px; /* Máximo ancho para el texto largo */
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    th {
-      white-space: nowrap !important;
-    }
-    .titulo_filtros {
-      white-space: nowrap !important;
-    }
-    /* Cambia el estilo del select */
-    .cliente .choices {
-        width: 50px !important;
-        margin-bottom: 0 !important;
-        font-size: 0.75rem;
-        height: fit-content;
-    }
-    .cliente .choices__inner {
-        padding-bottom: 0 !important;
-        display: block !important;
-        vertical-align: top !important;
-        width: 100% !important;
-        background-color: transparent !important;
-        padding: 0.1rem 0.1rem 0.1rem 0.2rem !important;
-        border: 1px solid rgb(175, 175, 175) !important;
-        border-radius: 2.5px !important;
-        font-size: 0.75rem !important;
-        min-height: 0px !important;
-        overflow: hidden !important;
-        box-shadow: none !important;
-    }
-
-    /* Estilo del dropdown */
-    .cliente .choices__list {
-        width: 200px; /* Cambia el ancho del dropdown */
-        max-width: 400px; /* Ajusta el ancho máximo como desees */
-    }
-    .choices__list.choices__list--single {
-        padding: 0.1rem 0.1rem 0.1rem 0.2rem !important;
-    }
-    .cliente .choices__item.choices__item--choice.choices__item--selectable {
-        color: black !important;
-        /* Puedes agregar más estilos aquí */
-    }
-    </style>
 </div>
-@section('scripts')
-    @include('crm.partials.toast')
-    <script src="{{asset('assets/vendors/choices.js/choices.min.js')}}"></script>
-    <script>
 
-        function redirectToWhatsapp(id) {
-            window.open(`/kit-digital/whatsapp/${id}`, '_blank');
-        }
+@section('js')
+<script>
+    function redirectToWhatsapp(id) {
+        window.open('/crm/kit-digital-whatsapp/' + id, '_blank');
+    }
 
-        $(document).ready(function() {
-
-        $("#sidebar").remove();
-        $("#main").css("margin-left", "0px");
-        // Función para manejar la actualización de datos
-        function handleDataUpdate(id, value, key) {
-            $.ajax({
-                type: "POST",
-                url: "{{ route('kitDigital.updateData') }}", // Asegúrate que esta es la ruta correcta
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                },
-                data: {
-                    id: id,
-                    value: value,
-                    key: key
-                },
-                success: function(data) {
-                    if (data.icon === 'success') {
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
-                            didOpen: (toast) => {
-                                toast.addEventListener('mouseenter', Swal.stopTimer);
-                                toast.addEventListener('mouseleave', Swal.resumeTimer);
-                            }
-                        });
-
-                        Toast.fire({
-                            icon: data.icon, // Corregido: Se agregó una coma al final
-                            title: data.mensaje // Corregido: Se agregó una coma al final
-                        });
-                    }else{
-                        Swal.fire({
-                            icon: data.icon,
-                            title: data.mensaje,
-                            confirmButtonText: 'Ok',
-                            backdrop: true // Agrega un fondo oscurecido
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error de servidor',
-                        text: 'Ha ocurrido un error. Por favor, intenta de nuevo.',
-                        confirmButtonText: 'Ok',
-                        backdrop: true // Agrega un fondo oscurecido
-                    });
-                }
+    // Inicializar Choices.js para los selects
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar todos los selects con clase 'choices'
+        const choiceElements = document.querySelectorAll('.choices');
+        choiceElements.forEach(element => {
+            new Choices(element, {
+                searchEnabled: false,
+                itemSelectText: '',
+                shouldSort: false,
             });
-        }
-
-        // Detectar cambios en inputs, selects y textareas dentro de la tabla
-        $('.table').on('change', 'input, select, textarea', function() {
-            var id = $(this).data('id');  // Asegúrate de que cada fila tenga un atributo data-id
-            var key = $(this).attr('name');
-            var value = $(this).val();
-            handleDataUpdate(id, value, key);
         });
     });
-    </script>
+
+    // Función para manejar actualizaciones de datos
+    function handleDataUpdate(id, value, key) {
+        // Aquí puedes agregar lógica para actualizar los datos
+        console.log('Actualizando:', { id, key, value });
+    }
+
+    // Detectar cambios en inputs, selects y textareas dentro de la tabla
+    $('.table').on('change', 'input, select, textarea', function() {
+        var id = $(this).data('id');  // Asegúrate de que cada fila tenga un atributo data-id
+        var key = $(this).attr('name');
+        var value = $(this).val();
+        handleDataUpdate(id, value, key);
+    });
+</script>
 @endsection

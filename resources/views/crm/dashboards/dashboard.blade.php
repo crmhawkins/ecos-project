@@ -1,1093 +1,814 @@
-@extends('crm.layouts.app')
+@extends('crm.layouts.clean_app')
 
-@section('titulo', 'Dashboard')
+@section('titulo', 'Dashboard Academia')
 
 @section('css')
-<link rel="stylesheet" href="{{asset('assets/vendors/choices.js/choices.min.css')}}" />
-<link rel="stylesheet" href="{{asset('assets/css/dashboard.css')}}" />
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 12px;
+        margin-bottom: 32px;
+        text-align: center;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: pulse 4s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2.8rem;
+        font-weight: 900;
+        margin-bottom: 12px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .dashboard-header p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        margin-bottom: 40px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        text-align: center;
+        border-left: 5px solid;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        opacity: 0.1;
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: translate(20px, -20px);
+    }
+    
+    .stat-card.alumnos {
+        border-left-color: var(--primary-color);
+    }
+    
+    .stat-card.alumnos::after {
+        content: '\f501';
+        background: var(--primary-color);
+        color: white;
+    }
+    
+    .stat-card.cursos {
+        border-left-color: var(--info-color);
+    }
+    
+    .stat-card.cursos::after {
+        content: '\f19d';
+        background: var(--info-color);
+        color: white;
+    }
+    
+    .stat-card.blog {
+        border-left-color: var(--success-color);
+    }
+    
+    .stat-card.blog::after {
+        content: '\f1ea';
+        background: var(--success-color);
+        color: white;
+    }
+    
+    .stat-card.categorias {
+        border-left-color: var(--warning-color);
+    }
+    
+    .stat-card.categorias::after {
+        content: '\f02c';
+        background: var(--warning-color);
+        color: white;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .stat-number {
+        font-size: 4rem;
+        font-weight: 900;
+        margin-bottom: 8px;
+        line-height: 1;
+        background: linear-gradient(45deg, currentColor, rgba(0,0,0,0.7));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .stat-card.alumnos .stat-number {
+        color: var(--primary-color);
+    }
+    
+    .stat-card.cursos .stat-number {
+        color: var(--info-color);
+    }
+    
+    .stat-card.blog .stat-number {
+        color: var(--success-color);
+    }
+    
+    .stat-card.categorias .stat-number {
+        color: var(--warning-color);
+    }
+    
+    .stat-label {
+        color: var(--text-primary);
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    .stat-sublabel {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-top: 8px;
+        font-weight: 500;
+    }
+    
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+        margin-bottom: 40px;
+    }
+    
+    .chart-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+    
+    .chart-header {
+        padding: 24px 32px;
+        border-bottom: 1px solid var(--border-color);
+        background: linear-gradient(135deg, #fafafa, #f0f0f0);
+    }
+    
+    .chart-header h3 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .chart-body {
+        padding: 32px;
+        height: 400px;
+        position: relative;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 24px;
+        margin-bottom: 40px;
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+    
+    .info-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .info-card-header {
+        padding: 24px 32px;
+        border-bottom: 1px solid var(--border-color);
+        background: linear-gradient(135deg, #fafafa, #f0f0f0);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .info-card-header h3 {
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .info-card-body {
+        padding: 32px;
+    }
+    
+    .mini-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    .mini-stat {
+        text-align: center;
+        padding: 24px;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        border-radius: 12px;
+        border-left: 4px solid;
+        transition: var(--transition);
+    }
+    
+    .mini-stat:hover {
+        transform: scale(1.05);
+    }
+    
+    .mini-stat.success {
+        border-left-color: var(--success-color);
+    }
+    
+    .mini-stat.info {
+        border-left-color: var(--info-color);
+    }
+    
+    .mini-stat.warning {
+        border-left-color: var(--warning-color);
+    }
+    
+    .mini-stat.primary {
+        border-left-color: var(--primary-color);
+    }
+    
+    .mini-stat-number {
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin-bottom: 8px;
+        line-height: 1;
+    }
+    
+    .mini-stat.success .mini-stat-number {
+        color: var(--success-color);
+    }
+    
+    .mini-stat.info .mini-stat-number {
+        color: var(--info-color);
+    }
+    
+    .mini-stat.warning .mini-stat-number {
+        color: var(--warning-color);
+    }
+    
+    .mini-stat.primary .mini-stat-number {
+        color: var(--primary-color);
+    }
+    
+    .mini-stat-label {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .recent-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .recent-item {
+        display: flex;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid #f1f5f9;
+        transition: var(--transition);
+    }
+    
+    .recent-item:hover {
+        background: #f8fafc;
+        margin: 0 -32px;
+        padding: 16px 32px;
+    }
+    
+    .recent-item:last-child {
+        border-bottom: none;
+    }
+    
+    .recent-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+        font-size: 18px;
+        color: white;
+        font-weight: 600;
+    }
+    
+    .recent-icon.alumno {
+        background: linear-gradient(135deg, var(--primary-color), #c2185b);
+    }
+    
+    .recent-icon.curso {
+        background: linear-gradient(135deg, var(--info-color), #1565c0);
+    }
+    
+    .recent-icon.blog {
+        background: linear-gradient(135deg, var(--success-color), #2e7d32);
+    }
+    
+    .recent-content h4 {
+        margin: 0 0 4px 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    
+    .recent-content p {
+        margin: 0;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+    
+    .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 12px;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--success-color), var(--info-color));
+        border-radius: 4px;
+        transition: width 1s ease-in-out;
+    }
+    
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 32px;
+    }
+    
+    .quick-action {
+        display: flex;
+        align-items: center;
+        padding: 16px 20px;
+        background: white;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        text-decoration: none;
+        color: var(--text-primary);
+        font-weight: 600;
+        transition: var(--transition);
+        box-shadow: var(--shadow);
+    }
+    
+    .quick-action:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        text-decoration: none;
+    }
+    
+    .quick-action i {
+        margin-right: 12px;
+        font-size: 18px;
+    }
+    
+    @media (max-width: 1024px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 24px;
+        }
+        
+        .dashboard-header h1 {
+            font-size: 2.2rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        
+        .stat-card {
+            padding: 24px;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        
+        .mini-stats {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        
+        .chart-body {
+            height: 300px;
+            padding: 16px;
+        }
+        
+        .quick-actions {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 @endsection
 
 @section('content')
-<div class="page-heading card" style="box-shadow: none !important; border:none !important;" >
-    <div class="page-title card-body">
-        <div class="row">
-            <div class="col-12 col-md-4 order-md-1 order-last">
-                <h3>Dashboard</h3>
-            </div>
+<div>
+    <!-- Header Principal -->
+    <div class="dashboard-header">
+        <h1>📚 Dashboard Academia Completo</h1>
+        <p>Panel de control integral del sistema educativo - {{ date('d/m/Y H:i:s') }}</p>
+    </div>
 
-            <div class="col-12 col-md-8 order-md-2 order-s">
-                <div class="row justify-end">
-                    <button id="endllamadaBtn" class="btn jornada btn-danger mx-2 col-2" onclick="endLlamada()" style="display:none;">Finalizar llamada</button>
-                     <h2 id="timer" class="display-6 font-weight-bold col-3">00:00:00</h2>
-                    <button id="startJornadaBtn" class="btn jornada btn-primary mx-2 col-2" onclick="startJornada()">Inicio Jornada</button>
-                    <button id="startPauseBtn" class="btn jornada btn-secondary mx-2 col-2" onclick="startPause()" style="display:none;">Iniciar Pausa</button>
-                    <button id="endPauseBtn" class="btn jornada btn-dark mx-2 col-2" onclick="endPause()" style="display:none;">Finalizar Pausa</button>
-                    <button id="endJornadaBtn" class="btn jornada btn-danger mx-2 col-2" onclick="endJornada()" style="display:none;">Fin de Jornada</button>
-                </div>
+    <!-- Estadísticas Principales -->
+    <div class="stats-grid">
+        <div class="stat-card alumnos">
+            <div class="stat-number">{{ $totalAlumnos ?? 0 }}</div>
+            <div class="stat-label">Total Alumnos</div>
+            <div class="stat-sublabel">+{{ $alumnosEsteAno ?? 0 }} registrados este año</div>
+        </div>
+        
+        <div class="stat-card cursos">
+            <div class="stat-number">{{ $totalCursos ?? 0 }}</div>
+            <div class="stat-label">Total Cursos</div>
+            <div class="stat-sublabel">{{ $cursosPublicados ?? 0 }} publicados • {{ $cursosActivos ?? 0 }} activos</div>
+        </div>
+        
+        <div class="stat-card blog">
+            <div class="stat-number">{{ $totalBlogPosts ?? 0 }}</div>
+            <div class="stat-label">Artículos Blog</div>
+            <div class="stat-sublabel">{{ $blogPostsPublicados ?? 0 }} publicados • {{ $blogPostsEsteMes ?? 0 }} este mes</div>
+        </div>
+        
+        <div class="stat-card categorias">
+            <div class="stat-number">{{ $totalCategorias ?? 0 }}</div>
+            <div class="stat-label">Categorías</div>
+            <div class="stat-sublabel">{{ $categoriasConCursos ?? 0 }} con cursos activos</div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>
+                    <i class="fas fa-chart-line" style="color: var(--primary-color);"></i>
+                    Crecimiento de Alumnos (Últimos 12 meses)
+                </h3>
+            </div>
+            <div class="chart-body">
+                <canvas id="alumnosChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>
+                    <i class="fas fa-chart-pie" style="color: var(--info-color);"></i>
+                    Cursos por Categoría
+                </h3>
+            </div>
+            <div class="chart-body">
+                <canvas id="categoriasChart"></canvas>
             </div>
         </div>
     </div>
-    <div class="card2 mt-4">
-        <div class="card-body2">
-            <div class="row justify-between">
-                <div class="col-md-6">
-                    <div class="side-column">
-                        <div class="mb-3 card-body">
-                            <h5 class="card-title fw-bold">Presupuestos</h5>
-                            <div class="row row-cols-1 row-cols-xl-3 g-xl-4 g-3 mb-3">
-                                <div class="col">
-                                    <div class="card h-100">
-                                        <div class="card-body p-3">
-                                            <h5 class="card-title m-0 text-color-4 fw-bold">Pendientes de confirmar</h5>
-                                            <span class="display-6 m-0"><b>{{count($user->presupuestosPorEstado(1))}}</b></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="card h-100">
-                                        <div class="card-body p-3">
-                                            <h5 class="card-title m-0 text-color-4 fw-bold">Pendientes de aceptar</h5>
-                                            <span class="display-6 m-0"><b>{{count($user->presupuestosPorEstado(2))}}</b></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="card h-100">
-                                        <div class="card-body p-3">
-                                            <h5 class="card-title m-0 text-color-4 fw-bold">Aceptados</h5>
-                                            <span class="display-6 m-0"><b>{{count($user->presupuestosPorEstado(3))}}</b></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <a href="{{route('presupuesto.create')}}" class="btn btn-outline-primary mb-2">Nuevo Presupuesto</a>
-                            <a href="{{route('presupuestos.indexUser')}}" class="btn btn-outline-secondary mb-2">Ver mis Presupuestos</a>
-                            <a href="{{route('presupuestos.index')}}" class="btn btn-outline-secondary mb-2">Ver todos los Presupuestos</a>
-                        </div>
-                        <div class="row row-cols-1 row-cols-xl-2 g-xl-4 g-1">
-                            <div class="col">
-                                <div class="card2">
-                                    <div class="mb-3 card-body">
-                                        <h5 class="card-title fw-bold">Petición</h5>
-                                        <div class="row mb-3 ">
-                                            <div class="col">
-                                                <div class="card">
-                                                    <div class="card-body p-3">
-                                                        <h5 class="card-title m-0 text-color-4  fw-bold">Pendientes</h5>
-                                                        <span class="display-6 m-0"><b>{{count($user->peticionesPendientes())}}</b></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <a href="{{route('peticion.create')}}" class="btn btn-outline-primary mb-2">Nueva Petición</a>
-                                        <a href="{{route('peticion.indexUser')}}" class="btn btn-outline-secondary mb-2">Ver Mis Peticiones</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card2">
-                                    <div class="mb-3 card-body">
-                                        <h5 class="card-title fw-bold">Ordenes de Compra</h5>
-                                        <div class="row mb-3 ">
-                                            <div class="col">
-                                                <div class="card">
-                                                    <div id="ordenes" class="card-body p-3">
-                                                        <h5 class="card-title  m-0 text-color-4  fw-bold">Pendientes</h5>
-                                                        <span class="display-6  m-0"><b>{{count($user->ordenes())}}</b></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <a href="{{route('order.index')}}"  class="btn btn-outline-secondary">Ver Ordenes</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row row-cols-1 row-cols-xl-2 g-xl-4 g-1">
-                            <div class="col">
-                                <div class="card2">
-                                    <div class="mb-3 card-body">
-                                        <h5 class="card-title fw-bold">Producción</h5>
-                                                                                {{-- <a href="{{route('presupuestos.status')}}" class="btn btn-outline-secondary mb-2">Ver Status Proyectos</a> --}}
 
-                                        <a href="{{route('tareas.index')}}" class="btn btn-outline-secondary mb-2">Ver Tareas</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card2">
-                                    <div class="mb-3 card-body">
-                                        <h5 class="card-title fw-bold">Gestión</h5>
-                                        <a href="{{route('reunion.create')}}" class="btn btn-outline-primary mb-2">Nueva Reunion</a>
-                                        <a href="{{route('reunion.index')}}" class="btn btn-outline-secondary mb-2">Ver Actas de reunion</a>
-                                        <a href="{{route('clientes.index')}}" class="btn btn-outline-secondary mb-2">Ver Clientes</a>
-                                        <a href="{{route('proveedores.index')}}" class="btn btn-outline-secondary mb-2">Ver Proveedores</a>
-                                        {{-- <a href="{{route('kitDigital.create')}}"  class="btn btn-outline-secondary mb-2">Tramitar Subvención</a>
-                                        <a target="_blank" href="{{route('kitDigital.index')}}" class="btn btn-outline-secondary mb-2">Kit Digital</a>
-                                        <a target="_blank" href="{{route('kitDigital.indexWhatsapp')}}" class="btn btn-outline-secondary mb-2">Kit Digital Whatsapp</a> --}}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
+    <!-- Información Detallada -->
+    <div class="info-grid">
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="fas fa-chart-bar" style="color: var(--success-color);"></i>
+                <h3>Actividad Reciente</h3>
+            </div>
+            <div class="info-card-body">
+                <div class="mini-stats">
+                    <div class="mini-stat success">
+                        <div class="mini-stat-number">{{ $alumnosEstaSeamana ?? 0 }}</div>
+                        <div class="mini-stat-label">Alumnos esta semana</div>
+                    </div>
+                    <div class="mini-stat info">
+                        <div class="mini-stat-number">{{ $blogPostsEsteMes ?? 0 }}</div>
+                        <div class="mini-stat-label">Posts este mes</div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="side-column">
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <div class="d-flex flex-wrap">
-                                    <div class="col-12 d-flex justify-content-center mb-4 align-items-center">
-                                         <div class="mx-6 text-center">
-                                            <h5 class="my-3">{{$user->name}}&nbsp;{{$user->surname}}</h5>
-                                            <p class="text-muted mb-1">{{$user->departamento->name}}</p>
-                                            <p class="text-muted mb-4">{{$user->acceso->name}}</p>
-                                            <div class="d-flex  align-items-center my-2">
-                                                <input type="color" class="form-control form-control-color" style="padding: 0.4rem" id="color">
-                                                <label for="color" class="form-label m-2">Color</label>
-                                            </div>
-                                        </div>
-                                        <div class="mx-6">
-                                            @if ($user->image == null)
-                                                <img alt="avatar" class="rounded-circle img-fluid  m-auto" style="width: 150px;" src="{{asset('assets/images/guest.webp')}}" />
-                                            @else
-                                                <img alt="avatar" class="rounded-circle img-fluid  m-auto" style="width: 150px;" src="{{ asset('/storage/avatars/'.$user->image) }}" />
-                                            @endif
-                                        </div>
-                                        {{-- <div class="mx-4 text-center">
-                                            <h1 class="fs-5 ">Productividad</h1>
-                                            <div class="progress-circle" data-percentage="70">
-                                            </div>
-                                        </div> --}}
-                                      {{-- <div class="mx-4 text-center">
-                                            <div class="card" style="border: 1px solid {{ $user->bono > 0 ? 'green' : 'gray' }}; padding: 10px;">
-                                                <h5 class="m-0" style="color: {{ $user->bono > 0 ? 'green' : 'gray' }};">
-                                                    {{ $user->bono > 0 ? 'Bono: ' . $user->bono.' €' : 'Sin bono' }}
-                                                </h5>
-                                            </div>
-                                        </div> --}}
-                                    </div>
-                                    <div class="col-12 d-flex flex-wrap justify-content-center">
-                                        <div class="my-2 text-center">
-                                            <a class="btn btn-outline-secondary"
-                                            href="{{route('contratos.index_user', $user->id)}}">Contrato</a>
-                                            <a class="btn btn-outline-secondary"
-                                            href="{{route('nominas.index_user', $user->id)}}">Nomina</a>
-                                            <a class="btn btn-outline-secondary"
-                                            href="{{route('holiday.index')}}">Vacaciones</a>
-                                            <a class="btn btn-outline-secondary"
-                                            href="{{route('passwords.index')}}">Contraseñas</a>
-                                        </div>
-                                        <div class="my-2 ml-4 text-center col-auto" role="tablist">
-                                            <a class=" btn btn-outline-secondary active"
-                                                id="list-todo-list" data-bs-toggle="list" href="#list-todo"
-                                                role="tab">TO-DO</a>
-                                            <a class="btn btn-outline-secondary"
-                                                id="list-agenda-list" data-bs-toggle="list"
-                                                href="#list-agenda" role="tab">Agenda</a>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <div class="tab-content text-justify" id="nav-tabContent">
-                                    <div class="tab-pane show active" id="list-todo" role="tabpanel"
-                                        aria-labelledby="list-todo-list">
-                                        <div class="card2 mt-4">
-                                            <div class="card-body2">
-                                                <div id="to-do-container" class="d-flex flex-column"  style="" >
-                                                    <button class="btn btn-outline-secondary mt-4 mx-3" onclick="showTodoModal()">
-                                                        <i class="fa-solid fa-plus"></i>
-                                                    </button>
-                                                    <div id="to-do" class="p-3">
-                                                        @foreach ($to_dos as $to_do)
-                                                            <div class="card mt-2" id="todo-card-{{$to_do->id}}">
-                                                                <div class="card-body d-flex justify-content-between clickable" id="todo-card-body-{{$to_do->id}}" data-todo-id="{{$to_do->id}}" style="{{$to_do->isCompletedByUser($user->id) ? 'background-color: #CDFEA4' : '' }}">
-                                                                    <div style="flex: 0 0 60%;">
-                                                                        <h3>{{ $to_do->titulo }}</h3>
-                                                                    </div>
-                                                                    <div class="d-flex align-items-center justify-content-around" style="flex: 0 0 40%;">
-                                                                        @if(!($to_do->isCompletedByUser($user->id)))
-                                                                        <button onclick="completeTask(event,{{ $to_do->id }})" id="complete-button-{{$to_do->id}}" class="btn btn-success btn-sm">Completar</button>
-                                                                        @endif
-                                                                        @if ($to_do->admin_user_id == $user->id)
-                                                                        <button onclick="finishTask(event,{{ $to_do->id }})" class="btn btn-danger btn-sm">Finalizar</button>
-                                                                        @endif
-                                                                        <div id="todo-card-{{ $to_do->id }}"  class="pulse justify-center align-items-center" style="{{ $to_do->unreadMessagesCountByUser($user->id) > 0 ? 'display: flex;' : 'display: none;' }}">
-                                                                            {{ $to_do->unreadMessagesCountByUser($user->id) }}
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="info">
-                                                                    <div class="d-flex justify-content-evenly flex-wrap">
-                                                                        @if($to_do->project_id)<a class="btn btn-outline-secondary mb-2" href="{{route('campania.edit',$to_do->project_id)}}"> Campaña {{$to_do->proyecto ? $to_do->proyecto->name : 'borrada'}}</a>@endif
-                                                                        @if($to_do->client_id)<a class="btn btn-outline-secondary mb-2" href="{{route('clientes.show',$to_do->client_id)}}"> Cliente {{$to_do->cliente ? $to_do->cliente->name : 'borrado'}}</a>@endif
-                                                                        @if($to_do->budget_id)<a class="btn btn-outline-secondary mb-2" href="{{route('presupuesto.edit',$to_do->budget_id)}}"> Presupuesto {{$to_do->presupuesto ? $to_do->presupuesto->concept : 'borrado'}}</a>@endif
-                                                                        @if($to_do->task_id) <a class="btn btn-outline-secondary mb-2" href="{{route('tarea.edit',$to_do->task_id)}}"> Tarea {{$to_do->tarea ? $to_do->tarea->title : 'borrada'}}</a> @endif
-                                                                    </div>
-                                                                    <div class="participantes d-flex flex-wrap mt-2">
-                                                                        <h3 class="m-2">Participantes</h3>
-                                                                        @foreach ($to_do->TodoUsers as $usuario )
-                                                                            <span class="badge m-2 {{$usuario->completada ? 'bg-success' :'bg-secondary'}}">
-                                                                                {{$usuario->usuarios->name}}
-                                                                            </span>
-                                                                        @endforeach
-                                                                    </div>
-                                                                    <h3 class="m-2">Descripcion </h3>
-                                                                    <p class="m-2">{{ $to_do->descripcion }}</p>
-                                                                    <div class="chat mt-4">
-                                                                        <div class="chat-container" >
-                                                                            @foreach ($to_do->mensajes as $mensaje)
-                                                                                <div class="p-3 message {{ $mensaje->admin_user_id == $user->id ? 'mine' : 'theirs' }}">
-                                                                                    @if ($mensaje->archivo)
-                                                                                        <div class="file-icon">
-                                                                                            <a href="{{ asset('storage/' . $mensaje->archivo) }}" target="_blank"><i class="fa-regular fa-file-lines fa-2x"></i></a>
-                                                                                        </div>
-                                                                                    @endif
-                                                                                    <strong>{{ $mensaje->user->name }}:</strong> {{ $mensaje->mensaje }}
-                                                                                </div>
-                                                                            @endforeach
-                                                                        </div>
-                                                                        <form id="mensaje" action="{{ route('message.store') }}" method="post" enctype="multipart/form-data">
-                                                                            @csrf
-                                                                            <input type="hidden" name="todo_id" value="{{ $to_do->id }}">
-                                                                            <input type="hidden" name="admin_user_id" value="{{ $user->id }}">
-                                                                            <div class="input-group my-2">
-                                                                                <input type="text" class="form-control" name="mensaje" placeholder="Escribe un mensaje...">
-                                                                                <label class="input-group-text" style="background: white; ">
-                                                                                    <i class="fa-solid fa-paperclip" id="file-clip"></i>
-                                                                                    <input type="file" class="form-control" style="display: none;" id="file-input" name="archivo">
-                                                                                    <i class="fa-solid fa-check" id="file-icon" style="display: none; color: green;"></i>
-                                                                                </label>
-                                                                                <button id="enviar" class="btn btn-primary" type="button"><i class="fa-regular fa-paper-plane"></i></button>
-                                                                            </div>
-                                                                        </form>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="tab-pane" id="list-agenda" role="tabpanel"
-                                        aria-labelledby="list-agenda-list">
-                                        <div class="card2 mt-4">
-                                            <div class="card-body2 text-center">
-                                                <div id="calendar" class="p-4" style="min-height: 600px; margin-top: 0.75rem; margin-bottom: 0.75rem; overflow-y: auto; border-color:black; border-width: thin; border-radius: 20px;" >
-                                                    <!-- Aquí se renderizarán las tareas según la vista seleccionada -->
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class=" d-flex justify-content-center">
-                                    {{-- <button class="btn btn-primary mx-2">Enviar Archivos</button>
-                                    <button class="btn btn-secondary mx-2">Correo</button> --}}
-                                    <button class="btn btn-primary mx-2" onclick="showLlamadaModal()">Iniciar LLamada</button>
-                                </div>
-                            </div>
-                        </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ $totalAlumnos > 0 ? min(($alumnosEstaSeamana / $totalAlumnos) * 100, 100) : 0 }}%"></div>
+                </div>
+                <p style="text-align: center; margin-top: 8px; font-size: 0.875rem; color: var(--text-secondary);">
+                    Progreso semanal: {{ $totalAlumnos > 0 ? round(($alumnosEstaSeamana / $totalAlumnos) * 100, 1) : 0 }}%
+                </p>
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="fas fa-cogs" style="color: var(--info-color);"></i>
+                <h3>Estado del Sistema</h3>
+            </div>
+            <div class="info-card-body">
+                <div class="mini-stats">
+                    <div class="mini-stat success">
+                        <div class="mini-stat-number">{{ $cursosActivos ?? 0 }}</div>
+                        <div class="mini-stat-label">Cursos activos</div>
+                    </div>
+                    <div class="mini-stat warning">
+                        <div class="mini-stat-number">{{ $cursosEsteAno ?? 0 }}</div>
+                        <div class="mini-stat-label">Creados este año</div>
                     </div>
                 </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ $totalCursos > 0 ? min(($cursosPublicados / $totalCursos) * 100, 100) : 0 }}%"></div>
+                </div>
+                <p style="text-align: center; margin-top: 8px; font-size: 0.875rem; color: var(--text-secondary);">
+                    Cursos publicados: {{ $totalCursos > 0 ? round(($cursosPublicados / $totalCursos) * 100, 1) : 0 }}%
+                </p>
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="fas fa-clock" style="color: var(--warning-color);"></i>
+                <h3>Últimas Actividades</h3>
+            </div>
+            <div class="info-card-body">
+                <ul class="recent-list">
+                    @if(isset($ultimosAlumnos) && $ultimosAlumnos->count() > 0)
+                        @foreach($ultimosAlumnos->take(3) as $alumno)
+                        <li class="recent-item">
+                            <div class="recent-icon alumno">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <div class="recent-content">
+                                <h4>{{ $alumno->name ?? 'Alumno' }} {{ $alumno->surname ?? '' }}</h4>
+                                <p>Registrado {{ $alumno->created_at ? $alumno->created_at->diffForHumans() : 'recientemente' }}</p>
+                            </div>
+                        </li>
+                        @endforeach
+                    @else
+                        <li class="recent-item">
+                            <div class="recent-icon alumno">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="recent-content">
+                                <h4>Sin actividad reciente</h4>
+                                <p>No hay alumnos registrados recientemente</p>
+                            </div>
+                        </li>
+                    @endif
+                </ul>
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="fas fa-graduation-cap" style="color: var(--primary-color);"></i>
+                <h3>Cursos Destacados</h3>
+            </div>
+            <div class="info-card-body">
+                <ul class="recent-list">
+                    @if(isset($ultimosCursos) && $ultimosCursos->count() > 0)
+                        @foreach($ultimosCursos->take(3) as $curso)
+                        <li class="recent-item">
+                            <div class="recent-icon curso">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="recent-content">
+                                <h4>{{ Str::limit($curso->name ?? 'Curso sin nombre', 30) }}</h4>
+                                <p>{{ $curso->published ? 'Publicado' : 'Borrador' }} • {{ $curso->created_at ? $curso->created_at->diffForHumans() : 'Fecha no disponible' }}</p>
+                            </div>
+                        </li>
+                        @endforeach
+                    @else
+                        <li class="recent-item">
+                            <div class="recent-icon curso">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="recent-content">
+                                <h4>Sin cursos recientes</h4>
+                                <p>No hay cursos creados recientemente</p>
+                            </div>
+                        </li>
+                    @endif
+                </ul>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="llamadaModal" tabindex="-1" aria-labelledby="llamadaModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg"> <!-- Cambio a modal-lg para mayor ancho -->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="todoLlamadaLabel">Iniciar Llamada</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="Llamadaform" action="{{ route('llamada.store') }}" method="POST">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label for="client_id" class="form-label">Cliente</label>
-                                <select class="form-select choices" id="client" name="client_id">
-                                    <option value="">Seleccione cliente</option>
-                                    @foreach ($clientes as $cliente)
-                                        <option value="{{ $cliente->id }}" {{ old('client_id') == $cliente->id ? 'selected' : '' }}>
-                                            {{ $cliente->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('client_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                                <div class="col-md-12 mb-3">
-                                    <label for="phone" class="form-label">Telefono</label>
-                                    <input type="text" class="form-control" id="phone" name="phone">
-                                </div>
-                            </div>
-                            <input type="hidden" name="admin_user_id" value="{{ $user->id }}">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button id="iniciarllamada" type="submit" class="btn btn-primary">Iniciar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="todoModal" tabindex="-1" aria-labelledby="todoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg"> <!-- Cambio a modal-lg para mayor ancho -->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="eventModalLabel">Añadir To-do</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="todoform" action="{{ route('todos.store') }}" method="POST">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label for="titulo" class="form-label">Título</label>
-                                <input type="text" class="form-control" id="titulo" name="titulo" required>
-                            </div>
-                            <div class="col-md-12 mb-3">
-                                <label for="descripcion" class="form-label">Descripción</label>
-                                <textarea class="form-control" id="descripcion" name="descripcion" rows="4"></textarea>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="task_id" class="form-label">Tareas</label>
-                                <select class="form-select choices" id="task_id" name="task_id">
-                                    <option value="">Seleccione una tarea</option>
-                                    @foreach ($tareas as $tarea)
-                                        <option value="{{ $tarea->id }}" {{ old('task_id') == $tarea->id ? 'selected' : '' }}>
-                                            {{ $tarea->title }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('client_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="client_id" class="form-label">Cliente</label>
-                                <select class="form-select choices" id="client_id" name="client_id">
-                                    <option value="">Seleccione cliente</option>
-                                    @foreach ($clientes as $cliente)
-                                        <option value="{{ $cliente->id }}" {{ old('client_id') == $cliente->id ? 'selected' : '' }}>
-                                            {{ $cliente->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('client_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="budget_id" class="form-label">Presupuesto</label>
-                                <select class="form-select choices" id="budget_id" name="budget_id">
-                                    <option value="">Seleccione presupuesto</option>
-                                    @foreach ($budgets as $budget)
-                                        <option value="{{ $budget->id }}" {{ old('budget_id') == $budget->id ? 'selected' : '' }}>
-                                            {{ $budget->concept }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('budget_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="project_id" class="form-label">Campaña</label>
-                                <select class="choices form-select" id="project_id" name="project_id">
-                                    <option value="">Seleccione campaña</option>
-                                    @foreach ($projects as $project)
-                                        <option value="{{ $project->id }}" {{ old('project_id') == $project->id ? 'selected' : '' }}>
-                                            {{ $project->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('project_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="admin_user_ids" class="form-label">Usuarios</label>
-                                <select class="form-select" id="admin_user_ids" name="admin_user_ids[]" multiple>
-                                    <option value="">Seleccione usuarios</option>
-                                    @foreach ($users as $gestor)
-                                        @if ($gestor->id !== auth()->id()) <!-- Excluir al usuario logueado -->
-                                            <option value="{{ $gestor->id }}" {{ in_array($gestor->id, old('admin_user_ids', [])) ? 'selected' : '' }}>
-                                                {{ $gestor->name }} {{ $gestor->surname }}
-                                            </option>
-                                        @endif
-                                    @endforeach
-                                </select>
-                                @error('admin_user_ids')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="start" class="form-label">Inicio</label>
-                                <input type="datetime-local" class="form-control" id="start" name="start" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="end" class="form-label">Fin</label>
-                                <input type="datetime-local" class="form-control" id="end" name="end">
-                            </div>
-                            <div class="col-md-6 mb-3 d-flex align-items-center justify-content-center">
-                                <input type="color" style="padding: 0.4rem" class="form-control form-control-color" id="color1" name="color">
-                                <label for="color1" class="form-label ml-2">Color</label>
-                            </div>
-                            <div class=" col-md-6 mb-3 d-flex align-items-center justify-content-center">
-                                <input type="checkbox" style="height:25px; width:25px; " class="form-check-input" id="agendar" name="agendar">
-                                <label for="agendar" class="form-check-label ml-2">Agendar</label>
-                            </div>
-                            <input type="hidden" name="admin_user_id" value="{{ $user->id }}">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button id="todoboton" type="button" class="btn btn-primary">Guardar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="quick-actions">
+        <a href="{{ route('crm.alumnos.create') }}" class="quick-action">
+            <i class="fas fa-user-plus"></i>
+            Nuevo Alumno
+        </a>
+        <a href="{{ route('cursos.create') }}" class="quick-action">
+            <i class="fas fa-plus"></i>
+            Nuevo Curso
+        </a>
+        <a href="{{ route('crm.blog.create') }}" class="quick-action">
+            <i class="fas fa-edit"></i>
+            Nueva Noticia
+        </a>
+        <a href="{{ route('cursosCategoria.index') }}" class="quick-action">
+            <i class="fas fa-tags"></i>
+            Gestionar Categorías
+        </a>
+        <a href="{{ route('crm.alumnos.index') }}" class="quick-action">
+            <i class="fas fa-users"></i>
+            Ver Todos los Alumnos
+        </a>
+        <a href="{{ route('cursos.index') }}" class="quick-action">
+            <i class="fas fa-graduation-cap"></i>
+            Ver Todos los Cursos
+        </a>
     </div>
 </div>
 @endsection
 
 @section('scripts')
-@include('crm.partials.toast')
-<script src="{{asset('assets/vendors/choices.js/choices.min.js')}}"></script>
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
-<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/locales-all.global.min.js"></script>
 <script>
-    var enRutaEspecifica = true;
-    document.addEventListener('DOMContentLoaded', function() {
-        var multipleCancelButton = new Choices('#admin_user_ids', {
-            removeItemButton: true, // Permite a los usuarios eliminar una selección
-            searchEnabled: true,  // Habilita la búsqueda dentro del selector
-            paste: false          // Deshabilita la capacidad de pegar texto en el campo
-        });
-    });
-</script>
-<script>
-    let timerState = '{{ $jornadaActiva ? "running" : "stopped" }}'
-    let timerTime = {{ $timeWorkedToday }}; // In seconds, initialized with the time worked today
-    function getTime() {
-        fetch('/crm/dashboard/timeworked', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+document.addEventListener('DOMContentLoaded', function() {
+    // Datos para el gráfico de alumnos
+    const alumnosData = @json($alumnosPorMes ?? []);
+    const alumnosLabels = alumnosData.map(item => item.mes || 'N/A');
+    const alumnosValues = alumnosData.map(item => item.cantidad || 0);
+    
+    // Gráfico de crecimiento de alumnos
+    const alumnosCtx = document.getElementById('alumnosChart');
+    if (alumnosCtx) {
+        new Chart(alumnosCtx, {
+            type: 'line',
+            data: {
+                labels: alumnosLabels.length > 0 ? alumnosLabels : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                datasets: [{
+                    label: 'Nuevos Alumnos',
+                    data: alumnosValues.length > 0 ? alumnosValues : [0, 1, 2, 1, 3, 0, 0, 0, 0, 0, 0, 0],
+                    borderColor: '#D93690',
+                    backgroundColor: 'rgba(217, 54, 144, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#D93690',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
             },
-            body: JSON.stringify({})
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    timerTime = data.time
-                    updateTime()
-                }
-            });
-    }
-
-
-    function updateTime() {
-        let hours = Math.floor(timerTime / 3600);
-        let minutes = Math.floor((timerTime % 3600) / 60);
-        let seconds = Math.floor(timerTime % 60);
-
-        hours = hours < 10 ? '0' + hours : hours;
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        seconds = seconds < 10 ? '0' + seconds : seconds;
-
-        document.getElementById('timer').textContent = `${hours}:${minutes}:${seconds}`;
-    }
-
-    function startTimer() {
-            timerState = 'running';
-            timerInterval = setInterval(() => {
-                timerTime++;
-                updateTime();
-            }, 1000);
-    }
-
-    function stopTimer() {
-            clearInterval(timerInterval);
-            timerState = 'stopped';
-    }
-
-    function startJornada() {
-        fetch('/crm/start-jornada', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({})
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    startTimer();
-                    document.getElementById('startJornadaBtn').style.display = 'none';
-                    document.getElementById('startPauseBtn').style.display = 'block';
-                    document.getElementById('endJornadaBtn').style.display = 'block';
-                }
-            });
-    }
-
-    function endJornada() {
-        // Obtener el tiempo actualizado
-        getTime();
-
-        let now = new Date();
-        let currentHour = now.getHours();
-        let currentMinute = now.getMinutes();
-
-        // Convertir los segundos trabajados a horas
-        let workedHours = timerTime / 3600;
-
-        finalizarJornada();
-    }
-
-    function finalizarJornada() {
-        fetch('/crm/end-jornada', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                stopTimer();
-                document.getElementById('startJornadaBtn').style.display = 'block';
-                document.getElementById('startPauseBtn').style.display = 'none';
-                document.getElementById('endJornadaBtn').style.display = 'none';
-                document.getElementById('endPauseBtn').style.display = 'none';
-            }
-        });
-    }
-
-    function startPause() {
-        fetch('/crm/start-pause', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({})
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    stopTimer();
-                    document.getElementById('startPauseBtn').style.display = 'none';
-                    document.getElementById('endPauseBtn').style.display = 'block';
-                }
-            });
-    }
-
-    function endPause() {
-        fetch('/crm/end-pause', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({})
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    startTimer();
-                    document.getElementById('startPauseBtn').style.display = 'block';
-                    document.getElementById('endPauseBtn').style.display = 'none';
-                }
-            });
-    }
-
-    function endLlamada() {
-        fetch('/crm/dashboard/llamadafin', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({})
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('endllamadaBtn').style.display = 'none';
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'success',
-                        title: data.mensaje, // Aquí se muestra el mensaje del JSON
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
-                    });
-                }
-            });
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        updateTime(); // Initialize the timer display
-
-        setInterval(function() {
-            getTime();
-        }, 120000);
-
-        // Initialize button states based on jornada and pause
-        if ('{{ $jornadaActiva }}') {
-            document.getElementById('startJornadaBtn').style.display = 'none';
-            document.getElementById('endJornadaBtn').style.display = 'block';
-            if ('{{ $pausaActiva }}') {
-                document.getElementById('startPauseBtn').style.display = 'none';
-                document.getElementById('endPauseBtn').style.display = 'block';
-            } else {
-                document.getElementById('startPauseBtn').style.display = 'block';
-                document.getElementById('endPauseBtn').style.display = 'none';
-                startTimer(); // Start timer if not in pause
-            }
-        } else {
-            document.getElementById('startJornadaBtn').style.display = 'block';
-            document.getElementById('endJornadaBtn').style.display = 'none';
-            document.getElementById('startPauseBtn').style.display = 'none';
-            document.getElementById('endPauseBtn').style.display = 'none';
-        }
-
-        if ('{{ $llamadaActiva }}'){
-            document.getElementById('endllamadaBtn').style.display = 'block';
-        } else {
-            document.getElementById('endllamadaBtn').style.display = 'none';
-        }
-
-        });
-</script>
-<script>
-        $('#todoboton').click(function(e){
-            e.preventDefault(); // Esto previene que el enlace navegue a otra página.
-            $('#todoform').submit(); // Esto envía el formulario.
-        });
-
-        var events = @json($events);
-        document.addEventListener('DOMContentLoaded', function() {
-
-            var calendarEl = document.getElementById('calendar');
-            var tooltip = document.getElementById('tooltip');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'listWeek',
-                locale: 'es',
-                navLinks: true,
-                nowIndicator: true,
-                businessHours: [
-                    { daysOfWeek: [1], startTime: '08:00', endTime: '15:00' },
-                    { daysOfWeek: [2], startTime: '08:00', endTime: '15:00' },
-                    { daysOfWeek: [3], startTime: '08:00', endTime: '15:00' },
-                    { daysOfWeek: [4], startTime: '08:00', endTime: '15:00' },
-                    { daysOfWeek: [5], startTime: '08:00', endTime: '15:00' }
-                ],
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridDay,listWeek'
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
                 },
-                events: events,
-                eventClick: function(info) {
-                    var event = info.event;
-                    var clientId = event.extendedProps.client_id;
-                    var budgetId = event.extendedProps.budget_id;
-                    var projectId = event.extendedProps.project_id;
-                    var clienteName = event.extendedProps.cliente_name || '';
-                    var presupuestoRef = event.extendedProps.presupuesto_ref || '';
-                    var presupuestoConp = event.extendedProps.presupuesto_conp || '';
-                    var proyectoName = event.extendedProps.proyecto_name || '';
-                    var descripcion = event.extendedProps.descripcion || '';
-
-                    // Construye las rutas solo si los IDs existen
-                    var ruta = clientId ? `{{ route("clientes.show", ":id") }}`.replace(':id', clientId) : '#';
-                    var ruta2 = budgetId ? `{{ route("presupuesto.edit", ":id1") }}`.replace(':id1', budgetId) : '#';
-                    var ruta3 = projectId ? `{{ route("campania.show", ":id2") }}`.replace(':id2', projectId) : '#';
-
-                    // Construye el contenido del tooltip condicionalmente
-                    var tooltipContent = '<div style="text-align: left;">' +
-                        '<h5>' + event.title + '</h5>';
-
-                    if (clienteName) {
-                        tooltipContent += '<a href="' + ruta + '"><p><strong>Cliente:</strong> ' + clienteName + '</p></a>';
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f1f5f9'
+                        },
+                        ticks: {
+                            color: '#6b7280'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: '#f1f5f9'
+                        },
+                        ticks: {
+                            color: '#6b7280'
+                        }
                     }
-
-                    if (presupuestoRef || presupuestoConp) {
-                        tooltipContent += '<a href="' + ruta2 + '"><p><strong>Presupuesto:</strong> ' +
-                            (presupuestoRef ? 'Ref:' + presupuestoRef + '<br>' : '') +
-                            (presupuestoConp ? 'Concepto: ' + presupuestoConp : '') +
-                            '</p></a>';
-                    }
-
-                    if (proyectoName) {
-                        tooltipContent += '<a href="' + ruta3 + '"><p><strong>Campaña:</strong> ' + proyectoName + '</p></a>';
-                    }
-
-                    if (descripcion) {
-                        tooltipContent += '<p>' + descripcion + '</p>';
-                    }
-
-                    tooltipContent += '</div>';
-
-                    var tooltip = new bootstrap.Tooltip(info.el, {
-                        title: tooltipContent,
-                        placement: 'top',
-                        trigger: 'manual',
-                        html: true,
-                        container: 'body',
-                        customClass: 'custom-tooltip', // Aplica una clase personalizada para el estilo
-                        sanitize: false // Asegúrate de que el contenido HTML se procesa correctamente
-                    });
-
-                    // Cambia el color de fondo del tooltip
-                    tooltip.show();
-                    var tooltipElement = document.querySelector('.tooltip-inner');
-                    if (tooltipElement) {
-                        tooltipElement.style.backgroundColor = event.extendedProps.color || '#000'; // Usa el color del evento o negro por defecto
-                    }
-
-                    function handleClickOutside(event) {
-                    if (!info.el.contains(event.target)) {
-                        tooltip.dispose();
-                        document.removeEventListener('click', handleClickOutside);
+                },
+                elements: {
+                    point: {
+                        hoverBackgroundColor: '#D93690'
                     }
                 }
-                document.addEventListener('click', handleClickOutside);
+            }
+        });
+    }
+    
+    // Datos para el gráfico de categorías
+    const categoriasData = @json($cursosPorCategoria ?? []);
+    const categoriasLabels = categoriasData.map(item => item.name || 'Sin categoría');
+    const categoriasValues = categoriasData.map(item => item.cursos_count || 0);
+    
+    // Gráfico de cursos por categoría
+    const categoriasCtx = document.getElementById('categoriasChart');
+    if (categoriasCtx) {
+        new Chart(categoriasCtx, {
+            type: 'doughnut',
+            data: {
+                labels: categoriasLabels.length > 0 ? categoriasLabels : ['Sin datos'],
+                datasets: [{
+                    data: categoriasValues.length > 0 ? categoriasValues : [1],
+                    backgroundColor: [
+                        '#D93690',
+                        '#3b82f6',
+                        '#10b981',
+                        '#f59e0b',
+                        '#8b5cf6',
+                        '#ef4444'
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
             },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            color: '#6b7280'
+                        }
+                    }
+                },
+                cutout: '60%'
+            }
         });
-            calendar.render();
-        });
-
+    }
+    
+    console.log('🎯 Dashboard Academia completo cargado exitosamente');
+    console.log('Estadísticas completas:', {
+        alumnos: {{ $totalAlumnos ?? 0 }},
+        cursos: {{ $totalCursos ?? 0 }},
+        blog: {{ $totalBlogPosts ?? 0 }},
+        categorias: {{ $totalCategorias ?? 0 }},
+        cursosActivos: {{ $cursosActivos ?? 0 }},
+        cursosPublicados: {{ $cursosPublicados ?? 0 }}
+    });
+});
 </script>
-<script>
-    function showTodoModal() {
-        var todoModal = new bootstrap.Modal(document.getElementById('todoModal'));
-        todoModal.show();
-    }
-    function showLlamadaModal() {
-        var llamadaModal = new bootstrap.Modal(document.getElementById('llamadaModal'));
-        llamadaModal.show();
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-        const progressCircles = document.querySelectorAll('.progress-circle');
-
-        progressCircles.forEach(circle => {
-            const percentage = circle.getAttribute('data-percentage');
-            circle.style.setProperty('--percentage', percentage);
-
-            let progressColor;
-
-            if (percentage < 50) {
-                progressColor = '#ff0000'; // Rojo
-            } else if (percentage < 75) {
-                progressColor = '#ffa500'; // Naranja
-            } else {
-                progressColor = '#4caf50'; // Verde
-            }
-
-            circle.style.setProperty('--progress-color', progressColor);
-        });
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.clickable').forEach(function(element) {
-            element.addEventListener('click', function(event) {
-                event.stopPropagation();
-
-
-                var info = this.nextElementSibling;
-                var isVisible = info.style.display === 'block';
-
-                if (!isVisible) {
-                    document.querySelectorAll('.info').forEach(function(infoElement) {
-                        infoElement.style.display = 'none';
-                    });
-                    info.style.display = 'block';
-                    markMessagesAsRead(this.getAttribute('data-todo-id'));
-                } else {
-                    info.style.display = 'none';
-                }
-            });
-        });
-
-        // Función para marcar mensajes como leídos
-        function markMessagesAsRead(todoId) {
-            if (!todoId) return;
-
-            fetch(`/crm/mark-as-read/${todoId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    let unreadCounter = document.querySelector(`[data-todo-id="${todoId}"] .pulse`);
-                    if (unreadCounter) {
-                        unreadCounter.textContent = '';
-                        unreadCounter.style.display = 'none';
-                    }
-                }
-            })
-            .catch(error => console.error('Error al marcar mensajes como leídos:', error));
-        }
-
-
-        // Manejo de archivos
-        document.querySelectorAll('#file-input').forEach(function(inputElement) {
-            inputElement.addEventListener('change', function() {
-                console.log('File input changed'); // Verifica que el evento se activa
-                const fileIcon = this.closest('.input-group-text').querySelector('#file-icon');
-                const fileClip = this.closest('.input-group-text').querySelector('#file-clip');
-
-                if (this.files.length > 0) {
-                    fileIcon.style.display = 'inline-block';
-                    fileClip.style.display = 'none';
-                } else {
-                    fileIcon.style.display = 'none';
-                    fileClip.style.display = 'inline-block';
-                }
-            });
-        });
-    });
-
-
-    // Completar tarea
-    function completeTask(event, todoId) {
-        event.stopPropagation();
-        const Toast = Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-            },
-        });
-
-        fetch(`/crm/todos/complete/${todoId}`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/json'
-            }
-        }).then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const card = document.getElementById(`todo-card-body-${todoId}`);
-                if (card) {
-                    card.style.backgroundColor = '#CDFEA4'; // Color verde claro
-                }
-
-                const completeButton = document.getElementById(`complete-button-${todoId}`);
-                if (completeButton) {
-                    completeButton.style.display = 'none';
-                }
-                Toast.fire({
-                    icon: "success",
-                    title: "Tarea completada con éxito!"
-                });
-            } else {
-                Toast.fire({
-                    icon: "error",
-                    title: "Error al completar la tarea!"
-                });
-            }
-        }).catch(error => console.error('Error:', error));
-    }
-
-    // Finalizar tarea
-    function finishTask(event, todoId) {
-        event.stopPropagation();
-        const Toast = Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-            },
-        });
-
-        fetch(`/crm/todos/finish/${todoId}`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/json'
-            }
-        }).then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const card = document.getElementById(`todo-card-${todoId}`);
-                if (card) {
-                    card.style.display = 'none';
-                }
-                Toast.fire({
-                    icon: "success",
-                    title: "Tarea finalizada con éxito!"
-                });
-            } else {
-                Toast.fire({
-                    icon: "error",
-                    title: "Error al finalizar la tarea!"
-                });
-            }
-        }).catch(error => console.error('Error:', error));
-    }
-
-    // Enviar mensaje
-    document.querySelectorAll('#enviar').forEach(function(button) {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            this.closest('form').submit();
-        });
-    });
-
-    function updateUnreadMessagesCount(todoId) {
-        fetch(`/crm/todos/unread-messages-count/${todoId}`,{
-            method: 'POST', // Cambiamos a POST
-            headers: {
-                'Content-Type': 'application/json', // Indicamos que enviamos JSON
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            },
-            body: JSON.stringify({}) // Enviamos un cuerpo vacío o puedes agregar datos si es necesario
-
-            })
-            .then(response => response.json())
-            .then(data => {
-                const pulseDiv = document.querySelector(`#todo-card-${todoId} .pulse`);
-
-                if (data.unreadCount > 0) {
-                    pulseDiv.style.display = 'flex';
-                    pulseDiv.textContent = data.unreadCount;
-                } else {
-                    pulseDiv.style.display = 'none';
-                    pulseDiv.textContent = '';
-                }
-            });
-    }
-
-    function loadMessages(todoId) {
-        $.ajax({
-            url: `/todos/getMessages/${todoId}`,
-            type: 'POST',
-            contentType: 'application/json', // Especifica el tipo de contenido
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            },
-            data: JSON.stringify({}),
-            success: function(data) {
-                let messagesContainer = $(`#todo-card-${todoId} .chat-container`);
-                messagesContainer.html(''); // Limpiamos el contenedor
-                data.forEach(function(message) {
-                    let fileIcon = '';
-                    if (message.archivo) {
-                        fileIcon = `
-                            <div class="file-icon">
-                                <a href="/storage/${message.archivo}" target="_blank">
-                                    <i class="fa-regular fa-file-lines fa-2x"></i>
-                                </a>
-                            </div>
-                        `;
-                    }
-                    const messageClass = message.admin_user_id == {{ auth()->id() }} ? 'mine' : 'theirs';
-
-                    messagesContainer.append(`
-                        <div class="p-3 message ${messageClass}">
-                            ${fileIcon}
-                            <strong>${message.user.name}:</strong> ${message.mensaje}
-                        </div>
-                    `);
-                });
-            }
-        });
-    }
-
-    function startPolling() {
-        @if (count($to_dos) > 0)
-            @foreach ($to_dos as $to_do)
-                setInterval(function() {
-                    updateUnreadMessagesCount('{{ $to_do->id }}');
-                    loadMessages('{{ $to_do->id }}');
-                }, 5000);  // Polling cada 5 segundos para cada to-do
-            @endforeach
-        @else
-            console.log('No hay to-dos activos.');
-        @endif
-    }
-
-    $(document).ready(function() {
-        startPolling();
-    });
-
-    function showTodoModal() {
-        var todoModal = new bootstrap.Modal(document.getElementById('todoModal'));
-        todoModal.show();
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-        const taskSelect = document.getElementById('task_id');
-        const clientSelect = document.getElementById('client_id');
-        const budgetSelect = document.getElementById('budget_id');
-        const projectSelect = document.getElementById('project_id');
-
-        function disableOtherFields(selectedField) {
-            const fields = [taskSelect, clientSelect, budgetSelect, projectSelect];
-            fields.forEach(field => {
-                if (field !== selectedField) {
-                    field.disabled = true;
-                    field.value = ''; // Limpiar selección en otros campos
-                }
-            });
-        }
-
-        function enableAllFields() {
-            [taskSelect, clientSelect, budgetSelect, projectSelect].forEach(field => {
-                field.disabled = false;
-            });
-        }
-
-        // Añadir eventos a cada campo
-        [taskSelect, clientSelect, budgetSelect, projectSelect].forEach(field => {
-            field.addEventListener('change', function() {
-                if (this.value) {
-                    disableOtherFields(this);
-                } else {
-                    enableAllFields(); // Si no se selecciona nada, habilitar todos los campos
-                }
-            });
-        });
-    });
-</script>
-
 @endsection
-

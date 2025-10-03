@@ -37,6 +37,18 @@ class TasksController extends Controller
         return view('crm.tasks.asignar', compact('tareas'));
     }
 
+    public function show(string $id) {
+        $tarea = Task::find($id);
+        if (!$tarea) {
+            session()->flash('toast', [
+                'icon' => 'error',
+                'mensaje' => 'La tarea no existe'
+            ]);
+            return redirect()->route('tarea.index');
+        }
+        return view('crm.tasks.show', compact('tarea'));
+    }
+
     public function edit(string $id)
     {
         $task = Task::find($id);

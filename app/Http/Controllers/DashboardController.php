@@ -32,7 +32,6 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-
         $id = Auth::user()->id;
         $acceso = Auth::user()->access_level_id;
         $user = User::find($id);
@@ -43,12 +42,79 @@ class DashboardController extends Controller
         $jornadaActiva = $user->activeJornada();
         $llamadaActiva = $user->activeLlamada();
         $events = $user->eventos->map(function ($event) {
-            return $event->nonNullAttributes(); // Usa el método que definimos antes
+            return $event->nonNullAttributes();
         });
         $pausaActiva = null;
         if ($jornadaActiva) {
             $pausaActiva = $jornadaActiva->pausasActiva();
         }
+
+        // === ANALÍTICAS DE ACADEMIA ÚNICAMENTE ===
+        
+        // Estadísticas de Alumnos
+        $totalAlumnos = \App\Models\Alumnos\Alumno::count();
+        $alumnosEsteAno = \App\Models\Alumnos\Alumno::whereYear('created_at', date('Y'))->count();
+        $alumnosEsteMes = \App\Models\Alumnos\Alumno::whereYear('created_at', date('Y'))
+            ->whereMonth('created_at', date('m'))->count();
+        $alumnosEstaSeamana = \App\Models\Alumnos\Alumno::where('created_at', '>=', Carbon::now()->subWeek())->count();
+        
+        // Estadísticas de Cursos
+        $totalCursos = \App\Models\Cursos\Cursos::count();
+        $cursosPublicados = \App\Models\Cursos\Cursos::where('published', true)->count();
+        $cursosActivos = \App\Models\Cursos\Cursos::where('published', true)->where('inactive', false)->count();
+        $cursosEsteAno = \App\Models\Cursos\Cursos::whereYear('created_at', date('Y'))->count();
+        
+        // Estadísticas de Blog/Noticias
+        $totalBlogPosts = \App\Models\Blog\BlogPost::count();
+        $blogPostsPublicados = \App\Models\Blog\BlogPost::where('published', true)->count();
+        $blogPostsEsteAno = \App\Models\Blog\BlogPost::whereYear('created_at', date('Y'))->count();
+        $blogPostsEsteMes = \App\Models\Blog\BlogPost::whereYear('created_at', date('Y'))
+            ->whereMonth('created_at', date('m'))->count();
+        
+        // Estadísticas de Categorías
+        $totalCategorias = \App\Models\Cursos\Category::count();
+        $categoriasConCursos = \App\Models\Cursos\Category::has('cursos')->count();
+        
+        // Estadísticas de Aulas (si existen)
+        $totalAulas = 0;
+        $reservasActivas = 0;
+        try {
+            if (class_exists('\App\Models\Aulas\Aula')) {
+                $totalAulas = \App\Models\Aulas\Aula::count();
+            }
+            if (class_exists('\App\Models\Reservas\Reserva')) {
+                $reservasActivas = \App\Models\Reservas\Reserva::whereDate('fecha', '>=', Carbon::today())->count();
+            }
+        } catch (\Exception $e) {
+            // Si no existen los modelos, mantener en 0
+        }
+        
+        // Gráfico de alumnos por mes (últimos 12 meses)
+        $alumnosPorMes = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $fecha = Carbon::now()->subMonths($i);
+            $alumnosPorMes[] = [
+                'mes' => $fecha->format('M'),
+                'cantidad' => \App\Models\Alumnos\Alumno::whereYear('created_at', $fecha->year)
+                    ->whereMonth('created_at', $fecha->month)->count()
+            ];
+        }
+        
+        // Gráfico de cursos por categoría
+        $cursosPorCategoria = \App\Models\Cursos\Category::withCount('cursos')
+            ->orderBy('cursos_count', 'desc')
+            ->limit(6)
+            ->get();
+            
+        // Últimos cursos creados
+        $ultimosCursos = \App\Models\Cursos\Cursos::orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+            
+        // Últimos alumnos registrados
+        $ultimosAlumnos = \App\Models\Alumnos\Alumno::orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
 
 
 
@@ -111,14 +177,35 @@ class DashboardController extends Controller
                     'totalGastosComunes',
                     'totalGastosSociados',
                     'beneficios',
-                    'to_dos_finalizados'
+                    'to_dos_finalizados',
+                    // Variables de analíticas de ACADEMIA
+                    'totalAlumnos',
+                    'alumnosEsteAno',
+                    'alumnosEsteMes',
+                    'alumnosEstaSeamana',
+                    'totalCursos',
+                    'cursosPublicados',
+                    'cursosActivos',
+                    'cursosEsteAno',
+                    'totalBlogPosts',
+                    'blogPostsPublicados',
+                    'blogPostsEsteAno',
+                    'blogPostsEsteMes',
+                    'totalCategorias',
+                    'categoriasConCursos',
+                    'totalAulas',
+                    'reservasActivas',
+                    'alumnosPorMes',
+                    'cursosPorCategoria',
+                    'ultimosCursos',
+                    'ultimosAlumnos'
                 ));
             case(2):
                 $clientes = Client::where('is_client',true)->get();
                 $budgets = Budget::where('admin_user_id',$id)->get();
                 $projects = Project::where('admin_user_id',$id)->get();
                 $tareas = Task::where('gestor_id',$id)->get();
-                return view('crm.dashboards.dashboard_gestor', compact(
+                return view('crm.dashboards.dashboard', compact(
                     'user',
                     'tareas',
                     'to_dos',
@@ -131,14 +218,35 @@ class DashboardController extends Controller
                     'jornadaActiva',
                     'pausaActiva',
                     'llamadaActiva',
-                    'to_dos_finalizados'
+                    'to_dos_finalizados',
+                    // Variables de analíticas de ACADEMIA
+                    'totalAlumnos',
+                    'alumnosEsteAno',
+                    'alumnosEsteMes',
+                    'alumnosEstaSeamana',
+                    'totalCursos',
+                    'cursosPublicados',
+                    'cursosActivos',
+                    'cursosEsteAno',
+                    'totalBlogPosts',
+                    'blogPostsPublicados',
+                    'blogPostsEsteAno',
+                    'blogPostsEsteMes',
+                    'totalCategorias',
+                    'categoriasConCursos',
+                    'totalAulas',
+                    'reservasActivas',
+                    'alumnosPorMes',
+                    'cursosPorCategoria',
+                    'ultimosCursos',
+                    'ultimosAlumnos'
                 ));
             case(3):
                 $clientes = Client::where('is_client',true)->get();
                 $budgets = Budget::where('admin_user_id',$id)->get();
                 $projects = Project::where('admin_user_id',$id)->get();
                 $tareas = Task::where('gestor_id',$id)->get();
-                return view('crm.dashboards.dashboard_gestor', compact(
+                return view('crm.dashboards.dashboard', compact(
                     'user',
                     'tareas',
                     'to_dos',
@@ -151,16 +259,36 @@ class DashboardController extends Controller
                     'jornadaActiva',
                     'pausaActiva',
                     'llamadaActiva',
-                    'to_dos_finalizados'
+                    'to_dos_finalizados',
+                    // Variables de analíticas de ACADEMIA
+                    'totalAlumnos',
+                    'alumnosEsteAno',
+                    'alumnosEsteMes',
+                    'alumnosEstaSeamana',
+                    'totalCursos',
+                    'cursosPublicados',
+                    'cursosActivos',
+                    'cursosEsteAno',
+                    'totalBlogPosts',
+                    'blogPostsPublicados',
+                    'blogPostsEsteAno',
+                    'blogPostsEsteMes',
+                    'totalCategorias',
+                    'categoriasConCursos',
+                    'totalAulas',
+                    'reservasActivas',
+                    'alumnosPorMes',
+                    'cursosPorCategoria',
+                    'ultimosCursos',
+                    'ultimosAlumnos'
                 ));
             case(4):
                 $clientes = Client::where('is_client',true)->get();
                 $budgets = Budget::where('admin_user_id',$id)->get();
                 $projects = Project::where('admin_user_id',$id)->get();
                 $tareas = Task::where('gestor_id',$id)->get();
-                $v1 = count(Budget::where('admin_user_id',2)->whereYear('created_at',2202)->get())/12;
 
-                return view('crm.dashboards.dashboard_gestor', compact(
+                return view('crm.dashboards.dashboard', compact(
                     'user',
                     'tareas',
                     'to_dos',
@@ -173,7 +301,28 @@ class DashboardController extends Controller
                     'jornadaActiva',
                     'pausaActiva',
                     'llamadaActiva',
-                    'to_dos_finalizados'
+                    'to_dos_finalizados',
+                    // Variables de analíticas de ACADEMIA
+                    'totalAlumnos',
+                    'alumnosEsteAno',
+                    'alumnosEsteMes',
+                    'alumnosEstaSeamana',
+                    'totalCursos',
+                    'cursosPublicados',
+                    'cursosActivos',
+                    'cursosEsteAno',
+                    'totalBlogPosts',
+                    'blogPostsPublicados',
+                    'blogPostsEsteAno',
+                    'blogPostsEsteMes',
+                    'totalCategorias',
+                    'categoriasConCursos',
+                    'totalAulas',
+                    'reservasActivas',
+                    'alumnosPorMes',
+                    'cursosPorCategoria',
+                    'ultimosCursos',
+                    'ultimosAlumnos'
                 ));
             case(5):
                 $tareas = $user->tareas->whereIn('task_status_id', [1, 2, 5]);
@@ -234,7 +383,7 @@ class DashboardController extends Controller
                 $productividadIndividual = $totalTareas > 0 ? $totalProductividad : 0;
                 $horasMes = $this->tiempoProducidoMes($user->id);
 
-                return view('crm.dashboards.dashboard_personal', compact(
+                return view('crm.dashboards.dashboard', compact(
                     'user',
                     'tiempoProducidoHoy',
                     'tasks',
@@ -249,7 +398,28 @@ class DashboardController extends Controller
                     'totalEstimatedTime',
                     'totalRealTime',
                     'horasMes',
-                    'to_dos_finalizados'
+                    'to_dos_finalizados',
+                    // Variables de analíticas de ACADEMIA
+                    'totalAlumnos',
+                    'alumnosEsteAno',
+                    'alumnosEsteMes',
+                    'alumnosEstaSeamana',
+                    'totalCursos',
+                    'cursosPublicados',
+                    'cursosActivos',
+                    'cursosEsteAno',
+                    'totalBlogPosts',
+                    'blogPostsPublicados',
+                    'blogPostsEsteAno',
+                    'blogPostsEsteMes',
+                    'totalCategorias',
+                    'categoriasConCursos',
+                    'totalAulas',
+                    'reservasActivas',
+                    'alumnosPorMes',
+                    'cursosPorCategoria',
+                    'ultimosCursos',
+                    'ultimosAlumnos'
                 ));
             case(6):
                 $ayudas = KitDigital::where('comercial_id', $user->id)->get();
@@ -276,7 +446,29 @@ class DashboardController extends Controller
                         $comisionRestante += ($this->convertToNumber($ayuda->importe)* 0.05);
                     }
                 }
-                return view('crm.dashboards.dashboard_comercial', compact('user','diasDiferencia','estadosKit','comisionRestante','ayudas','comisionTramitadas','comisionPendiente', 'comisionCurso', 'pedienteCierre','timeWorkedToday', 'jornadaActiva', 'pausaActiva'));
+                return view('crm.dashboards.dashboard', compact('user','diasDiferencia','estadosKit','comisionRestante','ayudas','comisionTramitadas','comisionPendiente', 'comisionCurso', 'pedienteCierre','timeWorkedToday', 'jornadaActiva', 'pausaActiva',
+                    // Variables de analíticas de ACADEMIA
+                    'totalAlumnos',
+                    'alumnosEsteAno',
+                    'alumnosEsteMes',
+                    'alumnosEstaSeamana',
+                    'totalCursos',
+                    'cursosPublicados',
+                    'cursosActivos',
+                    'cursosEsteAno',
+                    'totalBlogPosts',
+                    'blogPostsPublicados',
+                    'blogPostsEsteAno',
+                    'blogPostsEsteMes',
+                    'totalCategorias',
+                    'categoriasConCursos',
+                    'totalAulas',
+                    'reservasActivas',
+                    'alumnosPorMes',
+                    'cursosPorCategoria',
+                    'ultimosCursos',
+                    'ultimosAlumnos'
+                ));
         }
     }
     public function parseFlexibleTime($time) {

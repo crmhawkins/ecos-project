@@ -75,4 +75,22 @@ class AulasTable extends Component
     {
         $this->resetPage();
     }
+
+    public function delete($id)
+    {
+        $aula = Aulas::find($id);
+        if ($aula) {
+            $aula->delete();
+            session()->flash('success', 'Aula eliminada exitosamente.');
+        }
+    }
+
+    public function limpiarFiltros()
+    {
+        $this->buscar = '';
+        $this->perPage = 10;
+        $this->sortColumn = 'created_at';
+        $this->sortDirection = 'desc';
+        $this->resetPage();
+    }
 }

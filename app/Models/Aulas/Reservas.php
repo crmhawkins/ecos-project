@@ -14,21 +14,31 @@ class Reservas extends Model
     protected $table = 'reservas';
 
     protected $fillable = [
+        // Campos nuevos del sistema
+        'titulo',
+        'descripcion',
+        'solicitante',
+        'email_contacto',
+        'fecha_inicio',
+        'fecha_fin',
+        'hora_inicio',
+        'hora_fin',
+        'aula_id',
+        'numero_asistentes',
+        'estado',
+        'prioridad',
+        'equipamiento_requerido',
+        'observaciones',
+        // Campos del sistema anterior (para compatibilidad)
         'curso',
         'profesor',
         'contacto_profesor',
-        'hora_inicio',
-        'hora_fin',
         'dias',
-        'fecha_inicio',
-        'fecha_fin',
         'alumnos',
         'informatica',
         'homologada',
-        'aula_id',
         'archivo',
-        'observaciones',
-        'estado',
+        'inactive'
     ];
 
     protected $attributes = [

@@ -83,4 +83,16 @@ class CursosTable extends Component
     {
         $this->resetPage();
     }
+
+    public function delete($id)
+    {
+        try {
+            $curso = Cursos::findOrFail($id);
+            $curso->delete();
+            
+            session()->flash('success', 'Curso eliminado exitosamente.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al eliminar el curso: ' . $e->getMessage());
+        }
+    }
 }

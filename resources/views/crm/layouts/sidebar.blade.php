@@ -49,6 +49,8 @@
                     $aulasActive = request()->routeIs('aulas.*');
                     $builderActive = request()->routeIs('builder.*');
                     $ContabilidadActive = request()->routeIs('cuentasContables.*') || request()->routeIs('subCuentasContables.*') || request()->routeIs('subCuentasHijaContables.*') || request()->routeIs('grupoContabilidad.*') || request()->routeIs('subGrupoContabilidad.*') || request()->routeIs('admin.planContable.index');
+                    $blogActive = request()->routeIs('crm.blog.*');
+                    $alumnosActive = request()->routeIs('crm.alumnos.*');
                     $admin = (Auth::user()->access_level_id == 1);
                     $gerente = (Auth::user()->access_level_id == 2);
                     $contable = (Auth::user()->access_level_id == 3);
@@ -69,6 +71,48 @@
                         <i class="fa-solid fa-palette fs-5"></i>
                         <span>Builder</span>
                     </a>
+                </li>
+
+                <li class="sidebar-item has-sub {{ $blogActive ? 'active' : '' }}">
+                    <a href="#" class='sidebar-link'>
+                        <i class="fa-solid fa-newspaper fs-5"></i>
+                        <span>Blog/Noticias</span>
+                    </a>
+                    <ul class="submenu" style="{{ $blogActive ? 'display:block;' : 'display:none' }}">
+                        <li class="submenu-item {{ request()->routeIs('crm.blog.index') ? 'active' : '' }}">
+                            <a href="{{route('crm.blog.index')}}">
+                                <i class="fa-solid fa-list"></i>
+                                <span>Ver Noticias</span>
+                            </a>
+                        </li>
+                        <li class="submenu-item {{ request()->routeIs('crm.blog.create') ? 'active' : '' }}">
+                            <a href="{{route('crm.blog.create')}}">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>Nueva Noticia</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="sidebar-item has-sub {{ $alumnosActive ? 'active' : '' }}">
+                    <a href="#" class='sidebar-link'>
+                        <i class="fa-solid fa-user-graduate fs-5"></i>
+                        <span>Alumnos</span>
+                    </a>
+                    <ul class="submenu" style="{{ $alumnosActive ? 'display:block;' : 'display:none' }}">
+                        <li class="submenu-item {{ request()->routeIs('crm.alumnos.index') ? 'active' : '' }}">
+                            <a href="{{route('crm.alumnos.index')}}">
+                                <i class="fa-solid fa-list"></i>
+                                <span>Ver Alumnos</span>
+                            </a>
+                        </li>
+                        <li class="submenu-item {{ request()->routeIs('crm.alumnos.create') ? 'active' : '' }}">
+                            <a href="{{route('crm.alumnos.create')}}">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>Nuevo Alumno</span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
                 <li class="sidebar-item has-sub {{ $CursosActive ? 'active' : '' }}">
                     <a href="#" class='sidebar-link'>

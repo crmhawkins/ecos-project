@@ -20,6 +20,18 @@ class ServicesController extends Controller
         return view('crm.services.create', compact('categorias'));
     }
 
+    public function show(string $id) {
+        $servicio = Service::find($id);
+        if (!$servicio) {
+            session()->flash('toast', [
+                'icon' => 'error',
+                'mensaje' => 'El servicio no existe'
+            ]);
+            return redirect()->route('servicios.index');
+        }
+        return view('crm.services.show', compact('servicio'));
+    }
+
 
     public function store(Request $request) {
 
