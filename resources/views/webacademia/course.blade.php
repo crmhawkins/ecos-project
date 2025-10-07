@@ -167,25 +167,31 @@
 @endsection
 
 @section('content')
-<section class="section-top">
-    <div class="container">
+<section class="section-top" style="background: linear-gradient(135deg, #D93690 0%, #667eea 100%); padding: 100px 0; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"grain\" width=\"100\" height=\"100\" patternUnits=\"userSpaceOnUse\"><circle cx=\"50\" cy=\"50\" r=\"1\" fill=\"white\" opacity=\"0.1\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23grain)\"/></svg>'); opacity: 0.3;"></div>
+    <div class="container" style="position: relative; z-index: 1;">
         <div class="col-lg-10 offset-lg-1 text-center">
-            <div class="section-top-title wow fadeInRight">
-                <h1>Todos los cursos</h1>
-                <ul>
-                    <li><a href="{{ url('/') }}">Inicio</a></li>
-                    <li> / Cursos</li>
+            <div class="section-top-title wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+                <h1 style="color: white; font-size: 3.5rem; font-weight: 800; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">Todos los cursos</h1>
+                <p style="color: rgba(255, 255, 255, 0.9); font-size: 1.2rem; margin-bottom: 30px;">Descubre nuestra amplia gama de cursos especializados</p>
+                <ul style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 25px; padding: 8px 20px; display: inline-block; margin-bottom: 20px;">
+                    <li><a href="/" style="color: white; text-decoration: none; font-weight: 600; padding: 4px 8px; border-radius: 15px; display: inline-block;">Home</a></li>
+                    <li style="color: white; margin-left: 10px;"> / Cursos</li>
                 </ul>
                 @if($isLoggedIn)
-                    <p class="mt-3 text-success">
-                        <i class="fa fa-user"></i> Bienvenido, {{ $user->name }}
-                    </p>
+                    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px 25px; display: inline-block; margin-top: 20px;">
+                        <p style="color: white; margin: 0; font-weight: 500;">
+                            <i class="fa fa-user" style="margin-right: 8px;"></i> Bienvenido, {{ $user->name }}
+                        </p>
+                    </div>
                 @else
-                    <p class="mt-3 text-info">
-                        <i class="fa fa-info-circle"></i> 
-                        <a href="{{ url('/weblogin') }}" class="text-primary">Inicia sesión</a> 
-                        para agregar cursos al carrito
-                    </p>
+                    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px 25px; display: block; margin-top: 20px; width: 100%; text-align: center;">
+                        <p style="color: white; margin: 0; font-weight: 500;">
+                            <i class="fa fa-info-circle" style="margin-right: 8px;"></i> 
+                            <a href="{{ url('/weblogin') }}" style="color: white; text-decoration: underline; font-weight: 600;">Inicia sesión</a> 
+                            para agregar cursos al carrito
+                        </p>
+                    </div>
                 @endif
             </div>
         </div>

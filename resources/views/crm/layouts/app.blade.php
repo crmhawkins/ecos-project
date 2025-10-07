@@ -36,6 +36,7 @@
         </div>
 
         @include('crm.layouts.horizontal_navbar')
+        @include('crm.layouts.sidebar')
 
         <main id="main" style="margin-left: 0 !important; width: 100% !important; min-height: 100vh; background: #f8f9fa; padding: 0;">
             <div style="padding: 20px;">

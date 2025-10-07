@@ -59,6 +59,8 @@ use App\Http\Controllers\Tesoreria\IvaController;
 use App\Http\Controllers\Users\DepartamentController;
 use App\Http\Controllers\Users\PositionController;
 use App\Http\Controllers\Web\WebController;
+use App\Http\Controllers\Api\AiAssistantController;
+use App\Http\Controllers\Admin\AiAssistantController as AdminAiAssistantController;
 use App\Http\Controllers\Blog\BlogController;
 use App\Http\Controllers\Alumnos\AlumnosController;
 use App\Http\Controllers\Builder\BuilderController;
@@ -707,6 +709,23 @@ Route::prefix('crm')->group(function () {
         Route::post('/configuracion/update/{id}', [SettingsController::class, 'update'])->name('configuracion.update');
         Route::post('/configuracion/store', [SettingsController::class, 'store'])->name('configuracion.store');
 
+        // Asistente de IA - CRM
+        Route::get('/ai-assistant', [AdminAiAssistantController::class, 'index'])->name('admin.ai-assistant.index');
+        Route::get('/ai-assistant/config', [AdminAiAssistantController::class, 'config'])->name('admin.ai-assistant.config');
+        Route::get('/ai-assistant/prompts', [AdminAiAssistantController::class, 'prompts'])->name('admin.ai-assistant.prompts');
+        Route::get('/ai-assistant/links', [AdminAiAssistantController::class, 'links'])->name('admin.ai-assistant.links');
+        Route::get('/ai-assistant/conversations', [AdminAiAssistantController::class, 'conversations'])->name('admin.ai-assistant.conversations');
+        
+        // Rutas de gestión
+        Route::put('/ai-assistant/config', [AdminAiAssistantController::class, 'updateConfig'])->name('admin.ai-assistant.update-config');
+        Route::post('/ai-assistant/prompts', [AdminAiAssistantController::class, 'createPrompt'])->name('admin.ai-assistant.create-prompt');
+        Route::put('/ai-assistant/prompts/{id}', [AdminAiAssistantController::class, 'updatePrompt'])->name('admin.ai-assistant.update-prompt');
+        Route::delete('/ai-assistant/prompts/{id}', [AdminAiAssistantController::class, 'deletePrompt'])->name('admin.ai-assistant.delete-prompt');
+        Route::post('/ai-assistant/links', [AdminAiAssistantController::class, 'createLink'])->name('admin.ai-assistant.create-link');
+        Route::put('/ai-assistant/links/{id}', [AdminAiAssistantController::class, 'updateLink'])->name('admin.ai-assistant.update-link');
+        Route::delete('/ai-assistant/links/{id}', [AdminAiAssistantController::class, 'deleteLink'])->name('admin.ai-assistant.delete-link');
+        Route::delete('/ai-assistant/conversations/{id}', [AdminAiAssistantController::class, 'deleteConversation'])->name('admin.ai-assistant.delete-conversation');
+
         Route::get('/cuentas-contables', [CuentasContableController::class, 'index'])->name('cuentasContables.index');
         Route::get('/cuentas-contables/create', [CuentasContableController::class, 'create'])->name('cuentasContables.create');
         Route::post('/cuentas-contables/store', [CuentasContableController::class, 'store'])->name('cuentasContables.store');
@@ -789,4 +808,11 @@ Route::prefix('crm')->group(function () {
         Route::get('/settings', [App\Http\Controllers\User\UserSettingsController::class, 'index'])->name('settings');
         Route::put('/settings/update', [App\Http\Controllers\User\UserSettingsController::class, 'update'])->name('settings.update');
     });
+});
+
+// Rutas del Asistente de IA
+Route::prefix('api/ai-assistant')->group(function () {
+    Route::post('/send-message', [AiAssistantController::class, 'sendMessage'])->name('ai.send-message');
+    Route::get('/config', [AiAssistantController::class, 'getConfig'])->name('ai.config');
+    Route::get('/history', [AiAssistantController::class, 'getHistory'])->name('ai.history');
 });

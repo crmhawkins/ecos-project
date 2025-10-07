@@ -39,7 +39,7 @@
                     $cargoActive= request()->routeIs('cargo.*');
                     $departamentoActive= request()->routeIs('departamento.*');
                     $tesoreriaActive = request()->routeIs('ingreso.*')  || request()->routeIs('diarioCaja.*') || request()->routeIs('gasto.*') || request()->routeIs('gasto-asociado.*') || request()->routeIs('gasto-sin-clasificar.*') || request()->routeIs('gastos-asociado.*') || request()->routeIs('categorias-gastos*');
-                    $cofiguracionActive = request()->routeIs('configuracion.*');
+                    $cofiguracionActive = request()->routeIs('configuracion.*') || request()->routeIs('admin.ai-assistant.*');
                     $EmailConfig = request()->routeIs('admin.categoriaEmail.*') || request()->routeIs('admin.statusMail.*');
                     $BajaActive = request()->routeIs('bajas.*');
                     $StadisticsActive = request()->routeIs('estadistica.*');
@@ -835,6 +835,12 @@
                                     <a href="{{route('configuracion.index')}}" class='sidebar-link'>
                                         <i class="fa-solid fa-gears fs-5"></i>
                                         <span>Cofiguracion Empresa</span>
+                                    </a>
+                                </li>
+                                <li class="submenu-item {{ request()->routeIs('admin.ai-assistant.*') ? 'active' : '' }}">
+                                    <a href="{{route('admin.ai-assistant.index')}}" class='sidebar-link'>
+                                        <i class="fa-solid fa-robot fs-5"></i>
+                                        <span>Asistente de IA</span>
                                     </a>
                                 </li>
                             </ul>

@@ -9,6 +9,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; }
@@ -150,6 +151,7 @@
             styles: [
                 '{{ asset("assets/bootstrap/css/bootstrap.min.css") }}',
                 'https://fonts.googleapis.com/css?family=Mulish:300,400,500,600,700,800&display=swap',
+                'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css',
                 '{{ asset("assets/fonts/font-awesome.min.css") }}',
                 '{{ asset("assets/fonts/themify-icons.css") }}',
                 '{{ asset("assets/owlcarousel/css/owl.carousel.css") }}',

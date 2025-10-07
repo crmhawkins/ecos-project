@@ -107,6 +107,15 @@
                 </div>
             </div>
 
+            <!-- Asistente de IA -->
+            <div class="crm-menu-item" style="background: red; color: white; padding: 5px;">
+                <a href="/crm/ai-assistant" class="crm-menu-link {{ request()->routeIs('admin.ai-assistant.*') ? 'crm-active' : '' }}" 
+                   style="display: flex; align-items: center; padding: 8px 16px; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.3s;">
+                    <i class="fas fa-robot" style="margin-right: 6px; font-size: 14px;"></i>
+                    Asistente IA
+                </a>
+            </div>
+
             <!-- Empresa -->
             <div class="crm-menu-item">
                 <a href="#" class="crm-menu-link" 

@@ -445,6 +445,14 @@
                     </div>
                 </div>
                 
+                <!-- Asistente de IA -->
+                <div class="nav-item">
+                    <a href="/crm/ai-assistant" class="nav-link {{ request()->routeIs('admin.ai-assistant.*') ? 'active' : '' }}">
+                        <i class="fas fa-robot"></i>
+                        Asistente IA
+                    </a>
+                </div>
+                
                 <!-- Empresa -->
                 <div class="nav-item">
                     <a href="{{ route('empresa.index') }}" class="nav-link {{ request()->routeIs('empresa.*') ? 'active' : '' }}">

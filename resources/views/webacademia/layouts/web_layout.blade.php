@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/animate.css') }}">
     <!-- Style CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+    @livewireStyles
     @yield('css')
 
 </head>
@@ -39,6 +40,12 @@
 </main>
 
 @include('webacademia.partials.footer')
+
+<!-- Asistente de IA -->
+@livewire('ai-chat')
+
+<!-- Livewire Scripts -->
+@livewireScripts
 
 <!-- Latest jQuery -->
 <script src="{{ asset('assets/js/jquery-1.12.4.min.js') }}"></script>
