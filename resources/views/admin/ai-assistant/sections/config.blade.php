@@ -36,6 +36,11 @@
                     @csrf
                     @method('PUT')
                     
+                    <!-- Campos ocultos para checkboxes no marcados -->
+                    <input type="hidden" name="is_active" value="0">
+                    <input type="hidden" name="show_courses" value="0">
+                    <input type="hidden" name="show_contact_info" value="0">
+                    
                     <div style="margin-bottom: 24px;">
                         <label for="assistant_name" style="font-weight: 600; color: #2d3748; margin-bottom: 8px; display: block; font-size: 0.95rem;">Nombre del Asistente</label>
                         <input type="text" id="assistant_name" name="assistant_name" 
@@ -100,28 +105,39 @@
                     </div>
 
                     <div style="margin-bottom: 16px;">
-                        <input type="checkbox" id="is_active" name="is_active" 
+                        <input type="checkbox" id="is_active" name="is_active" value="1"
                                {{ $config->is_active ? 'checked' : '' }}
                                style="margin-right: 8px;">
                         <label for="is_active" style="font-weight: 500; color: #2d3748;">Asistente Activo</label>
                     </div>
                     <div style="margin-bottom: 16px;">
-                        <input type="checkbox" id="show_courses" name="show_courses" 
+                        <input type="checkbox" id="show_courses" name="show_courses" value="1"
                                {{ $config->show_courses ? 'checked' : '' }}
                                style="margin-right: 8px;">
                         <label for="show_courses" style="font-weight: 500; color: #2d3748;">Mostrar Información de Cursos</label>
                     </div>
                     <div style="margin-bottom: 24px;">
-                        <input type="checkbox" id="show_contact_info" name="show_contact_info" 
+                        <input type="checkbox" id="show_contact_info" name="show_contact_info" value="1"
                                {{ $config->show_contact_info ? 'checked' : '' }}
                                style="margin-right: 8px;">
                         <label for="show_contact_info" style="font-weight: 500; color: #2d3748;">Mostrar Información de Contacto</label>
                     </div>
 
-                    <button type="submit" style="background: linear-gradient(135deg, #D93690 0%, #667eea 100%); border: none; border-radius: 8px; padding: 12px 24px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(217, 54, 144, 0.3); color: white; cursor: pointer; margin-top: 16px;">
+                    <button type="submit" onclick="debugForm()" style="background: linear-gradient(135deg, #D93690 0%, #667eea 100%); border: none; border-radius: 8px; padding: 12px 24px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(217, 54, 144, 0.3); color: white; cursor: pointer; margin-top: 16px;">
                         <i class="fas fa-save" style="margin-right: 8px;"></i> Guardar Configuración
                     </button>
                 </form>
+
+                <script>
+                function debugForm() {
+                    const form = document.querySelector('form');
+                    const formData = new FormData(form);
+                    console.log('Form data being sent:');
+                    for (let [key, value] of formData.entries()) {
+                        console.log(key + ': ' + value);
+                    }
+                }
+                </script>
             </div>
         </div>
     </div>

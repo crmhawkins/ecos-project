@@ -50,6 +50,12 @@
 
 @include('webacademia.partials.footer')
 
+<!-- Asistente de IA -->
+@livewire('ai-chat')
+
+<!-- Livewire Scripts -->
+@livewireScripts
+
 <!-- Latest jQuery -->
 <script src="{{ asset('assets/js/jquery-1.12.4.min.js') }}"></script>
 <!-- Latest compiled and minified Bootstrap -->

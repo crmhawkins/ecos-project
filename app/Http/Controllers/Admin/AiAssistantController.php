@@ -64,24 +64,34 @@ class AiAssistantController extends Controller
      */
     public function updateConfig(Request $request)
     {
-        $request->validate([
-            'assistant_name' => 'required|string|max:255',
-            'welcome_message' => 'required|string|max:500',
-            'system_prompt' => 'required|string|max:2000',
-            'ai_model' => 'required|string',
-            'temperature' => 'required|numeric|between:0,2',
-            'max_tokens' => 'required|integer|min:100|max:4000',
-            'is_active' => 'boolean',
-            'show_courses' => 'boolean',
-            'show_contact_info' => 'boolean',
-            'primary_color' => 'required|string',
-            'secondary_color' => 'required|string'
-        ]);
+        try {
+            \Log::info('AI Assistant Config Update Request:', $request->all());
+            
+            $request->validate([
+                'assistant_name' => 'required|string|max:255',
+                'welcome_message' => 'required|string|max:500',
+                'system_prompt' => 'required|string|max:2000',
+                'ai_model' => 'required|string',
+                'temperature' => 'required|numeric|between:0,2',
+                'max_tokens' => 'required|integer|min:100|max:4000',
+                'is_active' => 'boolean',
+                'show_courses' => 'boolean',
+                'show_contact_info' => 'boolean',
+                'primary_color' => 'required|string',
+                'secondary_color' => 'required|string'
+            ]);
 
-        $config = AiAssistantConfig::getActiveConfig();
-        $config->update($request->all());
+            $config = AiAssistantConfig::getActiveConfig();
+            \Log::info('Config found:', ['id' => $config->id, 'name' => $config->assistant_name]);
+            
+            $config->update($request->all());
+            \Log::info('Config updated successfully');
 
-        return redirect()->back()->with('success', 'Configuración actualizada correctamente.');
+            return redirect()->back()->with('success', 'Configuración actualizada correctamente.');
+        } catch (\Exception $e) {
+            \Log::error('Error updating AI Assistant config:', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Error al actualizar la configuración: ' . $e->getMessage());
+        }
     }
 
     /**
