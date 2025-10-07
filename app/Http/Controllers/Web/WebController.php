@@ -66,7 +66,15 @@ class WebController extends Controller
         }
 
             $initialCursos = $query->take(9)->orderBy('created_at', 'desc')->get();
-            $categorias = \App\Models\Cursos\Category::where('inactive', 0)->get();
+            
+            // Obtener solo las categorías que tienen cursos activos
+            $categorias = \App\Models\Cursos\Category::where('inactive', 0)
+                ->whereHas('cursos', function($query) {
+                    $query->where('inactive', 0)
+                          ->where('published', 1)
+                          ->whereNotNull('moodle_id');
+                })
+                ->get();
             
             // Verificar si el usuario está logueado
             $isLoggedIn = Auth::guard('alumno')->check();
@@ -85,7 +93,14 @@ class WebController extends Controller
                 ->take(9)
                 ->orderBy('created_at', 'desc')
                 ->get();
-            $categorias = \App\Models\Cursos\Category::where('inactive', 0)->get();
+            // Obtener solo las categorías que tienen cursos activos
+            $categorias = \App\Models\Cursos\Category::where('inactive', 0)
+                ->whereHas('cursos', function($query) {
+                    $query->where('inactive', 0)
+                          ->where('published', 1)
+                          ->whereNotNull('moodle_id');
+                })
+                ->get();
             
             $isLoggedIn = Auth::guard('alumno')->check();
             $user = $isLoggedIn ? Auth::guard('alumno')->user() : null;
