@@ -428,14 +428,14 @@
                 @csrf
                 
                 <div class="form-group">
-                    <label for="username">Usuario</label>
+                    <label for="login">Usuario o Email</label>
                     <input 
                         type="text" 
-                        id="username" 
-                        name="username" 
-                        class="form-control @error('username') is-invalid @enderror" 
-                        value="{{ old('username') }}" 
-                        placeholder="tu_usuario"
+                        id="login" 
+                        name="login" 
+                        class="form-control @error('login') is-invalid @enderror" 
+                        value="{{ old('login') }}" 
+                        placeholder="usuario o email@ejemplo.com"
                         required 
                         autofocus
                         autocomplete="username"
@@ -510,11 +510,11 @@
             btn.disabled = true;
         });
 
-        // Auto-focus on username field
+        // Auto-focus on login field
         document.addEventListener('DOMContentLoaded', function() {
-            const usernameField = document.getElementById('username');
-            if (usernameField && !usernameField.value) {
-                usernameField.focus();
+            const loginField = document.getElementById('login');
+            if (loginField && !loginField.value) {
+                loginField.focus();
             }
         });
 

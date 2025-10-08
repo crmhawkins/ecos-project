@@ -571,6 +571,8 @@
     <script>
         let timerState = '{{ $jornadaActiva ? "running" : "stopped" }}'
         let timerTime = {{ $timeWorkedToday }}; // In seconds, initialized with the time worked today
+        let timerInterval = null; // Declare timerInterval globally
+        
         function getTime() {
             fetch('/crm/dashboard/timeworked', {
                 method: 'POST',
@@ -586,33 +588,47 @@
                         timerTime = data.time
                         updateTime()
                     }
+                })
+                .catch(error => {
+                    console.error('Error fetching time:', error);
                 });
         }
 
-
         function updateTime() {
-        let hours = Math.floor(timerTime / 3600);
-        let minutes = Math.floor((timerTime % 3600) / 60);
-        let seconds = Math.floor(timerTime % 60);
+            let hours = Math.floor(timerTime / 3600);
+            let minutes = Math.floor((timerTime % 3600) / 60);
+            let seconds = Math.floor(timerTime % 60);
 
-        hours = hours < 10 ? '0' + hours : hours;
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        seconds = seconds < 10 ? '0' + seconds : seconds;
+            hours = hours < 10 ? '0' + hours : hours;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
 
-        document.getElementById('timer').textContent = `${hours}:${minutes}:${seconds}`;
-    }
+            const timerElement = document.getElementById('timer');
+            if (timerElement) {
+                timerElement.textContent = `${hours}:${minutes}:${seconds}`;
+            }
+        }
 
         function startTimer() {
-                timerState = 'running';
-                timerInterval = setInterval(() => {
-                    timerTime++;
-                    updateTime();
-                }, 1000);
+            if (timerState === 'running') {
+                return; // Already running
+            }
+            timerState = 'running';
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            timerInterval = setInterval(() => {
+                timerTime++;
+                updateTime();
+            }, 1000);
         }
 
         function stopTimer() {
+            if (timerInterval) {
                 clearInterval(timerInterval);
-                timerState = 'stopped';
+                timerInterval = null;
+            }
+            timerState = 'stopped';
         }
 
         function startJornada() {
@@ -725,33 +741,43 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            updateTime(); // Initialize the timer display
+            // Initialize the timer display first
+            updateTime();
 
+            // Set up periodic time sync (every 2 minutes)
             setInterval(function() {
                 getTime();
             }, 120000);
 
             // Initialize button states based on jornada and pause
-            if ('{{ $jornadaActiva }}') {
-                document.getElementById('startJornadaBtn').style.display = 'none';
-                document.getElementById('endJornadaBtn').style.display = 'block';
-                if ('{{ $pausaActiva }}') {
-                    document.getElementById('startPauseBtn').style.display = 'none';
-                    document.getElementById('endPauseBtn').style.display = 'block';
+            const startJornadaBtn = document.getElementById('startJornadaBtn');
+            const endJornadaBtn = document.getElementById('endJornadaBtn');
+            const startPauseBtn = document.getElementById('startPauseBtn');
+            const endPauseBtn = document.getElementById('endPauseBtn');
+
+            if ('{{ $jornadaActiva }}' === '1' || '{{ $jornadaActiva }}' === true) {
+                if (startJornadaBtn) startJornadaBtn.style.display = 'none';
+                if (endJornadaBtn) endJornadaBtn.style.display = 'block';
+                
+                if ('{{ $pausaActiva }}' === '1' || '{{ $pausaActiva }}' === true) {
+                    if (startPauseBtn) startPauseBtn.style.display = 'none';
+                    if (endPauseBtn) endPauseBtn.style.display = 'block';
+                    // Don't start timer if in pause
                 } else {
-                    document.getElementById('startPauseBtn').style.display = 'block';
-                    document.getElementById('endPauseBtn').style.display = 'none';
-                    startTimer(); // Start timer if not in pause
+                    if (startPauseBtn) startPauseBtn.style.display = 'block';
+                    if (endPauseBtn) endPauseBtn.style.display = 'none';
+                    // Start timer if jornada is active and not in pause
+                    setTimeout(() => {
+                        startTimer();
+                    }, 1000); // Small delay to ensure everything is loaded
                 }
             } else {
-                document.getElementById('startJornadaBtn').style.display = 'block';
-                document.getElementById('endJornadaBtn').style.display = 'none';
-                document.getElementById('startPauseBtn').style.display = 'none';
-                document.getElementById('endPauseBtn').style.display = 'none';
+                if (startJornadaBtn) startJornadaBtn.style.display = 'block';
+                if (endJornadaBtn) endJornadaBtn.style.display = 'none';
+                if (startPauseBtn) startPauseBtn.style.display = 'none';
+                if (endPauseBtn) endPauseBtn.style.display = 'none';
             }
-
-
-            });
+        });
     </script>
     {{-- <script>
             document.querySelectorAll('#enviar').forEach(function(button) {

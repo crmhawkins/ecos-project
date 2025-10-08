@@ -428,17 +428,17 @@
                 @csrf
                 
                 <div class="form-group">
-                    <label for="email">Correo Electrónico</label>
+                    <label for="login">Usuario o Email</label>
                     <input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
-                        class="form-control @error('email') is-invalid @enderror" 
-                        value="{{ old('email') }}" 
-                        placeholder="tu@email.com"
+                        type="text" 
+                        id="login" 
+                        name="login" 
+                        class="form-control @error('login') is-invalid @enderror" 
+                        value="{{ old('login') }}" 
+                        placeholder="usuario o email@ejemplo.com"
                         required 
                         autofocus
-                        autocomplete="email"
+                        autocomplete="username"
                     >
                 </div>
 
@@ -510,11 +510,11 @@
             btn.disabled = true;
         });
 
-        // Auto-focus on email field
+        // Auto-focus on login field
         document.addEventListener('DOMContentLoaded', function() {
-            const emailField = document.getElementById('email');
-            if (emailField && !emailField.value) {
-                emailField.focus();
+            const loginField = document.getElementById('login');
+            if (loginField && !loginField.value) {
+                loginField.focus();
             }
         });
 

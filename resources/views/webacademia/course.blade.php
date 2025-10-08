@@ -174,10 +174,13 @@
             <div class="section-top-title wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
                 <h1 style="color: white; font-size: 3.5rem; font-weight: 800; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">Todos los cursos</h1>
                 <p style="color: rgba(255, 255, 255, 0.9); font-size: 1.2rem; margin-bottom: 30px;">Descubre nuestra amplia gama de cursos especializados</p>
-                <ul style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 25px; padding: 8px 20px; display: inline-block; margin-bottom: 20px;">
-                    <li><a href="/" style="color: white; text-decoration: none; font-weight: 600; padding: 4px 8px; border-radius: 15px; display: inline-block;">Home</a></li>
-                    <li style="color: white; margin-left: 10px;"> / Cursos</li>
-                </ul>
+                <div style="background: rgba(255,255,255,0.1); border-radius: 25px; padding: 10px 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); display: inline-flex; align-items: center; gap: 8px; margin-top: 15px;">
+                    <a href="/" style="color: white; text-decoration: none; font-weight: 500; transition: all 0.3s ease;" onmouseover="this.style.color='#ff6b9d'" onmouseout="this.style.color='white'">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                    <span style="color: rgba(255,255,255,0.8);">/</span>
+                    <span style="color: rgba(255,255,255,0.8);">Cursos</span>
+                </div>
                 @if($isLoggedIn)
                     <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px 25px; display: inline-block; margin-top: 20px;">
                         <p style="color: white; margin: 0; font-weight: 500;">
