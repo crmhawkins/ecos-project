@@ -252,58 +252,58 @@
                 <h3 class="form-section-title"><i class="fas fa-door-open"></i> Información Básica</h3>
                 
                 <div class="form-group">
-                    <label for="nombre">Nombre del Aula <span style="color: red;">*</span></label>
-                    <input type="text" name="nombre" id="nombre" class="form-control" 
-                           value="{{ old('nombre') }}" placeholder="Ej: Aula 101, Laboratorio de Informática" required>
+                    <label for="name">Nombre del Aula <span style="color: red;">*</span></label>
+                    <input type="text" name="name" id="name" class="form-control" 
+                           value="{{ old('name') }}" placeholder="Ej: Aula 101, Laboratorio de Informática" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="descripcion">Descripción</label>
-                    <textarea name="descripcion" id="descripcion" class="form-control" 
-                              placeholder="Descripción detallada del aula y sus características">{{ old('descripcion') }}</textarea>
+                    <label for="description">Descripción</label>
+                    <textarea name="description" id="description" class="form-control" 
+                              placeholder="Descripción detallada del aula y sus características">{{ old('description') }}</textarea>
                 </div>
 
                 <div class="form-row-3">
                     <div class="form-group">
-                        <label for="capacidad">Capacidad <span style="color: red;">*</span></label>
-                        <input type="number" name="capacidad" id="capacidad" class="form-control" 
-                               value="{{ old('capacidad') }}" min="1" placeholder="Ej: 30" required>
+                        <label for="capacity">Capacidad <span style="color: red;">*</span></label>
+                        <input type="number" name="capacity" id="capacity" class="form-control" 
+                               value="{{ old('capacity') }}" min="1" placeholder="Ej: 30" required>
                         <small style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 5px; display: block;">
                             Número máximo de personas
                         </small>
                     </div>
                     <div class="form-group">
-                        <label for="planta">Planta/Piso</label>
-                        <input type="text" name="planta" id="planta" class="form-control" 
-                               value="{{ old('planta') }}" placeholder="Ej: Planta Baja, 1º Piso">
+                        <label for="floor">Planta/Piso</label>
+                        <input type="text" name="floor" id="floor" class="form-control" 
+                               value="{{ old('floor') }}" placeholder="Ej: Planta Baja, 1º Piso">
                     </div>
                     <div class="form-group">
-                        <label for="edificio">Edificio</label>
-                        <input type="text" name="edificio" id="edificio" class="form-control" 
-                               value="{{ old('edificio') }}" placeholder="Ej: Edificio A, Principal">
+                        <label for="building">Edificio</label>
+                        <input type="text" name="building" id="building" class="form-control" 
+                               value="{{ old('building') }}" placeholder="Ej: Edificio A, Principal">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="estado">Estado del Aula <span style="color: red;">*</span></label>
-                        <select name="estado" id="estado" class="form-control" required>
+                        <label for="status">Estado del Aula <span style="color: red;">*</span></label>
+                        <select name="status" id="status" class="form-control" required>
                             <option value="">Selecciona un estado</option>
-                            <option value="disponible" {{ old('estado') == 'disponible' ? 'selected' : '' }}>Disponible</option>
-                            <option value="ocupada" {{ old('estado') == 'ocupada' ? 'selected' : '' }}>Ocupada</option>
-                            <option value="mantenimiento" {{ old('estado') == 'mantenimiento' ? 'selected' : '' }}>En Mantenimiento</option>
+                            <option value="disponible" {{ old('status') == 'disponible' ? 'selected' : '' }}>Disponible</option>
+                            <option value="ocupada" {{ old('status') == 'ocupada' ? 'selected' : '' }}>Ocupada</option>
+                            <option value="mantenimiento" {{ old('status') == 'mantenimiento' ? 'selected' : '' }}>En Mantenimiento</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="tipo">Tipo de Aula</label>
-                        <select name="tipo" id="tipo" class="form-control">
+                        <label for="type">Tipo de Aula</label>
+                        <select name="type" id="type" class="form-control">
                             <option value="">Selecciona un tipo</option>
-                            <option value="aula_teorica" {{ old('tipo') == 'aula_teorica' ? 'selected' : '' }}>Aula Teórica</option>
-                            <option value="laboratorio" {{ old('tipo') == 'laboratorio' ? 'selected' : '' }}>Laboratorio</option>
-                            <option value="taller" {{ old('tipo') == 'taller' ? 'selected' : '' }}>Taller</option>
-                            <option value="auditorio" {{ old('tipo') == 'auditorio' ? 'selected' : '' }}>Auditorio</option>
-                            <option value="sala_reuniones" {{ old('tipo') == 'sala_reuniones' ? 'selected' : '' }}>Sala de Reuniones</option>
-                            <option value="biblioteca" {{ old('tipo') == 'biblioteca' ? 'selected' : '' }}>Biblioteca</option>
+                            <option value="aula_teorica" {{ old('type') == 'aula_teorica' ? 'selected' : '' }}>Aula Teórica</option>
+                            <option value="laboratorio" {{ old('type') == 'laboratorio' ? 'selected' : '' }}>Laboratorio</option>
+                            <option value="taller" {{ old('type') == 'taller' ? 'selected' : '' }}>Taller</option>
+                            <option value="auditorio" {{ old('type') == 'auditorio' ? 'selected' : '' }}>Auditorio</option>
+                            <option value="sala_reuniones" {{ old('type') == 'sala_reuniones' ? 'selected' : '' }}>Sala de Reuniones</option>
+                            <option value="biblioteca" {{ old('type') == 'biblioteca' ? 'selected' : '' }}>Biblioteca</option>
                         </select>
                     </div>
                 </div>
@@ -383,27 +383,27 @@
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="responsable">Responsable del Aula</label>
-                        <input type="text" name="responsable" id="responsable" class="form-control" 
-                               value="{{ old('responsable') }}" placeholder="Nombre del responsable">
+                        <label for="responsible">Responsable del Aula</label>
+                        <input type="text" name="responsible" id="responsible" class="form-control" 
+                               value="{{ old('responsible') }}" placeholder="Nombre del responsable">
                     </div>
                     <div class="form-group">
-                        <label for="telefono_contacto">Teléfono de Contacto</label>
-                        <input type="tel" name="telefono_contacto" id="telefono_contacto" class="form-control" 
-                               value="{{ old('telefono_contacto') }}" placeholder="+34 600 000 000">
+                        <label for="contact_phone">Teléfono de Contacto</label>
+                        <input type="tel" name="contact_phone" id="contact_phone" class="form-control" 
+                               value="{{ old('contact_phone') }}" placeholder="+34 600 000 000">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="horario_disponible">Horario de Disponibilidad</label>
-                    <textarea name="horario_disponible" id="horario_disponible" class="form-control" 
-                              placeholder="Ej: Lunes a Viernes de 8:00 a 20:00">{{ old('horario_disponible') }}</textarea>
+                    <label for="available_schedule">Horario de Disponibilidad</label>
+                    <textarea name="available_schedule" id="available_schedule" class="form-control" 
+                              placeholder="Ej: Lunes a Viernes de 8:00 a 20:00">{{ old('available_schedule') }}</textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="observaciones">Observaciones</label>
-                    <textarea name="observaciones" id="observaciones" class="form-control" 
-                              placeholder="Notas adicionales, restricciones, etc.">{{ old('observaciones') }}</textarea>
+                    <label for="observations">Observaciones</label>
+                    <textarea name="observations" id="observations" class="form-control" 
+                              placeholder="Notas adicionales, restricciones, etc.">{{ old('observations') }}</textarea>
                 </div>
             </div>
         </div>
@@ -433,8 +433,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Validación de capacidad
-    const capacidadInput = document.getElementById('capacidad');
-    capacidadInput.addEventListener('input', function() {
+    const capacityInput = document.getElementById('capacity');
+    capacityInput.addEventListener('input', function() {
         if (this.value < 1) {
             this.setCustomValidity('La capacidad debe ser al menos 1 persona');
         } else {

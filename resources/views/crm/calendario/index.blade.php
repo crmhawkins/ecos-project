@@ -126,6 +126,82 @@
         background-color: #ef4444;
     }
 
+    /* Estilos para los filtros de aulas */
+    .aula-filter {
+        accent-color: var(--primary-color);
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .form-check-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(217, 54, 144, 0.25);
+    }
+    
+    .form-check-label {
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+    
+    .form-check-label:hover {
+        color: var(--primary-color) !important;
+    }
+    
+    .btn-outline-primary {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .btn-primary:hover {
+        background-color: #c02d7a;
+        border-color: #c02d7a;
+    }
+    
+    .btn-outline-secondary {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+    
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: white;
+    }
+    
+    /* Animación para los filtros */
+    .form-check {
+        transition: transform 0.2s ease;
+    }
+    
+    .form-check:hover {
+        transform: translateX(5px);
+    }
+    
+    /* Estilo para el contador de aulas seleccionadas */
+    .aulas-counter {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+
     .calendar-container {
         background: white;
         border-radius: 16px;
@@ -468,6 +544,63 @@
         </div>
     </div>
 
+    <!-- Filtros de Aulas -->
+    <div class="legend-card">
+        <div class="legend-title">
+            <i class="fas fa-filter"></i>
+            Filtros de Aulas
+            <span id="aulasCounter" class="aulas-counter">0 seleccionadas</span>
+        </div>
+        <form id="aulasFilterForm" method="GET" action="{{ route('calendario.index') }}">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 600; color: var(--text-primary); margin-bottom: 15px; display: block;">Seleccionar Aulas:</label>
+                        <div class="row">
+                            @if($aulas && $aulas->count() > 0)
+                                @foreach($aulas as $aula)
+                                    <div class="col-md-4 col-sm-6 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input aula-filter" 
+                                                   type="checkbox" 
+                                                   name="aulas[]" 
+                                                   value="{{ $aula->id }}" 
+                                                   id="aula_{{ $aula->id }}"
+                                                   {{ in_array($aula->id, $selectedAulas) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="aula_{{ $aula->id }}" style="font-weight: 500; color: var(--text-primary); cursor: pointer;">
+                                                {{ $aula->name }}
+                                                @if($aula->capacity)
+                                                    <small class="text-muted">({{ $aula->capacity }} plazas)</small>
+                                                @endif
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="col-12">
+                                    <p class="text-muted">No hay aulas disponibles para filtrar.</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex flex-column gap-2">
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="selectAllAulas()">
+                            <i class="fas fa-check-double me-1"></i> Seleccionar Todas
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearAllAulas()">
+                            <i class="fas fa-times me-1"></i> Limpiar Filtros
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fas fa-filter me-1"></i> Aplicar Filtros
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <!-- Leyenda -->
     <div class="legend-card">
         <div class="legend-title">
@@ -774,6 +907,53 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeModal();
     }
+});
+
+// Funciones para manejar filtros de aulas
+function selectAllAulas() {
+    const checkboxes = document.querySelectorAll('.aula-filter');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    updateAulasCounter();
+}
+
+function clearAllAulas() {
+    const checkboxes = document.querySelectorAll('.aula-filter');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    updateAulasCounter();
+}
+
+function updateAulasCounter() {
+    const checkedBoxes = document.querySelectorAll('.aula-filter:checked');
+    const counter = document.getElementById('aulasCounter');
+    const count = checkedBoxes.length;
+    
+    if (count === 0) {
+        counter.textContent = '0 seleccionadas';
+        counter.style.background = '#6c757d';
+    } else if (count === document.querySelectorAll('.aula-filter').length) {
+        counter.textContent = 'Todas seleccionadas';
+        counter.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+    } else {
+        counter.textContent = `${count} seleccionada${count > 1 ? 's' : ''}`;
+        counter.style.background = 'linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%)';
+    }
+}
+
+// Inicializar contador y eventos cuando se carga la página
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.aula-filter');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateAulasCounter();
+        });
+    });
+    
+    // Inicializar contador
+    updateAulasCounter();
 });
 </script>
 @endsection

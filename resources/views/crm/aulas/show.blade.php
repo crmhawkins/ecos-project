@@ -73,8 +73,78 @@
                                 <span style="color: #111827; font-weight: 500;">{{ $aula->name }}</span>
                             </div>
                             
+                            @if($aula->description)
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                                <span style="font-weight: 600; color: #6b7280; font-size: 0.9rem;">Descripción</span>
+                                <span style="color: #111827; font-weight: 500; text-align: right; max-width: 60%;">{{ $aula->description }}</span>
+                            </div>
+                            @endif
+                            
+                            @if($aula->capacity)
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                                <span style="font-weight: 600; color: #6b7280; font-size: 0.9rem;">Capacidad</span>
+                                <span style="color: #111827; font-weight: 500;">{{ $aula->capacity }} personas</span>
+                            </div>
+                            @endif
+                            
+                            @if($aula->floor)
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                                <span style="font-weight: 600; color: #6b7280; font-size: 0.9rem;">Planta/Piso</span>
+                                <span style="color: #111827; font-weight: 500;">{{ $aula->floor }}</span>
+                            </div>
+                            @endif
+                            
+                            @if($aula->building)
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                                <span style="font-weight: 600; color: #6b7280; font-size: 0.9rem;">Edificio</span>
+                                <span style="color: #111827; font-weight: 500;">{{ $aula->building }}</span>
+                            </div>
+                            @endif
+                            
+                            @if($aula->status)
                             <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
                                 <span style="font-weight: 600; color: #6b7280; font-size: 0.9rem;">Estado</span>
+                                <span style="color: #111827; font-weight: 500;">
+                                    @if($aula->status == 'disponible')
+                                        <span style="color: #10b981;">
+                                            <i class="fas fa-check-circle"></i> Disponible
+                                        </span>
+                                    @elseif($aula->status == 'ocupada')
+                                        <span style="color: #f59e0b;">
+                                            <i class="fas fa-clock"></i> Ocupada
+                                        </span>
+                                    @else
+                                        <span style="color: #ef4444;">
+                                            <i class="fas fa-tools"></i> En Mantenimiento
+                                        </span>
+                                    @endif
+                                </span>
+                            </div>
+                            @endif
+                            
+                            @if($aula->type)
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                                <span style="font-weight: 600; color: #6b7280; font-size: 0.9rem;">Tipo</span>
+                                <span style="color: #111827; font-weight: 500;">{{ ucfirst(str_replace('_', ' ', $aula->type)) }}</span>
+                            </div>
+                            @endif
+                            
+                            @if($aula->responsible)
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                                <span style="font-weight: 600; color: #6b7280; font-size: 0.9rem;">Responsable</span>
+                                <span style="color: #111827; font-weight: 500;">{{ $aula->responsible }}</span>
+                            </div>
+                            @endif
+                            
+                            @if($aula->contact_phone)
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                                <span style="font-weight: 600; color: #6b7280; font-size: 0.9rem;">Teléfono</span>
+                                <span style="color: #111827; font-weight: 500;">{{ $aula->contact_phone }}</span>
+                            </div>
+                            @endif
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                                <span style="font-weight: 600; color: #6b7280; font-size: 0.9rem;">Estado del Sistema</span>
                                 <span style="color: #111827; font-weight: 500;">
                                     @if($aula->inactive)
                                         <span style="color: #ef4444;">
@@ -122,6 +192,55 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Equipamiento y Horarios -->
+        <div style="background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e5e7eb; overflow: hidden; margin-bottom: 24px;">
+            <div style="background: #f8fafc; padding: 20px 24px; border-bottom: 1px solid #e5e7eb;">
+                <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: #111827; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-tools"></i> Equipamiento y Horarios
+                </h3>
+            </div>
+            
+            <div style="padding: 24px;">
+                <div class="row">
+                    @if($aula->equipment && is_array($aula->equipment) && count($aula->equipment) > 0)
+                    <div class="col-md-6">
+                        <h4 style="font-size: 1.1rem; font-weight: 600; color: #111827; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-cogs"></i> Equipamiento Disponible
+                        </h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                            @foreach($aula->equipment as $equipment)
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f8fafc; border-radius: 6px; border: 1px solid #e5e7eb;">
+                                <i class="fas fa-check-circle" style="color: #10b981; font-size: 0.9rem;"></i>
+                                <span style="font-size: 0.9rem; color: #111827; font-weight: 500;">{{ ucfirst(str_replace('_', ' ', $equipment)) }}</span>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+                    
+                    <div class="col-md-6">
+                        @if($aula->available_schedule)
+                        <h4 style="font-size: 1.1rem; font-weight: 600; color: #111827; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-clock"></i> Horario de Disponibilidad
+                        </h4>
+                        <div style="background: #f8fafc; border-radius: 8px; padding: 16px; border: 1px solid #e5e7eb;">
+                            <p style="margin: 0; color: #111827; line-height: 1.6;">{{ $aula->available_schedule }}</p>
+                        </div>
+                        @endif
+                        
+                        @if($aula->observations)
+                        <h4 style="font-size: 1.1rem; font-weight: 600; color: #111827; margin-bottom: 16px; margin-top: 24px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-sticky-note"></i> Observaciones
+                        </h4>
+                        <div style="background: #f8fafc; border-radius: 8px; padding: 16px; border: 1px solid #e5e7eb;">
+                            <p style="margin: 0; color: #111827; line-height: 1.6;">{{ $aula->observations }}</p>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>

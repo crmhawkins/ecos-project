@@ -26,9 +26,17 @@ class ReservasController extends Controller
         
         return view('crm.reservas.index', compact('totalReservas', 'reservasConfirmadas', 'reservasPendientes', 'reservasCanceladas', 'aulas', 'servicios'));
     }
-    public function calendario()
+    public function calendario(Request $request)
     {
-        return view('crm.calendario.index');
+        // Obtener todas las aulas para los filtros
+        $aulas = Aulas::where('inactive', 0)
+            ->orderBy('name')
+            ->get();
+        
+        // Obtener aulas seleccionadas del filtro
+        $selectedAulas = $request->get('aulas', []);
+        
+        return view('crm.calendario.index', compact('aulas', 'selectedAulas'));
     }
 
     public function getReservasCalendario($year, $month)

@@ -276,7 +276,7 @@
         
         <div class="form-container">
             <div class="form-header-gradient">
-                <h1><i class="fas fa-edit"></i> Editar Aula: {{ $aula->nombre }}</h1>
+                <h1><i class="fas fa-edit"></i> Editar Aula: {{ $aula->name }}</h1>
                 <a href="{{ route('aulas.index') }}" class="btn-back">
                     <i class="fas fa-arrow-left"></i> Volver al Listado
                 </a>
@@ -288,11 +288,11 @@
                     <h4 style="margin: 0 0 15px 0; color: var(--text-primary);">Estadísticas del Aula</h4>
                     <div class="stats-grid">
                         <div class="stat-item">
-                            <div class="stat-number">{{ $aula->capacidad ?? 0 }}</div>
+                            <div class="stat-number">{{ $aula->capacity ?? 0 }}</div>
                             <div class="stat-label">Capacidad</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-number">{{ $aula->reservas->count() ?? 0 }}</div>
+                            <div class="stat-number">0</div>
                             <div class="stat-label">Reservas</div>
                         </div>
                         <div class="stat-item">
@@ -300,7 +300,7 @@
                             <div class="stat-label">Días Creada</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-number">{{ is_array($aula->equipamiento) ? count($aula->equipamiento) : 0 }}</div>
+                            <div class="stat-number">{{ is_array($aula->equipment) ? count($aula->equipment) : 0 }}</div>
                             <div class="stat-label">Equipos</div>
                         </div>
                     </div>
@@ -309,58 +309,58 @@
                 <h3 class="form-section-title"><i class="fas fa-door-open"></i> Información Básica</h3>
                 
                 <div class="form-group">
-                    <label for="nombre">Nombre del Aula <span style="color: red;">*</span></label>
-                    <input type="text" name="nombre" id="nombre" class="form-control" 
-                           value="{{ old('nombre', $aula->nombre) }}" placeholder="Ej: Aula 101, Laboratorio de Informática" required>
+                    <label for="name">Nombre del Aula <span style="color: red;">*</span></label>
+                    <input type="text" name="name" id="name" class="form-control" 
+                           value="{{ old('name', $aula->name) }}" placeholder="Ej: Aula 101, Laboratorio de Informática" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="descripcion">Descripción</label>
-                    <textarea name="descripcion" id="descripcion" class="form-control" 
-                              placeholder="Descripción detallada del aula y sus características">{{ old('descripcion', $aula->descripcion) }}</textarea>
+                    <label for="description">Descripción</label>
+                    <textarea name="description" id="description" class="form-control" 
+                              placeholder="Descripción detallada del aula y sus características">{{ old('description', $aula->description) }}</textarea>
                 </div>
 
                 <div class="form-row-3">
                     <div class="form-group">
-                        <label for="capacidad">Capacidad <span style="color: red;">*</span></label>
-                        <input type="number" name="capacidad" id="capacidad" class="form-control" 
-                               value="{{ old('capacidad', $aula->capacidad) }}" min="1" placeholder="Ej: 30" required>
+                        <label for="capacity">Capacidad <span style="color: red;">*</span></label>
+                        <input type="number" name="capacity" id="capacity" class="form-control" 
+                               value="{{ old('capacity', $aula->capacity) }}" min="1" placeholder="Ej: 30" required>
                         <small style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 5px; display: block;">
                             Número máximo de personas
                         </small>
                     </div>
                     <div class="form-group">
-                        <label for="planta">Planta/Piso</label>
-                        <input type="text" name="planta" id="planta" class="form-control" 
-                               value="{{ old('planta', $aula->planta) }}" placeholder="Ej: Planta Baja, 1º Piso">
+                        <label for="floor">Planta/Piso</label>
+                        <input type="text" name="floor" id="floor" class="form-control" 
+                               value="{{ old('floor', $aula->floor) }}" placeholder="Ej: Planta Baja, 1º Piso">
                     </div>
                     <div class="form-group">
-                        <label for="edificio">Edificio</label>
-                        <input type="text" name="edificio" id="edificio" class="form-control" 
-                               value="{{ old('edificio', $aula->edificio) }}" placeholder="Ej: Edificio A, Principal">
+                        <label for="building">Edificio</label>
+                        <input type="text" name="building" id="building" class="form-control" 
+                               value="{{ old('building', $aula->building) }}" placeholder="Ej: Edificio A, Principal">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="estado">Estado del Aula <span style="color: red;">*</span></label>
-                        <select name="estado" id="estado" class="form-control" required>
+                        <label for="status">Estado del Aula <span style="color: red;">*</span></label>
+                        <select name="status" id="status" class="form-control" required>
                             <option value="">Selecciona un estado</option>
-                            <option value="disponible" {{ old('estado', $aula->estado) == 'disponible' ? 'selected' : '' }}>Disponible</option>
-                            <option value="ocupada" {{ old('estado', $aula->estado) == 'ocupada' ? 'selected' : '' }}>Ocupada</option>
-                            <option value="mantenimiento" {{ old('estado', $aula->estado) == 'mantenimiento' ? 'selected' : '' }}>En Mantenimiento</option>
+                            <option value="disponible" {{ old('status', $aula->status) == 'disponible' ? 'selected' : '' }}>Disponible</option>
+                            <option value="ocupada" {{ old('status', $aula->status) == 'ocupada' ? 'selected' : '' }}>Ocupada</option>
+                            <option value="mantenimiento" {{ old('status', $aula->status) == 'mantenimiento' ? 'selected' : '' }}>En Mantenimiento</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="tipo">Tipo de Aula</label>
-                        <select name="tipo" id="tipo" class="form-control">
+                        <label for="type">Tipo de Aula</label>
+                        <select name="type" id="type" class="form-control">
                             <option value="">Selecciona un tipo</option>
-                            <option value="aula_teorica" {{ old('tipo', $aula->tipo) == 'aula_teorica' ? 'selected' : '' }}>Aula Teórica</option>
-                            <option value="laboratorio" {{ old('tipo', $aula->tipo) == 'laboratorio' ? 'selected' : '' }}>Laboratorio</option>
-                            <option value="taller" {{ old('tipo', $aula->tipo) == 'taller' ? 'selected' : '' }}>Taller</option>
-                            <option value="auditorio" {{ old('tipo', $aula->tipo) == 'auditorio' ? 'selected' : '' }}>Auditorio</option>
-                            <option value="sala_reuniones" {{ old('tipo', $aula->tipo) == 'sala_reuniones' ? 'selected' : '' }}>Sala de Reuniones</option>
-                            <option value="biblioteca" {{ old('tipo', $aula->tipo) == 'biblioteca' ? 'selected' : '' }}>Biblioteca</option>
+                            <option value="aula_teorica" {{ old('type', $aula->type) == 'aula_teorica' ? 'selected' : '' }}>Aula Teórica</option>
+                            <option value="laboratorio" {{ old('type', $aula->type) == 'laboratorio' ? 'selected' : '' }}>Laboratorio</option>
+                            <option value="taller" {{ old('type', $aula->type) == 'taller' ? 'selected' : '' }}>Taller</option>
+                            <option value="auditorio" {{ old('type', $aula->type) == 'auditorio' ? 'selected' : '' }}>Auditorio</option>
+                            <option value="sala_reuniones" {{ old('type', $aula->type) == 'sala_reuniones' ? 'selected' : '' }}>Sala de Reuniones</option>
+                            <option value="biblioteca" {{ old('type', $aula->type) == 'biblioteca' ? 'selected' : '' }}>Biblioteca</option>
                         </select>
                     </div>
                 </div>
@@ -371,64 +371,64 @@
                     <label>Equipamiento Disponible</label>
                     <div class="equipment-selector">
                         @php
-                            $currentEquipment = old('equipamiento', is_array($aula->equipamiento) ? $aula->equipamiento : []);
+                            $currentEquipment = old('equipment', is_array($aula->equipment) ? $aula->equipment : []);
                         @endphp
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="proyector" value="proyector" 
+                            <input type="checkbox" name="equipment[]" id="proyector" value="proyector" 
                                    {{ in_array('proyector', $currentEquipment) ? 'checked' : '' }}>
                             <i class="fas fa-video"></i>
                             <label for="proyector">Proyector</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="pizarra_digital" value="pizarra_digital" 
+                            <input type="checkbox" name="equipment[]" id="pizarra_digital" value="pizarra_digital" 
                                    {{ in_array('pizarra_digital', $currentEquipment) ? 'checked' : '' }}>
                             <i class="fas fa-chalkboard"></i>
                             <label for="pizarra_digital">Pizarra Digital</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="ordenadores" value="ordenadores" 
+                            <input type="checkbox" name="equipment[]" id="ordenadores" value="ordenadores" 
                                    {{ in_array('ordenadores', $currentEquipment) ? 'checked' : '' }}>
                             <i class="fas fa-desktop"></i>
                             <label for="ordenadores">Ordenadores</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="wifi" value="wifi" 
+                            <input type="checkbox" name="equipment[]" id="wifi" value="wifi" 
                                    {{ in_array('wifi', $currentEquipment) ? 'checked' : '' }}>
                             <i class="fas fa-wifi"></i>
                             <label for="wifi">WiFi</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="aire_acondicionado" value="aire_acondicionado" 
+                            <input type="checkbox" name="equipment[]" id="aire_acondicionado" value="aire_acondicionado" 
                                    {{ in_array('aire_acondicionado', $currentEquipment) ? 'checked' : '' }}>
                             <i class="fas fa-snowflake"></i>
                             <label for="aire_acondicionado">Aire Acondicionado</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="sistema_audio" value="sistema_audio" 
+                            <input type="checkbox" name="equipment[]" id="sistema_audio" value="sistema_audio" 
                                    {{ in_array('sistema_audio', $currentEquipment) ? 'checked' : '' }}>
                             <i class="fas fa-volume-up"></i>
                             <label for="sistema_audio">Sistema de Audio</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="microfono" value="microfono" 
+                            <input type="checkbox" name="equipment[]" id="microfono" value="microfono" 
                                    {{ in_array('microfono', $currentEquipment) ? 'checked' : '' }}>
                             <i class="fas fa-microphone"></i>
                             <label for="microfono">Micrófono</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="camara" value="camara" 
+                            <input type="checkbox" name="equipment[]" id="camara" value="camara" 
                                    {{ in_array('camara', $currentEquipment) ? 'checked' : '' }}>
                             <i class="fas fa-camera"></i>
                             <label for="camara">Cámara</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="impresora" value="impresora" 
+                            <input type="checkbox" name="equipment[]" id="impresora" value="impresora" 
                                    {{ in_array('impresora', $currentEquipment) ? 'checked' : '' }}>
                             <i class="fas fa-print"></i>
                             <label for="impresora">Impresora</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="scanner" value="scanner" 
+                            <input type="checkbox" name="equipment[]" id="scanner" value="scanner" 
                                    {{ in_array('scanner', $currentEquipment) ? 'checked' : '' }}>
                             <i class="fas fa-scanner"></i>
                             <label for="scanner">Escáner</label>
@@ -443,27 +443,27 @@
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="responsable">Responsable del Aula</label>
-                        <input type="text" name="responsable" id="responsable" class="form-control" 
-                               value="{{ old('responsable', $aula->responsable) }}" placeholder="Nombre del responsable">
+                        <label for="responsible">Responsable del Aula</label>
+                        <input type="text" name="responsible" id="responsible" class="form-control" 
+                               value="{{ old('responsible', $aula->responsible) }}" placeholder="Nombre del responsable">
                     </div>
                     <div class="form-group">
-                        <label for="telefono_contacto">Teléfono de Contacto</label>
-                        <input type="tel" name="telefono_contacto" id="telefono_contacto" class="form-control" 
-                               value="{{ old('telefono_contacto', $aula->telefono_contacto) }}" placeholder="+34 600 000 000">
+                        <label for="contact_phone">Teléfono de Contacto</label>
+                        <input type="tel" name="contact_phone" id="contact_phone" class="form-control" 
+                               value="{{ old('contact_phone', $aula->contact_phone) }}" placeholder="+34 600 000 000">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="horario_disponible">Horario de Disponibilidad</label>
-                    <textarea name="horario_disponible" id="horario_disponible" class="form-control" 
-                              placeholder="Ej: Lunes a Viernes de 8:00 a 20:00">{{ old('horario_disponible', $aula->horario_disponible) }}</textarea>
+                    <label for="available_schedule">Horario de Disponibilidad</label>
+                    <textarea name="available_schedule" id="available_schedule" class="form-control" 
+                              placeholder="Ej: Lunes a Viernes de 8:00 a 20:00">{{ old('available_schedule', $aula->available_schedule) }}</textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="observaciones">Observaciones</label>
-                    <textarea name="observaciones" id="observaciones" class="form-control" 
-                              placeholder="Notas adicionales, restricciones, etc.">{{ old('observaciones', $aula->observaciones) }}</textarea>
+                    <label for="observations">Observaciones</label>
+                    <textarea name="observations" id="observations" class="form-control" 
+                              placeholder="Notas adicionales, restricciones, etc.">{{ old('observations', $aula->observations) }}</textarea>
                 </div>
             </div>
         </div>
@@ -493,8 +493,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Validación de capacidad
-    const capacidadInput = document.getElementById('capacidad');
-    capacidadInput.addEventListener('input', function() {
+    const capacityInput = document.getElementById('capacity');
+    capacityInput.addEventListener('input', function() {
         if (this.value < 1) {
             this.setCustomValidity('La capacidad debe ser al menos 1 persona');
         } else {

@@ -12,11 +12,20 @@ class CalendarController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $feed = Calendar::all()->toArray();
         $api = Api::first();
-        return view('crm.calendar.index', compact('feed','api'));
+        
+        // Obtener todas las aulas para los filtros
+        $aulas = \App\Models\Aulas\Aulas::where('inactive', 0)
+            ->orderBy('name')
+            ->get();
+        
+        // Obtener aulas seleccionadas del filtro
+        $selectedAulas = $request->get('aulas', []);
+        
+        return view('crm.calendar.index', compact('feed', 'api', 'aulas', 'selectedAulas'));
     }
 
     /**

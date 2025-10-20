@@ -15,11 +15,28 @@ class Aulas extends Model
 
     protected $fillable = [
         'name',
+        'description',
+        'capacity',
+        'floor',
+        'building',
+        'status',
+        'type',
+        'equipment',
+        'responsible',
+        'contact_phone',
+        'available_schedule',
+        'observations',
         'inactive',
     ];
 
     protected $attributes = [
         'inactive' => 0,
+        'status' => 'disponible',
+    ];
+
+    protected $casts = [
+        'equipment' => 'array',
+        'inactive' => 'boolean',
     ];
 
     protected $dates = [

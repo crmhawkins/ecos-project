@@ -37,18 +37,51 @@ class AulasController extends Controller
 
 
     public function store(Request $request) {
-        // Validamos los campos disponibles en el modelo
+        // Validamos todos los campos del formulario
         $data = $this->validate($request, [
             'name' => 'required|max:255',
+            'description' => 'nullable|string',
+            'capacity' => 'nullable|integer|min:1',
+            'floor' => 'nullable|string|max:255',
+            'building' => 'nullable|string|max:255',
+            'status' => 'required|in:disponible,ocupada,mantenimiento',
+            'type' => 'nullable|in:aula_teorica,laboratorio,taller,auditorio,sala_reuniones,biblioteca',
+            'equipment' => 'nullable|array',
+            'equipment.*' => 'string',
+            'responsible' => 'nullable|string|max:255',
+            'contact_phone' => 'nullable|string|max:255',
+            'available_schedule' => 'nullable|string',
+            'observations' => 'nullable|string',
             'inactive' => 'nullable|boolean',
         ], [
             'name.required' => 'El nombre del aula es requerido',
             'name.max' => 'El nombre no puede tener más de 255 caracteres',
+            'capacity.integer' => 'La capacidad debe ser un número entero',
+            'capacity.min' => 'La capacidad debe ser al menos 1',
+            'status.required' => 'El estado del aula es requerido',
+            'status.in' => 'El estado debe ser: disponible, ocupada o mantenimiento',
+            'type.in' => 'El tipo de aula no es válido',
         ]);
+
+        // Procesar el equipamiento (convertir array a JSON)
+        if (isset($data['equipment'])) {
+            $data['equipment'] = json_encode($data['equipment']);
+        }
 
         // Mapear los campos del formulario a los campos del modelo
         $aulaData = [
             'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+            'capacity' => $data['capacity'] ?? null,
+            'floor' => $data['floor'] ?? null,
+            'building' => $data['building'] ?? null,
+            'status' => $data['status'],
+            'type' => $data['type'] ?? null,
+            'equipment' => $data['equipment'] ?? null,
+            'responsible' => $data['responsible'] ?? null,
+            'contact_phone' => $data['contact_phone'] ?? null,
+            'available_schedule' => $data['available_schedule'] ?? null,
+            'observations' => $data['observations'] ?? null,
             'inactive' => $data['inactive'] ?? 0,
         ];
 
@@ -78,15 +111,48 @@ class AulasController extends Controller
 
         $data = $this->validate($request, [
             'name' => 'required|max:255',
+            'description' => 'nullable|string',
+            'capacity' => 'nullable|integer|min:1',
+            'floor' => 'nullable|string|max:255',
+            'building' => 'nullable|string|max:255',
+            'status' => 'required|in:disponible,ocupada,mantenimiento',
+            'type' => 'nullable|in:aula_teorica,laboratorio,taller,auditorio,sala_reuniones,biblioteca',
+            'equipment' => 'nullable|array',
+            'equipment.*' => 'string',
+            'responsible' => 'nullable|string|max:255',
+            'contact_phone' => 'nullable|string|max:255',
+            'available_schedule' => 'nullable|string',
+            'observations' => 'nullable|string',
             'inactive' => 'nullable|boolean',
         ], [
             'name.required' => 'El nombre del aula es requerido',
             'name.max' => 'El nombre no puede tener más de 255 caracteres',
+            'capacity.integer' => 'La capacidad debe ser un número entero',
+            'capacity.min' => 'La capacidad debe ser al menos 1',
+            'status.required' => 'El estado del aula es requerido',
+            'status.in' => 'El estado debe ser: disponible, ocupada o mantenimiento',
+            'type.in' => 'El tipo de aula no es válido',
         ]);
+
+        // Procesar el equipamiento (convertir array a JSON)
+        if (isset($data['equipment'])) {
+            $data['equipment'] = json_encode($data['equipment']);
+        }
 
         // Mapear los campos del formulario a los campos del modelo
         $aulaData = [
             'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+            'capacity' => $data['capacity'] ?? null,
+            'floor' => $data['floor'] ?? null,
+            'building' => $data['building'] ?? null,
+            'status' => $data['status'],
+            'type' => $data['type'] ?? null,
+            'equipment' => $data['equipment'] ?? null,
+            'responsible' => $data['responsible'] ?? null,
+            'contact_phone' => $data['contact_phone'] ?? null,
+            'available_schedule' => $data['available_schedule'] ?? null,
+            'observations' => $data['observations'] ?? null,
             'inactive' => $data['inactive'] ?? 0,
         ];
 
