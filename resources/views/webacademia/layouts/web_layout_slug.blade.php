@@ -78,7 +78,9 @@
 <!-- Asistente de IA -->
 @livewire('ai-chat')
 
+@if(!request()->is('builder*'))
 <!-- Forzar sobrescritura de estilos problemáticos del theme - MÁXIMA PRIORIDAD -->
+<!-- Solo aplicar si NO estamos en el builder -->
 <style>
 /* Sobrescritura forzada para .ab_img img - se aplica al final del body para máxima prioridad */
 html body .ab_img img,
@@ -95,9 +97,16 @@ html body .wow.fadeInUp .ab_img img {
     margin-left: 0 !important;
 }
 </style>
+@endif
 <script>
 // Forzar aplicación de estilos después de que todo se cargue
+// SOLO si NO estamos en el builder (GrapesJS)
 document.addEventListener('DOMContentLoaded', function() {
+    // Verificar si estamos en el builder - si existe el contenedor de GrapesJS, no ejecutar
+    if (window.location.pathname.includes('/builder') || document.getElementById('gjs') || window.gjs) {
+        return; // No ejecutar en el builder
+    }
+    
     // Aplicar padding-right: 0 a todas las imágenes dentro de .ab_img
     const abImgImages = document.querySelectorAll('.ab_img img');
     abImgImages.forEach(function(img) {

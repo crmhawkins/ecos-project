@@ -477,18 +477,6 @@
             type: 'laravel',
             autoload: false, // Desactivado porque usamos fromElement: true
             autosave: false, // Desactivado - se guarda manualmente
-        },
-        // Configurar para que los estilos se guarden como CSS, no como inline
-        // Pero asegurar que se apliquen correctamente
-        styleManager: {
-            sectors: [{
-                name: 'Dimension',
-                open: false,
-                buildProps: ['width', 'height', 'min-width', 'min-height', 'max-width', 'max-height', 'object-fit', 'object-position'],
-            }]
-        },
-        // Asegurar que los estilos se guarden correctamente
-        avoidInlineStyle: false, // Permitir estilos inline si es necesario
             stepsBeforeSave: 999, // Número alto para evitar autoguardado
         },
         canvas: {
