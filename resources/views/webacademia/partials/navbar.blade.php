@@ -17,11 +17,32 @@
                 <div class="header_right">
                     <nav id="main-menu" class="ms-auto">
                         <ul id="in4wk">
-                            <li><a href="/web/index" class="nav-link">INICIO</a></li>
-                            <li><a href="/course" class="nav-link">CURSOS</a></li>
-                            <li><a href="/blog" class="nav-link">NOTICIAS</a></li>
-                            <li><a href="/web/about" class="nav-link">¿QUIÉNES SOMOS?</a></li>
-                            <li><a href="/contact" class="nav-link">CONTACTA</a></li>
+                            @php
+                                $menuItems = \App\Models\Web\WebMenuItem::getMenuItems();
+                            @endphp
+                            
+                            @if($menuItems && $menuItems->count() > 0)
+                                {{-- Menú dinámico desde base de datos --}}
+                                @foreach($menuItems as $item)
+                                    <li>
+                                        <a href="{{ $item->url }}" 
+                                           class="nav-link" 
+                                           target="{{ $item->target ?? '_self' }}">
+                                            @if($item->icon)
+                                                <i class="{{ $item->icon }}"></i>
+                                            @endif
+                                            {{ strtoupper($item->label) }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            @else
+                                {{-- Menú por defecto (fallback) --}}
+                                <li><a href="/web/index" class="nav-link">INICIO</a></li>
+                                <li><a href="/course" class="nav-link">CURSOS</a></li>
+                                <li><a href="/blog" class="nav-link">NOTICIAS</a></li>
+                                <li><a href="/web/about" class="nav-link">¿QUIÉNES SOMOS?</a></li>
+                                <li><a href="/contact" class="nav-link">CONTACTA</a></li>
+                            @endif
 
                             {{-- Botones para móvil/tablet --}}
                             <li class="d-lg-none mt-2">

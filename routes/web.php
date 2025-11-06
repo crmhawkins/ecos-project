@@ -64,6 +64,7 @@ use App\Http\Controllers\Admin\AiAssistantController as AdminAiAssistantControll
 use App\Http\Controllers\Blog\BlogController;
 use App\Http\Controllers\Alumnos\AlumnosController;
 use App\Http\Controllers\Builder\BuilderController;
+use App\Http\Controllers\Builder\MenuController;
 
 Route::get('/builder',[BuilderController::class, 'index'])->name('builder');
 
@@ -78,6 +79,16 @@ Route::post('/builder/create', [BuilderController::class, 'create'])->name('buil
 Route::get('/builder/seo/{view}', [BuilderController::class, 'seo'])->name('builder.seo');
 
 Route::post('/builder/seo/save', [BuilderController::class, 'saveSeo'])->name('builder.seo.save');
+
+Route::post('/builder/duplicate', [BuilderController::class, 'duplicate'])->name('builder.duplicate');
+
+// Rutas para gestión del menú
+Route::get('/builder/menu', [MenuController::class, 'index'])->name('builder.menu.index');
+Route::post('/builder/menu', [MenuController::class, 'store'])->name('builder.menu.store');
+Route::put('/builder/menu/{id}', [MenuController::class, 'update'])->name('builder.menu.update');
+Route::delete('/builder/menu/{id}', [MenuController::class, 'destroy'])->name('builder.menu.destroy');
+Route::post('/builder/menu/reorder', [MenuController::class, 'reorder'])->name('builder.menu.reorder');
+Route::get('/builder/menu/pages', [MenuController::class, 'getAvailablePages'])->name('builder.menu.pages');
 
 
 
