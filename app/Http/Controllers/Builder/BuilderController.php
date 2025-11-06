@@ -47,9 +47,13 @@ class BuilderController extends Controller
                         $initialCss
                     );
                 } else {
-                    // Ya tiene CSS del editor, extraer solo el CSS personalizado si existe
+                    // Ya tiene CSS del editor, extraer TODO el CSS (del editor + personalizado)
+                    // para que GrapesJS pueda cargarlo correctamente
+                    $initialCss = trim($extractedCss);
+                    
+                    // También extraer solo el CSS personalizado para el editor de CSS
                     if (preg_match('/\/\*\s*CSS Personalizado\s*\*\/(.*?)$/s', $extractedCss, $customMatches)) {
-                        $initialCss = trim($customMatches[1]);
+                        $customCssOnly = trim($customMatches[1]);
                     }
                 }
             }
@@ -184,17 +188,41 @@ class BuilderController extends Controller
             return response()->json(['error' => 'No se especificó la vista'], 400);
         }
 
-        // Si viene la ruta completa, construir la ruta completa
-        // Si viene solo el nombre, usar la ruta por defecto
-        if (strpos($view, 'webacademia/pages/') === 0) {
-            $path = resource_path("views/{$view}.blade.php");
-        } else {
-            // Si viene solo el nombre, añadir la ruta
-            $path = resource_path("views/webacademia/pages/{$view}.blade.php");
+        // Decodificar el parámetro view si viene codificado
+        $view = urldecode($view);
+        
+        // Extraer solo el nombre del archivo si viene la ruta completa
+        // Si viene "webacademia/pages/about", extraer solo "about"
+        if (strpos($view, '/') !== false) {
+            $viewParts = explode('/', $view);
+            $view = end($viewParts);
+        }
+        
+        // Si viene "webacademia/pages/about", extraer solo "about"
+        if (strpos($view, 'webacademia/pages/') !== false) {
+            $view = str_replace('webacademia/pages/', '', $view);
+        }
+        
+        // Limpiar el nombre del archivo (remover espacios, caracteres especiales, pero mantener guiones y guiones bajos)
+        $view = preg_replace('/[^a-zA-Z0-9_-]/', '', $view);
+        
+        if (empty($view)) {
+            return response()->json(['error' => 'Nombre de vista inválido'], 400);
         }
 
+        // Construir la ruta completa
+        $path = resource_path("views/webacademia/pages/{$view}.blade.php");
+
         if (!File::exists($path)) {
-            return response()->json(['error' => 'Vista no encontrada'], 404);
+            return response()->json([
+                'error' => 'Vista no encontrada',
+                'debug' => [
+                    'view_param' => $request->get('view'),
+                    'decoded_view' => $view,
+                    'path' => $path,
+                    'exists' => File::exists($path)
+                ]
+            ], 404);
         }
 
         // Validaciones de seguridad
@@ -206,8 +234,21 @@ class BuilderController extends Controller
         $styleBlocks = [];
         
         // CSS generado por el editor
+        // Aumentar especificidad para que los estilos se apliquen correctamente
         if (!empty($css)) {
-            $styleBlocks[] = "/* CSS generado por el editor */\n{$css}";
+            // Aumentar especificidad añadiendo !important a propiedades críticas
+            // y envolver en un selector más específico
+            $cssWithSpecificity = preg_replace(
+                '/(border-radius|object-fit|object-position|width|height):\s*([^;]+);/i',
+                '$1: $2 !important;',
+                $css
+            );
+            $styleBlocks[] = "/* CSS generado por el editor */\n{$cssWithSpecificity}";
+            
+            // Sobrescribir estilos problemáticos del style.css
+            // Remover padding-right de .ab_img img que interfiere con el diseño
+            // Usar selector más específico y añadir al final para máxima prioridad
+            $styleBlocks[] = "/* Sobrescribir estilos del theme - Máxima prioridad */\nbody .ab_img img,\nbody .ab_img > img,\nbody section .ab_img img,\nbody .container .ab_img img,\nbody .row .ab_img img { padding-right: 0 !important; padding-left: 0 !important; margin-right: 0 !important; }";
         }
         
         // CSS personalizado (si existe)
@@ -215,16 +256,43 @@ class BuilderController extends Controller
             $styleBlocks[] = "/* CSS Personalizado */\n{$customCss}";
         }
         
+        // SIEMPRE añadir la sobrescritura de .ab_img img al final, incluso si no hay CSS del editor
+        // Esto asegura que siempre se sobrescriba el padding del style.css
+        // Usar selectores muy específicos y múltiples para máxima prioridad
+        $styleBlocks[] = "/* Sobrescribir estilos del theme - SIEMPRE aplicar - MÁXIMA PRIORIDAD */\nhtml body .ab_img img,\nhtml body .ab_img > img,\nhtml body section .ab_img img,\nhtml body .container .ab_img img,\nhtml body .row .ab_img img,\nhtml body .col-lg-6 .ab_img img,\nhtml body .col-sm-12 .ab_img img,\nhtml body .wow.fadeInUp .ab_img img { padding-right: 0 !important; padding-left: 0 !important; margin-right: 0 !important; margin-left: 0 !important; }";
+        
         // Crear backup antes de guardar
         $this->createBackup($path, $view);
         
         // Combinar todos los estilos
         $allCss = implode("\n\n", $styleBlocks);
         
-        // Inserta el CSS en un <style> al principio del HTML
-        $finalHtml = !empty($allCss) 
-            ? "<style>\n{$allCss}\n</style>\n\n{$html}"
-            : $html;
+        // Extraer el bloque <style> si existe en el HTML actual y combinarlo
+        // Luego insertar el CSS en un <style> al principio del HTML
+        // IMPORTANTE: El CSS debe estar ANTES del <body> para que se aplique correctamente
+        if (!empty($allCss)) {
+            // Si el HTML ya tiene un bloque <style>, extraerlo y combinarlo
+            if (preg_match('/<style>(.*?)<\/style>/s', $html, $existingStyle)) {
+                // Remover el estilo existente del HTML
+                $html = preg_replace('/<style>.*?<\/style>/s', '', $html);
+            }
+            
+            // Insertar el CSS al principio del HTML (antes de cualquier contenido)
+            $finalHtml = "<style>\n{$allCss}\n</style>\n\n{$html}";
+        } else {
+            $finalHtml = $html;
+        }
+
+        // Log para debugging (solo en desarrollo)
+        if (config('app.debug')) {
+            \Log::info('Builder Save', [
+                'view' => $view,
+                'path' => $path,
+                'css_length' => strlen($allCss),
+                'html_length' => strlen($html),
+                'has_border_radius' => strpos($allCss, 'border-radius') !== false || strpos($html, 'border-radius') !== false
+            ]);
+        }
 
         File::put($path, $finalHtml);
 
@@ -340,6 +408,7 @@ class BuilderController extends Controller
 
     /**
      * Sanitizar HTML para prevenir XSS
+     * IMPORTANTE: Preserva los atributos style y otros atributos seguros que GrapesJS genera
      */
     private function sanitizeHtml($html)
     {
@@ -347,11 +416,8 @@ class BuilderController extends Controller
             return $html;
         }
 
-        // Permitir solo tags HTML seguros
-        $allowedTags = '<div><span><p><h1><h2><h3><h4><h5><h6><a><img><ul><ol><li><strong><em><b><i><u><br><hr><table><thead><tbody><tr><td><th><section><article><header><footer><nav><aside><main>';
-        
-        // Limpiar HTML pero mantener estructura
-        $html = strip_tags($html, $allowedTags);
+        // NO usar strip_tags porque elimina todos los atributos incluyendo style
+        // En su lugar, solo remover atributos peligrosos específicos
         
         // Remover atributos peligrosos como onclick, onerror, etc.
         $html = preg_replace('/\s*on\w+\s*=\s*["\'][^"\']*["\']/i', '', $html);
@@ -365,12 +431,14 @@ class BuilderController extends Controller
         
         // Limpiar atributos mal formados o vacíos que pueden causar errores
         $html = preg_replace('/\s+=\s*["\']\s*["\']/', '', $html);
-        $html = preg_replace('/\s+=\s*["\']\s*["\']/', '', $html);
         
         // Asegurar que no haya atributos con nombres numéricos (como "0")
         // Esto puede causar el error InvalidCharacterError
         $html = preg_replace('/\s+0\s*=\s*["\'][^"\']*["\']/', '', $html);
         $html = preg_replace('/\s+0\s*=\s*[^\s>]*/', '', $html);
+        
+        // IMPORTANTE: NO remover atributos style, class, id, src, alt, href, etc.
+        // Estos son necesarios para que GrapesJS funcione correctamente
         
         return $html;
     }

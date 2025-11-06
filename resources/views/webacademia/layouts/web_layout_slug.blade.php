@@ -32,6 +32,24 @@
     <!-- Style CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     @yield('css')
+    
+    @if(!empty($contentView))
+        @php
+            // Renderizar la vista una sola vez y almacenar el contenido en el contenedor de la app
+            $cacheKey = 'page_content_' . md5($contentView);
+            if (!app()->bound($cacheKey)) {
+                app()->instance($cacheKey, view($contentView)->render());
+            }
+            $pageContent = app($cacheKey);
+            // Extraer todos los bloques <style> y mostrarlos en el <head>
+            // IMPORTANTE: Esto se carga DESPUÉS de style.css para que tenga prioridad
+            if (preg_match_all('/<style>(.*?)<\/style>/s', $pageContent, $styleMatches)) {
+                foreach ($styleMatches[0] as $styleBlock) {
+                    echo $styleBlock . "\n";
+                }
+            }
+        @endphp
+    @endif
 </head>
 <body>
 @include('webacademia.partials.navbar')
@@ -44,7 +62,14 @@
 	<!-- END PRELOADER -->
 <main style="margin-top: 110px;">
   @if(!empty($contentView))
-        @include($contentView)
+        @php
+            // Usar el contenido ya renderizado y remover los bloques <style> (ya están en el <head>)
+            $cacheKey = 'page_content_' . md5($contentView);
+            $pageContent = app($cacheKey);
+            // Remover bloques <style> del contenido
+            $pageContent = preg_replace('/<style>.*?<\/style>/s', '', $pageContent);
+            echo $pageContent;
+        @endphp
     @endif
 </main>
 
@@ -52,6 +77,37 @@
 
 <!-- Asistente de IA -->
 @livewire('ai-chat')
+
+<!-- Forzar sobrescritura de estilos problemáticos del theme - MÁXIMA PRIORIDAD -->
+<style>
+/* Sobrescritura forzada para .ab_img img - se aplica al final del body para máxima prioridad */
+html body .ab_img img,
+html body .ab_img > img,
+html body section .ab_img img,
+html body .container .ab_img img,
+html body .row .ab_img img,
+html body .col-lg-6 .ab_img img,
+html body .col-sm-12 .ab_img img,
+html body .wow.fadeInUp .ab_img img {
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+}
+</style>
+<script>
+// Forzar aplicación de estilos después de que todo se cargue
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar padding-right: 0 a todas las imágenes dentro de .ab_img
+    const abImgImages = document.querySelectorAll('.ab_img img');
+    abImgImages.forEach(function(img) {
+        img.style.setProperty('padding-right', '0', 'important');
+        img.style.setProperty('padding-left', '0', 'important');
+        img.style.setProperty('margin-right', '0', 'important');
+        img.style.setProperty('margin-left', '0', 'important');
+    });
+});
+</script>
 
 <!-- Livewire Scripts -->
 @livewireScripts

@@ -171,6 +171,9 @@
                         <button id="saveButton" class="btn btn-primary" onclick="confirmSave()" disabled>
                             <i class="bi bi-save"></i> Guardar Cambios
                         </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="resetSaveState()" title="Resetear estado de guardado">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -360,7 +363,7 @@
     </div>
 
     {{-- Modal de confirmación --}}
-    <div id="saveConfirmModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div id="saveConfirmModal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
@@ -474,6 +477,18 @@
             type: 'laravel',
             autoload: false, // Desactivado porque usamos fromElement: true
             autosave: false, // Desactivado - se guarda manualmente
+        },
+        // Configurar para que los estilos se guarden como CSS, no como inline
+        // Pero asegurar que se apliquen correctamente
+        styleManager: {
+            sectors: [{
+                name: 'Dimension',
+                open: false,
+                buildProps: ['width', 'height', 'min-width', 'min-height', 'max-width', 'max-height', 'object-fit', 'object-position'],
+            }]
+        },
+        // Asegurar que los estilos se guarden correctamente
+        avoidInlineStyle: false, // Permitir estilos inline si es necesario
             stepsBeforeSave: 999, // Número alto para evitar autoguardado
         },
         canvas: {
@@ -530,26 +545,48 @@
     function addCssToCanvas(cssText) {
         if (!cssText || !editor) return;
         
-        // Añadir al editor (para que se guarde)
-        editor.Css.add(cssText);
+        // Si el CSS contiene "CSS generado por el editor", extraer solo el CSS del editor
+        // para añadirlo a GrapesJS, y el resto (CSS personalizado) inyectarlo directamente
+        if (cssText.includes('CSS generado por el editor')) {
+            // Extraer el CSS del editor (entre "CSS generado por el editor" y "CSS Personalizado")
+            const editorMatch = cssText.match(/\/\*\s*CSS generado por el editor\s*\*\/(.*?)(?:\/\*\s*CSS Personalizado|$)/s);
+            if (editorMatch && editorMatch[1]) {
+                const editorCss = editorMatch[1].trim();
+                // Añadir el CSS del editor a GrapesJS (para que se guarde)
+                editor.Css.add(editorCss);
+                console.log('CSS del editor añadido a GrapesJS:', editorCss.length, 'caracteres');
+            }
+            
+            // Extraer el CSS personalizado si existe
+            const customMatch = cssText.match(/\/\*\s*CSS Personalizado\s*\*\/(.*?)$/s);
+            if (customMatch && customMatch[1]) {
+                const customCssOnly = customMatch[1].trim();
+                // El CSS personalizado se maneja por separado
+                console.log('CSS personalizado detectado:', customCssOnly.length, 'caracteres');
+            }
+        } else {
+            // Es CSS original o personalizado, añadirlo directamente a GrapesJS
+            editor.Css.add(cssText);
+            console.log('CSS añadido a GrapesJS:', cssText.length, 'caracteres');
+        }
         
-        // Añadir directamente al canvas iframe para que se renderice
+        // Añadir TODO el CSS directamente al canvas iframe para que se renderice
         const canvas = editor.Canvas;
         const canvasDoc = canvas.getDocument();
         const canvasHead = canvasDoc.head;
         
-        // Verificar si ya existe un style tag para CSS personalizado
-        let styleTag = canvasHead.querySelector('style[data-custom-css]');
+        // Verificar si ya existe un style tag para CSS completo
+        let styleTag = canvasHead.querySelector('style[data-full-css]');
         if (!styleTag) {
             styleTag = canvasDoc.createElement('style');
-            styleTag.setAttribute('data-custom-css', 'true');
+            styleTag.setAttribute('data-full-css', 'true');
             canvasHead.appendChild(styleTag);
         }
         
-        // Añadir el CSS al style tag
+        // Añadir TODO el CSS al style tag para que se renderice
         styleTag.textContent = cssText;
         
-        console.log('CSS añadido al canvas:', cssText.substring(0, 50) + '...');
+        console.log('CSS completo inyectado en el canvas:', cssText.substring(0, 50) + '...');
     }
     
     // Función para encontrar la imagen dentro de un contenedor
@@ -694,9 +731,25 @@
         @if(!empty($initialCss))
             const initialCss = @json($initialCss);
             if (initialCss) {
-                addCssToCanvas(initialCss);
-                customCss = initialCss; // Guardar como CSS personalizado
-                console.log('CSS inicial cargado desde el archivo:', initialCss.length, 'caracteres');
+                // Si el CSS contiene "CSS generado por el editor", extraer solo el CSS personalizado
+                // para el editor de CSS, pero inyectar TODO el CSS en el canvas
+                if (initialCss.includes('CSS generado por el editor')) {
+                    // Extraer solo el CSS personalizado para el editor
+                    const customMatch = initialCss.match(/\/\*\s*CSS Personalizado\s*\*\/(.*?)$/s);
+                    if (customMatch && customMatch[1]) {
+                        customCss = customMatch[1].trim();
+                        console.log('CSS personalizado extraído:', customCss.length, 'caracteres');
+                    }
+                    
+                    // Inyectar TODO el CSS (del editor + personalizado) en el canvas
+                    addCssToCanvas(initialCss);
+                    console.log('CSS completo cargado desde el archivo:', initialCss.length, 'caracteres');
+                } else {
+                    // Es CSS original, usarlo como CSS personalizado
+                    addCssToCanvas(initialCss);
+                    customCss = initialCss;
+                    console.log('CSS inicial cargado desde el archivo:', initialCss.length, 'caracteres');
+                }
             }
         @endif
         
@@ -939,7 +992,9 @@ function markAsSaved() {
     const lastSaveTime = document.getElementById('lastSaveTime');
     
     if (saveButton) {
-        saveButton.disabled = true;
+        // Restaurar el texto original del botón
+        saveButton.innerHTML = '<i class="bi bi-save"></i> Guardar Cambios';
+        saveButton.disabled = false; // Habilitar el botón para futuros cambios
         saveButton.classList.remove('btn-warning');
         saveButton.classList.add('btn-primary');
     }
@@ -984,25 +1039,54 @@ function confirmSave() {
 function executeSave() {
     if (typeof editor === 'undefined' || !editor) {
         alert('Error: El editor no está disponible');
+        // Cerrar modal si está abierto
+        if (saveModal) {
+            saveModal.hide();
+        }
         return;
     }
     
     const saveButton = document.getElementById('saveButton');
+    if (!saveButton) {
+        console.error('Botón de guardar no encontrado');
+        return;
+    }
+    
     const originalText = saveButton.innerHTML;
     
     // Deshabilitar botón y mostrar loading
     saveButton.disabled = true;
     saveButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
     
-    const view = '{{ urlencode($currentView) }}';
-    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    // Cerrar modal inmediatamente
+    if (saveModal) {
+        saveModal.hide();
+    }
+    
+    // Extraer solo el nombre del archivo de la vista actual
+    let view = '{{ str_replace("webacademia/pages/", "", $currentView) }}';
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    
+    if (!token) {
+        console.error('Token CSRF no encontrado');
+        saveButton.disabled = false;
+        saveButton.innerHTML = originalText;
+        alert('Error: Token de seguridad no encontrado. Por favor, recarga la página.');
+        return;
+    }
+    
     const html = editor.getHtml();
     const css = editor.getCss();
     
     // Combinar CSS del editor con CSS personalizado
     const finalCss = customCss ? `${css}\n\n/* CSS Personalizado */\n${customCss}` : css;
     
-    fetch(`/builder/save?view=${view}`, {
+    // Crear un AbortController para timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
+    
+    // Codificar solo una vez
+    fetch(`/builder/save?view=${encodeURIComponent(view)}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -1014,31 +1098,89 @@ function executeSave() {
             css: finalCss,
             custom_css: customCss
         }),
+        signal: controller.signal
     })
-    .then(response => response.json())
+    .then(response => {
+        clearTimeout(timeoutId);
+        
+        // Log para debugging
+        console.log('Respuesta del servidor:', response.status, response.statusText);
+        
+        if (!response.ok) {
+            return response.json().then(data => {
+                console.error('Error del servidor:', data);
+                throw new Error(data.error || `Error HTTP: ${response.status}`);
+            });
+        }
+        return response.json();
+    })
     .then(data => {
-        if (data.status === 'ok' || data.error === undefined) {
-            // Éxito
-            markAsSaved();
-            if (saveModal) {
-                saveModal.hide();
+        console.log('Datos recibidos del servidor:', data);
+        
+        if (data && (data.status === 'ok' || (data.error === undefined && data.status !== 'error'))) {
+            // Éxito - restaurar botón inmediatamente
+            const saveButton = document.getElementById('saveButton');
+            if (saveButton) {
+                saveButton.disabled = false;
+                saveButton.innerHTML = '<i class="bi bi-save"></i> Guardar Cambios';
+                saveButton.classList.remove('btn-warning');
+                saveButton.classList.add('btn-primary');
             }
+            
+            // Marcar como guardado
+            markAsSaved();
             
             // Mostrar notificación de éxito
             showNotification('Cambios guardados correctamente', 'success');
+            
+            console.log('Guardado completado exitosamente');
         } else {
-            // Error
-            alert('Error al guardar: ' + (data.error || 'Error desconocido'));
-            saveButton.disabled = false;
-            saveButton.innerHTML = originalText;
+            // Error en la respuesta
+            console.error('Error en la respuesta:', data);
+            throw new Error(data.error || 'Error desconocido');
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Error al guardar los cambios. Por favor, inténtalo de nuevo.');
+        clearTimeout(timeoutId);
+        console.error('Error al guardar:', error);
+        
+        let errorMessage = 'Error al guardar los cambios. ';
+        if (error.name === 'AbortError') {
+            errorMessage += 'La operación tardó demasiado. Por favor, verifica tu conexión e inténtalo de nuevo.';
+        } else {
+            errorMessage += error.message || 'Por favor, inténtalo de nuevo.';
+        }
+        
+        alert(errorMessage);
         saveButton.disabled = false;
         saveButton.innerHTML = originalText;
+        markAsChanged(); // Volver a marcar como con cambios
     });
+}
+
+function resetSaveState() {
+    const saveButton = document.getElementById('saveButton');
+    if (saveButton) {
+        saveButton.disabled = false;
+        saveButton.innerHTML = '<i class="bi bi-save"></i> Guardar Cambios';
+        saveButton.classList.remove('btn-warning');
+        saveButton.classList.add('btn-primary');
+    }
+    
+    const saveStatus = document.getElementById('saveStatus');
+    if (saveStatus) {
+        saveStatus.className = 'badge bg-secondary';
+        saveStatus.innerHTML = '<i class="bi bi-check-circle"></i> Sin cambios';
+    }
+    
+    // Cerrar modal si está abierto
+    if (saveModal) {
+        saveModal.hide();
+    }
+    
+    hasUnsavedChanges = true;
+    markAsChanged();
+    console.log('Estado de guardado reseteado');
 }
 
 function showNotification(message, type = 'info') {

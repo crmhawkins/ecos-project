@@ -1107,7 +1107,7 @@ font-size:22px;
 
 .ab_img{position:relative;}
 .ab_img img {
-	padding-right: 40px;
+	padding-right: 0;
 }
  @media only screen and (max-width:880px){
 .ab_img img {padding-right:0px;width: 100%;}
