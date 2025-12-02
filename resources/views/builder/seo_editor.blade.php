@@ -31,31 +31,50 @@
 <div class="container">
     <div class="seo-box">
         <h4 class="mb-4"><i class="bi bi-globe"></i> Configuración SEO por página</h4>
-        <form method="POST" action="{{ route('seo.save') }}">
+        @if(session('status'))
+            <div class="alert alert-success">{{ session('status') }}</div>
+        @endif
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        <form method="POST" action="{{ route('builder.seo.save') }}">
             @csrf
             <div class="mb-3">
-                <label for="slug" class="form-label">Slug de la página</label>
-                <input type="text" name="slug" id="slug" class="form-control" value="{{ old('slug', $slug ?? '') }}" placeholder="ej: nosotros, contacto" required>
+                <label class="form-label">Vista / slug de la página</label>
+                <input type="text" class="form-control" value="{{ $view }}" disabled>
+                <input type="hidden" name="view" value="{{ $view }}">
             </div>
 
             <div class="mb-3">
                 <label for="title" class="form-label">Meta Title</label>
-                <input type="text" name="title" id="title" class="form-control" value="{{ old('title', $seo['title'] ?? '') }}">
+                <input type="text" name="title" id="title" class="form-control" maxlength="60"
+                       value="{{ old('title', $seo['title'] ?? '') }}">
+                <small class="text-muted">Máx. 60 caracteres. Se mostrará en la pestaña del navegador y resultados de búsqueda.</small>
             </div>
 
             <div class="mb-3">
                 <label for="description" class="form-label">Meta Description</label>
-                <textarea name="description" id="description" class="form-control" rows="3">{{ old('description', $seo['description'] ?? '') }}</textarea>
+                <textarea name="description" id="description" class="form-control" rows="3" maxlength="160">{{ old('description', $seo['description'] ?? '') }}</textarea>
+                <small class="text-muted">Máx. 160 caracteres. Resumen que se muestra en Google.</small>
             </div>
 
             <div class="mb-3">
                 <label for="keywords" class="form-label">Keywords</label>
-                <input type="text" name="keywords" id="keywords" class="form-control" value="{{ old('keywords', $seo['keywords'] ?? '') }}">
+                <input type="text" name="keywords" id="keywords" class="form-control"
+                       value="{{ old('keywords', $seo['keywords'] ?? '') }}">
+                <small class="text-muted">Opcional. Lista separada por comas.</small>
             </div>
 
             <div class="mb-3">
                 <label for="canonical" class="form-label">Canonical URL</label>
-                <input type="text" name="canonical" id="canonical" class="form-control" value="{{ old('canonical', $seo['canonical'] ?? '') }}">
+                <input type="text" name="canonical" id="canonical" class="form-control"
+                       value="{{ old('canonical', $seo['canonical'] ?? '') }}">
             </div>
 
             <div class="mb-3">
@@ -70,12 +89,13 @@
 
             <div class="mb-3">
                 <label for="og_title" class="form-label">OG Title (Facebook)</label>
-                <input type="text" name="og_title" id="og_title" class="form-control" value="{{ old('og_title', $seo['og_title'] ?? '') }}">
+                <input type="text" name="og_title" id="og_title" class="form-control" maxlength="60"
+                       value="{{ old('og_title', $seo['og_title'] ?? '') }}">
             </div>
 
             <div class="mb-3">
                 <label for="og_description" class="form-label">OG Description</label>
-                <textarea name="og_description" id="og_description" class="form-control" rows="2">{{ old('og_description', $seo['og_description'] ?? '') }}</textarea>
+                <textarea name="og_description" id="og_description" class="form-control" rows="2" maxlength="160">{{ old('og_description', $seo['og_description'] ?? '') }}</textarea>
             </div>
 
             <div class="d-grid mt-4">

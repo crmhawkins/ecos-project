@@ -4,7 +4,9 @@
             <i class="fas fa-lightbulb" style="font-size: 1.2rem; color: #D93690;"></i>
             Gestión de Prompts
         </h3>
-        <button style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; border-radius: 8px; padding: 8px 16px; color: white; font-weight: 600; cursor: pointer;">
+        <button type="button"
+                onclick="openNewPromptModal()"
+                style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; border-radius: 8px; padding: 8px 16px; color: white; font-weight: 600; cursor: pointer;">
             <i class="fas fa-plus" style="margin-right: 6px;"></i> Nuevo Prompt
         </button>
     </div>
@@ -88,3 +90,110 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Crear / Editar Prompt -->
+<div class="modal fade" id="promptModal" tabindex="-1" aria-labelledby="promptModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #D93690 0%, #667eea 100%); color: white;">
+                <h5 class="modal-title" id="promptModalLabel">
+                    <i class="fas fa-lightbulb" style="margin-right: 8px;"></i>
+                    <span id="promptModalTitle">Nuevo Prompt</span>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="promptForm" method="POST" action="{{ route('admin.ai-assistant.create-prompt') }}">
+                @csrf
+                <input type="hidden" name="_method" id="promptFormMethod" value="POST">
+                <input type="hidden" id="promptIdHidden">
+                <div class="modal-body" style="padding: 24px;">
+                    <div class="form-group mb-3">
+                        <label for="promptCategory" class="font-weight-semibold">Categoría</label>
+                        <input type="text" id="promptCategory" name="category" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="promptName" class="font-weight-semibold">Nombre</label>
+                        <input type="text" id="promptName" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="promptText" class="font-weight-semibold">Prompt</label>
+                        <textarea id="promptText" name="prompt" class="form-control" rows="6" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6 mb-3">
+                            <label for="promptPriority" class="font-weight-semibold">Prioridad (0-100)</label>
+                            <input type="number" id="promptPriority" name="priority" class="form-control" min="0" max="100" value="0" required>
+                        </div>
+                        <div class="form-group col-md-6 mb-3 d-flex align-items-center">
+                            <div class="form-check mt-3">
+                                <input type="checkbox" class="form-check-input" id="promptIsActive" name="is_active" value="1" checked>
+                                <label class="form-check-label" for="promptIsActive">Activo</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save" style="margin-right: 6px;"></i>
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.aiPrompts = @json($prompts ?? []);
+    let promptModalInstance = null;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalElement = document.getElementById('promptModal');
+        if (modalElement && typeof $ !== 'undefined' && typeof $(modalElement).modal === 'function') {
+            // Bootstrap 4 (usado en el layout CRM)
+            promptModalInstance = $(modalElement);
+        }
+    });
+
+    function openNewPromptModal() {
+        document.getElementById('promptModalTitle').innerText = 'Nuevo Prompt';
+        document.getElementById('promptForm').action = '{{ route('admin.ai-assistant.create-prompt') }}';
+        document.getElementById('promptFormMethod').value = 'POST';
+        document.getElementById('promptIdHidden').value = '';
+        document.getElementById('promptCategory').value = '';
+        document.getElementById('promptName').value = '';
+        document.getElementById('promptText').value = '';
+        document.getElementById('promptPriority').value = 0;
+        document.getElementById('promptIsActive').checked = true;
+
+        if (promptModalInstance) {
+            promptModalInstance.modal('show');
+        }
+    }
+
+    function editPrompt(id) {
+        const prompts = window.aiPrompts || [];
+        const prompt = prompts.find(p => parseInt(p.id) === parseInt(id));
+        if (!prompt) {
+            alert('No se ha encontrado la información de este prompt.');
+            return;
+        }
+
+        document.getElementById('promptModalTitle').innerText = 'Editar Prompt';
+        document.getElementById('promptForm').action = '{{ url('crm/ai-assistant/prompts') }}/' + id;
+        document.getElementById('promptFormMethod').value = 'PUT';
+        document.getElementById('promptIdHidden').value = id;
+        document.getElementById('promptCategory').value = prompt.category || '';
+        document.getElementById('promptName').value = prompt.name || '';
+        document.getElementById('promptText').value = prompt.prompt || '';
+        document.getElementById('promptPriority').value = prompt.priority ?? 0;
+        document.getElementById('promptIsActive').checked = !!prompt.is_active;
+
+        if (promptModalInstance) {
+            promptModalInstance.modal('show');
+        }
+    }
+</script>

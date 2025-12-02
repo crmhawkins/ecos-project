@@ -195,6 +195,13 @@ class AiAssistantService
      */
     protected function callOpenAI($messages)
     {
+        if (empty($this->apiKey)) {
+            // Si no hay API key configurada, devolver un mensaje claro pero sin lanzar excepción
+            Log::warning('AiAssistantService: falta OPENAI_API_KEY o services.openai.api_key');
+            return 'Por ahora el asistente no tiene conexión con el modelo de IA. '
+                .'Informa a la academia de que falta configurar la clave de OpenAI para activar las respuestas automáticas.';
+        }
+
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->apiKey,
             'Content-Type' => 'application/json',

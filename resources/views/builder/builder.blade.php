@@ -362,6 +362,37 @@
         </div>
     </div>
 
+    {{-- Modal Editor de Atributos (como código JSON) --}}
+    <div id="attributesCodeModal" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-secondary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-code"></i> Atributos del elemento
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        Edita los atributos del elemento en formato JSON. Solo modifica esto si sabes lo que haces.
+                    </div>
+                    <textarea id="attributesCodeTextarea" class="form-control" rows="14" style="font-family: monospace;"></textarea>
+                    <small class="text-muted d-block mt-2">
+                        Ejemplo: { "href": "#", "title": "Mi enlace" }
+                    </small>
+                    <div id="attributesCodeError" class="text-danger mt-2" style="display:none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAttributesFromModal()">
+                        <i class="bi bi-save"></i> Guardar atributos
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Modal de confirmación --}}
     <div id="saveConfirmModal" class="modal fade" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -714,6 +745,200 @@
                 changeProp: 1,
             }, { at: decorSector.getProperties().length });
         }
+
+        // ================================
+        // Panel de PRESETS DE ESTILO
+        // ================================
+        const stylePresets = [
+            { id: 'preset-btn-primary', label: 'Botón primario', className: 'btn-primary-custom' },
+            { id: 'preset-btn-secondary', label: 'Botón secundario', className: 'btn-secondary-custom' },
+            { id: 'preset-card-modern', label: 'Card moderna', className: 'modern-card' },
+            { id: 'preset-section-gradient', label: 'Sección degradada', className: 'gradient-section' },
+        ];
+
+        editor.Commands.add('open-style-presets', {
+            run(ed) {
+                const modal = ed.Modal;
+
+                const wrapper = document.createElement('div');
+                wrapper.style.padding = '10px';
+
+                const info = document.createElement('p');
+                info.textContent = 'Selecciona un elemento en el lienzo y luego aplica uno de los presets de estilo:';
+                info.style.fontSize = '13px';
+                info.style.marginBottom = '10px';
+                wrapper.appendChild(info);
+
+                const grid = document.createElement('div');
+                grid.style.display = 'grid';
+                grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(120px, 1fr))';
+                grid.style.gap = '8px';
+
+                stylePresets.forEach(preset => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.textContent = preset.label;
+                    btn.dataset.presetClass = preset.className;
+                    btn.style.border = '1px solid #e5e7eb';
+                    btn.style.borderRadius = '6px';
+                    btn.style.padding = '8px 10px';
+                    btn.style.fontSize = '12px';
+                    btn.style.cursor = 'pointer';
+                    btn.style.background = '#f9fafb';
+                    btn.style.textAlign = 'left';
+                    btn.style.transition = 'background 0.15s ease';
+                    btn.onmouseenter = () => btn.style.background = '#eef2ff';
+                    btn.onmouseleave = () => btn.style.background = '#f9fafb';
+                    grid.appendChild(btn);
+                });
+
+                wrapper.appendChild(grid);
+
+                const status = document.createElement('div');
+                status.style.marginTop = '10px';
+                status.style.fontSize = '12px';
+                status.style.color = '#6b7280';
+                wrapper.appendChild(status);
+
+                wrapper.querySelectorAll('[data-preset-class]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const selected = ed.getSelected();
+                        if (!selected) {
+                            status.textContent = 'Selecciona primero un elemento en el lienzo.';
+                            status.style.color = '#dc2626';
+                            return;
+                        }
+
+                        const cls = btn.dataset.presetClass;
+                        if (!cls) return;
+
+                        // Añadir la clase de preset y dejar que el usuario gestione otras clases desde el panel de selectores
+                        selected.addClass(cls);
+                        status.textContent = `Preset "${btn.textContent}" aplicado.`;
+                        status.style.color = '#16a34a';
+                    });
+                });
+
+                modal.setTitle('Presets de estilo');
+                modal.setContent(wrapper);
+                modal.open();
+            },
+        });
+
+        // Botón en la barra de opciones para abrir los presets
+        editor.Panels.addButton('options', {
+            id: 'open-style-presets',
+            className: 'fa fa-magic',
+            command: 'open-style-presets',
+            attributes: { title: 'Presets de estilo' },
+        });
+
+        // ================================
+        // Estilos por defecto en bloques básicos
+        // ================================
+        editor.on('component:add', comp => {
+            const tag = (comp.get('tagName') || '').toLowerCase();
+            const type = comp.get('type');
+
+            // Botones básicos → estilo primario por defecto
+            if (tag === 'button' || (tag === 'a' && (comp.getAttributes() || {}).role === 'button')) {
+                if (!comp.getClasses().includes('btn-primary-custom')) {
+                    comp.addClass('btn-primary-custom');
+                }
+            }
+
+            // Tarjetas/div contenedor con intención de card → estilo de card moderna
+            if (tag === 'div' && type === 'default') {
+                const classes = comp.getClasses() || [];
+                if (classes.includes('card') && !classes.includes('modern-card')) {
+                    comp.addClass('modern-card');
+                }
+            }
+
+            // Secciones vacías → sección degradada por defecto
+            if (tag === 'section' && comp.components().length === 0) {
+                if (!comp.getClasses().includes('gradient-section')) {
+                    comp.addClass('gradient-section');
+                }
+            }
+        });
+
+        // ================================
+        // Editor de atributos como JSON (modal)
+        // ================================
+        editor.Commands.add('open-attributes-code-modal', {
+            run(ed) {
+                const selected = ed.getSelected();
+                if (!selected) {
+                    showNotification('Selecciona primero un elemento para ver sus atributos.', 'info');
+                    return;
+                }
+                currentAttributesComponent = selected;
+                const attrs = selected.getAttributes() || {};
+                const textarea = document.getElementById('attributesCodeTextarea');
+                const errorDiv = document.getElementById('attributesCodeError');
+                if (textarea) {
+                    textarea.value = JSON.stringify(attrs, null, 2);
+                }
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                    errorDiv.textContent = '';
+                }
+                if (attributesCodeModal) {
+                    attributesCodeModal.show();
+                }
+            },
+        });
+
+        editor.Panels.addButton('options', {
+            id: 'open-attributes-code-modal',
+            className: 'fa fa-code',
+            command: 'open-attributes-code-modal',
+            attributes: { title: 'Editar atributos como código (JSON)' },
+        });
+
+        // ================================
+        // Duplicar bloque sin solaparlo
+        // ================================
+        editor.Commands.add('clone-clean', {
+            run(ed) {
+                const selected = ed.getSelected();
+                if (!selected) {
+                    return;
+                }
+
+                const parent = selected.parent();
+                if (!parent) {
+                    return;
+                }
+
+                const collection = parent.components();
+                const index = collection.indexOf(selected);
+                const clone = selected.clone();
+
+                // Quitar estilos de posicionamiento absoluto que provocan solapamientos
+                const styleToClean = ['position', 'top', 'left', 'right', 'bottom'];
+                const currentStyle = clone.getStyle() || {};
+                styleToClean.forEach(prop => {
+                    if (prop in currentStyle) {
+                        delete currentStyle[prop];
+                    }
+                });
+                clone.setStyle(currentStyle);
+
+                // Insertar el clon justo después del bloque original
+                collection.add(clone, { at: index + 1 });
+                ed.select(clone);
+            },
+        });
+
+        // Botón global para duplicar el bloque seleccionado usando el comando anterior
+        editor.Panels.addButton('options', {
+            id: 'clone-clean',
+            className: 'fa fa-clone',
+            command: 'clone-clean',
+            attributes: { title: 'Duplicar bloque (sin solapar)' },
+        });
         
         // Añadir CSS inicial del archivo si existe
         @if(!empty($initialCss))
@@ -815,24 +1040,26 @@
             }
         }
         
-        if (component && component.get('type') === 'video') {
+        if (component && (component.get('type') === 'video' || component.get('type') === 'image')) {
             const assetManager = editor.AssetManager;
 
             assetManager.open({
                 select: (asset) => {
                     const src = asset.get('src');
 
-                    // Establece el atributo src en el componente
+                    // Establece el atributo src en el componente seleccionado
                     component.setAttributes({ src: src });
 
-                    // ✅ Actualiza el trait manualmente
+                    // Actualiza también el trait "src" para que quede sincronizado
                     const traits = component.get('traits');
-                    const srcTrait = traits.find(tr => tr.get('name') === 'src');
-                    if (srcTrait) {
-                        srcTrait.set('value', src);
+                    if (traits && traits.length) {
+                        const srcTrait = traits.find(tr => tr.get('name') === 'src');
+                        if (srcTrait) {
+                            srcTrait.set('value', src);
+                        }
                     }
 
-                    component.view.render(); // fuerza render
+                    component.view && component.view.render(); // fuerza render
 
                     assetManager.close();
                 }
@@ -1310,11 +1537,21 @@ let cssEditorModal = null;
 let customCssEditor = null;
 let customCss = '';
 
+// Modal y estado para editor de atributos como código
+let attributesCodeModal = null;
+let currentAttributesComponent = null;
+
 // Inicializar modal y editor CSS
 setTimeout(function() {
     const modalElement = document.getElementById('cssEditorModal');
     if (modalElement) {
         cssEditorModal = new bootstrap.Modal(modalElement);
+    }
+    
+    // Inicializar modal de atributos
+    const attrsModalElement = document.getElementById('attributesCodeModal');
+    if (attrsModalElement) {
+        attributesCodeModal = new bootstrap.Modal(attrsModalElement);
     }
     
     // Inicializar CodeMirror cuando el modal se muestre
@@ -1397,6 +1634,38 @@ function clearCustomCss() {
             }
         }
         showNotification('CSS personalizado limpiado', 'info');
+    }
+}
+
+function saveAttributesFromModal() {
+    if (!currentAttributesComponent) {
+        return;
+    }
+
+    const textarea = document.getElementById('attributesCodeTextarea');
+    const errorDiv = document.getElementById('attributesCodeError');
+    if (!textarea) return;
+
+    errorDiv.style.display = 'none';
+    errorDiv.textContent = '';
+
+    try {
+        const parsed = JSON.parse(textarea.value || '{}');
+        if (typeof parsed !== 'object' || Array.isArray(parsed)) {
+            throw new Error('El JSON debe representar un objeto de atributos (clave/valor).');
+        }
+
+        currentAttributesComponent.setAttributes(parsed);
+        currentAttributesComponent.view && currentAttributesComponent.view.render();
+
+        if (attributesCodeModal) {
+            attributesCodeModal.hide();
+        }
+
+        showNotification('Atributos actualizados correctamente', 'success');
+    } catch (e) {
+        errorDiv.textContent = 'Error al parsear JSON: ' + e.message;
+        errorDiv.style.display = 'block';
     }
 }
 

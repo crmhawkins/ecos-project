@@ -17,6 +17,7 @@ use App\Services\CoursesSyncService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Blog\BlogPost;
 
 class WebController extends Controller
@@ -159,6 +160,36 @@ class WebController extends Controller
             'isInCart', 
             'cursosRelacionados'
         ));
+    }
+
+    /**
+     * Manejar envíos del formulario de contacto generado desde el builder.
+     */
+    public function handleContactForm(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'subject' => 'nullable|string|max:255',
+            'message' => 'required|string|max:5000',
+        ]);
+
+        $to = config('mail.contact_to', config('mail.from.address'));
+
+        Mail::raw(
+            "Nombre: {$data['name']}\nEmail: {$data['email']}\n\nMensaje:\n{$data['message']}",
+            function ($message) use ($data, $to) {
+                $subject = $data['subject'] ?: 'Nuevo mensaje de formulario de contacto';
+                $message->to($to)
+                    ->subject($subject);
+            }
+        );
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => 'ok']);
+        }
+
+        return back()->with('success', 'Gracias, hemos recibido tu mensaje correctamente.');
     }
 
     public function register(Request $request)

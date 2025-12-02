@@ -344,17 +344,82 @@ class BuilderController extends Controller
         $seoPath = resource_path("views/webacademia/seo/seo_{$view}.blade.php");
         $content = File::exists($seoPath) ? File::get($seoPath) : '';
 
-        return view('builder.seo_editor', compact('view', 'content'));
+        $seo = [
+            'title' => '',
+            'description' => '',
+            'keywords' => '',
+            'canonical' => '',
+            'robots' => '',
+            'og_title' => '',
+            'og_description' => '',
+        ];
+
+        if (!empty($content)) {
+            if (preg_match('/<title>(.*?)<\/title>/s', $content, $m)) {
+                $seo['title'] = trim($m[1]);
+            }
+            if (preg_match('/<meta\s+name=["\']description["\']\s+content=["\'](.*?)["\']/si', $content, $m)) {
+                $seo['description'] = trim($m[1]);
+            }
+            if (preg_match('/<meta\s+name=["\']keywords["\']\s+content=["\'](.*?)["\']/si', $content, $m)) {
+                $seo['keywords'] = trim($m[1]);
+            }
+            if (preg_match('/<link\s+rel=["\']canonical["\']\s+href=["\'](.*?)["\']/si', $content, $m)) {
+                $seo['canonical'] = trim($m[1]);
+            }
+            if (preg_match('/<meta\s+name=["\']robots["\']\s+content=["\'](.*?)["\']/si', $content, $m)) {
+                $seo['robots'] = trim($m[1]);
+            }
+            if (preg_match('/<meta\s+property=["\']og:title["\']\s+content=["\'](.*?)["\']/si', $content, $m)) {
+                $seo['og_title'] = trim($m[1]);
+            }
+            if (preg_match('/<meta\s+property=["\']og:description["\']\s+content=["\'](.*?)["\']/si', $content, $m)) {
+                $seo['og_description'] = trim($m[1]);
+            }
+        }
+
+        return view('builder.seo_editor', compact('view', 'seo'));
     }
 
     public function saveSeo(Request $request)
     {
-        $view = $request->input('view');
-        $content = $request->input('seo_content');
+        $data = $request->validate([
+            'view' => 'required|string',
+            'title' => 'nullable|string|max:60',
+            'description' => 'nullable|string|max:160',
+            'keywords' => 'nullable|string|max:255',
+            'canonical' => 'nullable|string|max:255',
+            'robots' => 'nullable|string|max:50',
+            'og_title' => 'nullable|string|max:60',
+            'og_description' => 'nullable|string|max:160',
+        ]);
 
-        if (!$view) {
-            return back()->withErrors(['view' => 'Vista no especificada']);
+        $view = $data['view'];
+
+        $lines = [];
+        if (!empty($data['title'])) {
+            $lines[] = '<title>'.e($data['title']).'</title>';
         }
+        if (!empty($data['description'])) {
+            $lines[] = '<meta name="description" content="'.e($data['description']).'">';
+        }
+        if (!empty($data['keywords'])) {
+            $lines[] = '<meta name="keywords" content="'.e($data['keywords']).'">';
+        }
+        if (!empty($data['canonical'])) {
+            $lines[] = '<link rel="canonical" href="'.e($data['canonical']).'">';
+        }
+        if (!empty($data['robots'])) {
+            $lines[] = '<meta name="robots" content="'.e($data['robots']).'">';
+        }
+        if (!empty($data['og_title'])) {
+            $lines[] = '<meta property="og:title" content="'.e($data['og_title']).'">';
+        }
+        if (!empty($data['og_description'])) {
+            $lines[] = '<meta property="og:description" content="'.e($data['og_description']).'">';
+        }
+
+        $content = implode("\n", $lines);
 
         $seoPath = resource_path("views/webacademia/seo/seo_{$view}.blade.php");
         File::put($seoPath, $content);

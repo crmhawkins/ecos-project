@@ -22,5 +22,6 @@ class VerifyCsrfToken extends Middleware
         '/api/Proyectos',
         '/api/Servicios',
         '/builder/save',
+        '/contact/form-submit',
     ];
 }

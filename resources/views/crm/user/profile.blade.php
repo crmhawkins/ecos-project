@@ -111,7 +111,9 @@
                     <div style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 1.2rem; color: white; background: #D93690;">
                         <i class="fas fa-calendar-alt"></i>
                     </div>
-                    <div style="font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 4px;">{{ $user->created_at->diffInDays(now()) }}</div>
+                    <div style="font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 4px;">
+                        {{ optional($user->created_at)->diffInDays(now()) ?? 0 }}
+                    </div>
                     <div style="color: #6b7280; font-size: 0.9rem; font-weight: 500;">Días activo</div>
                 </div>
                 

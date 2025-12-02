@@ -439,22 +439,8 @@
             content: {
                 type: 'custom-html',
                 classes: ['custom-html-block'],
-                components: [
-                    {
-                        type: 'textnode',
-                        content: '<!-- Inserta tu código HTML aquí -->'
-                    }
-                ],
-                editable: true,
-                droppable: false,
-                traits: [
-                    {
-                        type: 'textarea',
-                        name: 'html',
-                        label: 'Código HTML',
-                        placeholder: 'Inserta tu código HTML personalizado aquí...'
-                    }
-                ]
+                editable: false,
+                droppable: false
             },
             style: `
                 .custom-html-block {
@@ -476,6 +462,172 @@
                     text-transform: uppercase;
                 }
             `
+        },
+
+        // Formulario de contacto básico
+        contactForm: {
+            label: 'Formulario de Contacto',
+            category: 'Preestilizados',
+            content: `
+                <section class="contact-form-section">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <h2 class="contact-form-title">Envíanos un mensaje</h2>
+                                <p class="contact-form-subtitle">Rellena el siguiente formulario y nos pondremos en contacto contigo lo antes posible.</p>
+                                <form class="contact-form" method="POST" action="/contact/form-submit">
+                                    <div class="contact-form-row">
+                                        <div class="contact-form-group">
+                                            <label for="cf-name">Nombre completo</label>
+                                            <input type="text" id="cf-name" name="name" placeholder="Tu nombre" required>
+                                        </div>
+                                        <div class="contact-form-group">
+                                            <label for="cf-email">Email</label>
+                                            <input type="email" id="cf-email" name="email" placeholder="tu@email.com" required>
+                                        </div>
+                                    </div>
+                                    <div class="contact-form-group">
+                                        <label for="cf-subject">Asunto</label>
+                                        <input type="text" id="cf-subject" name="subject" placeholder="¿Sobre qué quieres hablar?">
+                                    </div>
+                                    <div class="contact-form-group">
+                                        <label for="cf-message">Mensaje</label>
+                                        <textarea id="cf-message" name="message" rows="4" placeholder="Cuéntanos en qué podemos ayudarte" required></textarea>
+                                    </div>
+                                    <button type="submit" class="contact-form-btn">Enviar mensaje</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            `,
+            style: `
+                .contact-form-section {
+                    padding: 80px 0;
+                    background: linear-gradient(135deg, #f8fafc 0%, #e5e7eb 100%);
+                }
+                .contact-form-title {
+                    text-align: center;
+                    font-weight: 800;
+                    font-size: 2.2rem;
+                    margin-bottom: 10px;
+                    color: #1f2937;
+                }
+                .contact-form-subtitle {
+                    text-align: center;
+                    color: #6b7280;
+                    margin-bottom: 30px;
+                }
+                .contact-form {
+                    background: #ffffff;
+                    border-radius: 16px;
+                    padding: 30px;
+                    box-shadow: 0 10px 30px rgba(15,23,42,0.12);
+                    border: 1px solid #e5e7eb;
+                }
+                .contact-form-row {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+                    gap: 20px;
+                }
+                .contact-form-group {
+                    margin-bottom: 20px;
+                }
+                .contact-form-group label {
+                    display: block;
+                    margin-bottom: 6px;
+                    font-weight: 600;
+                    color: #374151;
+                    font-size: 0.95rem;
+                }
+                .contact-form-group input,
+                .contact-form-group textarea {
+                    width: 100%;
+                    border-radius: 10px;
+                    border: 2px solid #e5e7eb;
+                    padding: 10px 14px;
+                    font-size: 0.95rem;
+                    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+                    font-family: inherit;
+                }
+                .contact-form-group input:focus,
+                .contact-form-group textarea:focus {
+                    outline: none;
+                    border-color: #D93690;
+                    box-shadow: 0 0 0 3px rgba(217,54,144,0.15);
+                }
+                .contact-form-btn {
+                    background: linear-gradient(135deg, #D93690 0%, #8B5CF6 100%);
+                    color: #ffffff;
+                    border: none;
+                    border-radius: 999px;
+                    padding: 12px 28px;
+                    font-weight: 600;
+                    font-size: 0.95rem;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    cursor: pointer;
+                    transition: transform 0.15s ease, box-shadow 0.15s ease;
+                }
+                .contact-form-btn:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 8px 18px rgba(217,54,144,0.35);
+                }
+            `
+        },
+
+        // Fila de columnas configurable
+        columnsRow: {
+            label: 'Columnas',
+            category: 'Diseño',
+            content: `
+                <div class="ecos-columns-row" data-columns="3" data-equal="1">
+                    <div class="ecos-column"><p>Columna 1</p></div>
+                    <div class="ecos-column"><p>Columna 2</p></div>
+                    <div class="ecos-column"><p>Columna 3</p></div>
+                </div>
+            `,
+            style: `
+                .ecos-columns-row {
+                    display: flex;
+                    gap: 24px;
+                    margin-bottom: 30px;
+                }
+                .ecos-column {
+                    background: #ffffff;
+                    border-radius: 16px;
+                    padding: 24px 20px;
+                    box-shadow: 0 10px 25px rgba(15,23,42,0.08);
+                    border: 1px solid #e5e7eb;
+                    min-height: 80px;
+                    flex: 1 1 0;
+                    position: relative;
+                }
+                .ecos-column-resizer {
+                    position: absolute;
+                    top: 0;
+                    right: -12px;
+                    width: 16px;
+                    height: 100%;
+                    cursor: col-resize;
+                    z-index: 5;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .ecos-column-resizer::before {
+                    content: '';
+                    width: 3px;
+                    height: 40px;
+                    border-radius: 999px;
+                    background: rgba(15,23,42,0.3);
+                }
+                .ecos-columns-row.dragging {
+                    user-select: none;
+                }
+            `
         }
     };
 
@@ -495,16 +647,171 @@
             }
         });
 
+        // Registrar componente personalizado para Card moderna
+        domc.addType('card-modern', {
+            model: {
+                defaults: {
+                    tagName: 'div',
+                    classes: ['modern-card'],
+                    selectable: true,
+                    draggable: true,
+                    droppable: true,
+                    traits: []
+                }
+            }
+        });
+
+        // Componente para fila de columnas configurable
+        domc.addType('ecos-columns-row', {
+            model: {
+                defaults: {
+                    tagName: 'div',
+                    classes: ['ecos-columns-row'],
+                    attributes: {
+                        'data-columns': 3,
+                        'data-equal': 1,
+                    },
+                    traits: [
+                        {
+                            type: 'number',
+                            name: 'data-columns',
+                            label: 'Nº columnas',
+                            min: 1,
+                            max: 4,
+                            step: 1,
+                            changeProp: 1,
+                        },
+                        {
+                            type: 'checkbox',
+                            name: 'data-equal',
+                            label: 'Columnas iguales',
+                            valueTrue: 1,
+                            valueFalse: 0,
+                            changeProp: 1,
+                        },
+                    ],
+                },
+                init() {
+                    this.on('change:attributes', this.updateColumnsFromAttrs);
+                    this.updateColumnsFromAttrs();
+                },
+                updateColumnsFromAttrs() {
+                    const attrs = this.getAttributes() || {};
+                    const columns = Math.min(4, Math.max(1, parseInt(attrs['data-columns'] || 3, 10)));
+                    const equal = String(attrs['data-equal'] || '1') === '1';
+
+                    // Asegurar número de hijos ecos-column
+                    const currentChildren = this.components().filter(c => c.get('tagName') === 'div');
+                    const diff = columns - currentChildren.length;
+
+                    if (diff > 0) {
+                        for (let i = 0; i < diff; i++) {
+                            this.append({
+                                type: 'default',
+                                tagName: 'div',
+                                classes: ['ecos-column'],
+                                content: `<p>Columna ${currentChildren.length + i + 1}</p>`,
+                            });
+                        }
+                    } else if (diff < 0) {
+                        for (let i = 0; i < Math.abs(diff); i++) {
+                            const child = currentChildren.at(currentChildren.length - 1 - i);
+                            if (child) child.remove();
+                        }
+                    }
+
+                    if (equal) {
+                        // Todas las columnas al mismo ancho usando flex
+                        currentChildren.forEach(child => {
+                            child.addStyle({ flex: `1 1 ${100 / columns}%` });
+                        });
+                    }
+                },
+            },
+            view: {
+                events: {
+                    mousedown: 'onMouseDown',
+                },
+                onRender() {
+                    // Añadir resizers entre columnas solo en el builder
+                    const el = this.el;
+                    const columns = Array.from(el.querySelectorAll('.ecos-column'));
+                    // Limpiar resizers previos
+                    el.querySelectorAll('.ecos-column-resizer').forEach(r => r.remove());
+
+                    columns.forEach((col, index) => {
+                        if (index === columns.length - 1) return; // último sin resizer
+                        const resizer = document.createElement('div');
+                        resizer.className = 'ecos-column-resizer';
+                        resizer.dataset.colIndex = index;
+                        col.appendChild(resizer);
+                    });
+                },
+                onMouseDown(ev) {
+                    const target = ev.target.closest('.ecos-column-resizer');
+                    if (!target) return;
+
+                    ev.preventDefault();
+                    const rowEl = this.el;
+                    const colIndex = parseInt(target.dataset.colIndex, 10);
+                    const columns = Array.from(rowEl.querySelectorAll('.ecos-column'));
+                    const leftCol = columns[colIndex];
+                    const rightCol = columns[colIndex + 1];
+                    if (!leftCol || !rightCol) return;
+
+                    const startX = ev.clientX;
+                    const rowRect = rowEl.getBoundingClientRect();
+                    const totalWidth = rowRect.width;
+
+                    const getPercent = (el) => {
+                        const rect = el.getBoundingClientRect();
+                        return (rect.width / totalWidth) * 100;
+                    };
+
+                    let leftWidth = getPercent(leftCol);
+                    let rightWidth = getPercent(rightCol);
+
+                    const minPercent = 15;
+
+                    const onMouseMove = (e) => {
+                        const deltaX = e.clientX - startX;
+                        const deltaPercent = (deltaX / totalWidth) * 100;
+                        let newLeft = leftWidth + deltaPercent;
+                        let newRight = rightWidth - deltaPercent;
+
+                        if (newLeft < minPercent || newRight < minPercent) return;
+
+                        leftCol.style.flex = `0 0 ${newLeft}%`;
+                        rightCol.style.flex = `0 0 ${newRight}%`;
+                        rowEl.classList.add('dragging');
+                    };
+
+                    const onMouseUp = () => {
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                        rowEl.classList.remove('dragging');
+                    };
+
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                },
+            },
+        });
+
         // Registrar componente personalizado para HTML
         domc.addType('custom-html', {
             model: {
                 defaults: {
                     tagName: 'div',
                     classes: ['custom-html-block'],
+                    // El contenido HTML se guarda en este atributo
+                    attributes: {
+                        'data-html-content': '<!-- Inserta tu código HTML aquí -->'
+                    },
                     traits: [
                         {
                             type: 'textarea',
-                            name: 'html',
+                            name: 'data-html-content',
                             label: 'Código HTML',
                             placeholder: 'Inserta tu código HTML personalizado aquí...',
                             changeProp: 1
@@ -512,21 +819,22 @@
                     ]
                 },
                 init() {
-                    this.on('change:html', this.updateHtml);
+                    this.on('change:attributes', this.updateHtmlFromAttr);
+                    // Render inicial desde el atributo
+                    this.updateHtmlFromAttr();
                 },
-                updateHtml() {
-                    const html = this.get('html') || '';
-                    if (html) {
-                        this.set('content', html);
-                    }
+                updateHtmlFromAttr() {
+                    const attrs = this.getAttributes() || {};
+                    const html = attrs['data-html-content'] || '<!-- Inserta tu código HTML aquí -->';
+                    this.components(html);
                 }
             },
             view: {
                 onRender() {
-                    const html = this.model.get('html') || '';
-                    if (html) {
-                        this.el.innerHTML = html;
-                    }
+                    const model = this.model;
+                    const attrs = model.getAttributes() || {};
+                    const html = attrs['data-html-content'] || '<!-- Inserta tu código HTML aquí -->';
+                    this.el.innerHTML = html;
                 }
             }
         });
@@ -551,22 +859,7 @@
             }
         });
 
-        // Manejar el trait de HTML personalizado
-        editor.on('component:selected', (component) => {
-            if (component && component.get('type') === 'custom-html') {
-                const traits = component.get('traits');
-                const htmlTrait = traits.find(t => t.get('name') === 'html');
-                if (htmlTrait) {
-                    htmlTrait.on('change', () => {
-                        const html = htmlTrait.getValue();
-                        if (html) {
-                            component.set('content', html);
-                            component.view.render();
-                        }
-                    });
-                }
-            }
-        });
+        // No es necesario un listener extra: el cambio se maneja en el propio modelo
     };
 
     // Exportar para uso global

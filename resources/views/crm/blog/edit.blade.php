@@ -3,7 +3,8 @@
 @section('titulo', 'Editar Artículo')
 
 @section('css')
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+{{-- Editor de texto: usar CKEditor local para evitar errores de carga del CDN --}}
+<script src="{{ asset('assets/vendors/ckeditor/ckeditor.js') }}"></script>
 <style>
     /* Variables específicas para el blog */
     :root {
@@ -592,22 +593,13 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar TinyMCE
-    tinymce.init({
-        selector: '#content',
-        height: 500,
-        menubar: false,
-        plugins: [
-            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'help', 'wordcount'
-        ],
-        toolbar: 'undo redo | blocks | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-        content_style: 'body { font-family: Inter, Arial, sans-serif; font-size: 16px; line-height: 1.6; }',
-        language: 'es',
-        branding: false,
-        promotion: false,
-    });
+    // Inicializar CKEditor clásico sobre el textarea de contenido
+    if (typeof CKEDITOR !== 'undefined') {
+        CKEDITOR.replace('content', {
+            language: 'es',
+            height: 400,
+        });
+    }
 
     // Manejo de archivo
     const fileInput = document.getElementById('featured_image');
