@@ -146,6 +146,9 @@
                         <button type="button" class="btn btn-outline-primary" onclick="showDuplicateModal()" title="Duplicar vista actual">
                             <i class="bi bi-files"></i>
                         </button>
+                            <button type="button" class="btn btn-outline-danger" onclick="showDeleteViewModal()" title="Borrar vista actual">
+                                <i class="bi bi-trash"></i>
+                            </button>
                     </div>
                 </form>
             </div>
@@ -207,6 +210,32 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary" onclick="executeDuplicate()">
                         <i class="bi bi-files"></i> Duplicar Vista
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Modal de borrar vista --}}
+    <div id="deleteViewModal" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle"></i> Borrar vista
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Vas a borrar la vista <strong id="deleteViewName">{{ str_replace('webacademia/pages/', '', $currentView) }}</strong>.</p>
+                    <p class="text-danger small mb-0">
+                        Esta acción no se puede deshacer. Asegúrate de que la vista no se usa en el menú ni en enlaces externos.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" onclick="executeDeleteView()">
+                        <i class="bi bi-trash"></i> Sí, borrar vista
                     </button>
                 </div>
             </div>
@@ -1429,12 +1458,17 @@ window.addEventListener('beforeunload', function(e) {
 // ============================================
 
 let duplicateModal = null;
+let deleteViewModal = null;
 
 // Inicializar modal de duplicar
 setTimeout(function() {
     const modalElement = document.getElementById('duplicateModal');
     if (modalElement) {
         duplicateModal = new bootstrap.Modal(modalElement);
+    }
+    const deleteModalElement = document.getElementById('deleteViewModal');
+    if (deleteModalElement) {
+        deleteViewModal = new bootstrap.Modal(deleteModalElement);
     }
 }, 500);
 
@@ -1453,6 +1487,57 @@ function showDuplicateModal() {
     if (duplicateModal) {
         duplicateModal.show();
     }
+}
+
+function showDeleteViewModal() {
+    const modalElement = document.getElementById('deleteViewModal');
+    if (!deleteViewModal && modalElement) {
+        deleteViewModal = new bootstrap.Modal(modalElement);
+    }
+    const nameSpan = document.getElementById('deleteViewName');
+    if (nameSpan) {
+        nameSpan.textContent = '{{ str_replace('webacademia/pages/', '', $currentView) }}';
+    }
+    if (deleteViewModal) {
+        deleteViewModal.show();
+    }
+}
+
+function executeDeleteView() {
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const view = '{{ str_replace('webacademia/pages/', '', $currentView) }}';
+
+    if (!view) {
+        alert('Vista no válida');
+        return;
+    }
+
+    fetch('/builder/delete', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ view: view })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'ok') {
+            showNotification('Vista borrada correctamente', 'success');
+            if (deleteViewModal) {
+                deleteViewModal.hide();
+            }
+            // Redirigir a la home del builder
+            window.location.href = '/builder';
+        } else {
+            alert(data.error || 'Error al borrar la vista');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Error al borrar la vista');
+    });
 }
 
 function executeDuplicate() {

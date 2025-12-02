@@ -339,6 +339,42 @@ class BuilderController extends Controller
         return redirect()->route('builder', ['view' => "webacademia/pages/{$viewName}"]);
     }
 
+    /**
+     * Eliminar una vista de webacademia/pages con comprobaciones básicas.
+     */
+    public function delete(Request $request)
+    {
+        $viewName = $request->input('view');
+
+        if (!$viewName) {
+            return response()->json(['error' => 'Vista no especificada'], 400);
+        }
+
+        // Normalizar: si viene "webacademia/pages/index", quedarnos solo con "index"
+        $viewName = urldecode($viewName);
+        if (strpos($viewName, '/') !== false) {
+            $parts = explode('/', $viewName);
+            $viewName = end($parts);
+        }
+
+        // Proteger vistas críticas
+        $protected = ['index', 'footer'];
+        if (in_array($viewName, $protected, true)) {
+            return response()->json(['error' => 'Esta vista no se puede borrar desde el editor'], 403);
+        }
+
+        $path = resource_path("views/webacademia/pages/{$viewName}.blade.php");
+        if (!File::exists($path)) {
+            return response()->json(['error' => 'La vista no existe'], 404);
+        }
+
+        // TODO opcional: comprobar si está en el menú antes de borrar
+
+        File::delete($path);
+
+        return response()->json(['status' => 'ok']);
+    }
+
     public function seo($view)
     {
         $seoPath = resource_path("views/webacademia/seo/seo_{$view}.blade.php");

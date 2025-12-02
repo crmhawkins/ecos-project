@@ -73,6 +73,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/builder/save', [BuilderController::class, 'save'])->name('builder.save');
     Route::post('/builder/upload', [BuilderController::class, 'upload']);
     Route::post('/builder/create', [BuilderController::class, 'create'])->name('builder.create');
+    Route::delete('/builder/delete', [BuilderController::class, 'delete'])->name('builder.delete');
     Route::get('/builder/seo/{view}', [BuilderController::class, 'seo'])->name('builder.seo');
     Route::post('/builder/seo/save', [BuilderController::class, 'saveSeo'])->name('builder.seo.save');
     Route::post('/builder/duplicate', [BuilderController::class, 'duplicate'])->name('builder.duplicate');
