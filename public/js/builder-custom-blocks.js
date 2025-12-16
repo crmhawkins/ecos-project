@@ -635,6 +635,38 @@
     const customBlocksPlugin = (editor) => {
         const blockManager = editor.BlockManager;
         const domc = editor.DomComponents;
+        
+        // Función para inyectar todos los estilos de bloques personalizados en el canvas
+        const injectAllBlockStyles = () => {
+            try {
+                const canvas = editor.Canvas;
+                const canvasDoc = canvas.getDocument();
+                if (!canvasDoc || !canvasDoc.head) return;
+                
+                const canvasHead = canvasDoc.head;
+                let styleTag = canvasHead.querySelector('style[data-custom-blocks-css]');
+                if (!styleTag) {
+                    styleTag = canvasDoc.createElement('style');
+                    styleTag.setAttribute('data-custom-blocks-css', 'true');
+                    canvasHead.appendChild(styleTag);
+                }
+                
+                // Recopilar todos los estilos de los bloques personalizados
+                let allStyles = '';
+                Object.keys(customBlocks).forEach(key => {
+                    const block = customBlocks[key];
+                    if (block.style) {
+                        allStyles += '\n' + block.style;
+                    }
+                });
+                
+                // Añadir todos los estilos de una vez
+                styleTag.textContent = allStyles.trim();
+                console.log('Estilos de bloques personalizados inyectados en canvas');
+            } catch (e) {
+                console.warn('Error al inyectar estilos de bloques en canvas:', e);
+            }
+        };
 
         // Registrar componente personalizado para hero-section
         domc.addType('hero-section', {
@@ -854,9 +886,26 @@
             // Añadir los estilos CSS al editor cuando se carga
             if (block.style) {
                 editor.on('load', () => {
+                    // Añadir al CSS de GrapesJS
                     editor.Css.add(block.style);
                 });
             }
+        });
+        
+        // Inyectar todos los estilos de bloques personalizados en el canvas
+        editor.on('load', () => {
+            // Inyectar inmediatamente
+            setTimeout(injectAllBlockStyles, 100);
+        });
+        
+        // También inyectar cuando el canvas se carga
+        editor.on('canvas:frame:load', () => {
+            setTimeout(injectAllBlockStyles, 100);
+        });
+        
+        // Inyectar cuando se añade un componente (por si el canvas ya estaba cargado)
+        editor.on('component:add', () => {
+            setTimeout(injectAllBlockStyles, 100);
         });
 
         // No es necesario un listener extra: el cambio se maneja en el propio modelo

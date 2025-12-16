@@ -230,6 +230,23 @@ class BuilderController extends Controller
         $css = $this->sanitizeCss($css);
         $customCss = $this->sanitizeCss($customCss);
         
+        // Limpiar el HTML: remover etiquetas <body>, <html>, <!DOCTYPE> si existen
+        // El archivo Blade solo debe contener el contenido del body, no las etiquetas
+        $html = preg_replace('/<!DOCTYPE[^>]*>/i', '', $html);
+        $html = preg_replace('/<html[^>]*>/i', '', $html);
+        $html = preg_replace('/<\/html>/i', '', $html);
+        
+        // Extraer el contenido interno de <body> si existe
+        if (preg_match('/<body[^>]*>(.*?)<\/body>/is', $html, $bodyMatches)) {
+            $html = $bodyMatches[1];
+        } else {
+            // Si no hay <body>, remover cualquier etiqueta <body> suelta
+            $html = preg_replace('/<body[^>]*>/i', '', $html);
+            $html = preg_replace('/<\/body>/i', '', $html);
+        }
+        
+        $html = trim($html);
+        
         // Construir el HTML final con CSS separado
         $styleBlocks = [];
         

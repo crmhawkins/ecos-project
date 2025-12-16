@@ -5,7 +5,8 @@
 
 
     {{-- CSS del editor --}}
-    <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet">
+    {{-- CSS local de GrapesJS para no depender del CDN --}}
+    <link href="{{ asset('vendor/grapesjs/grapes.min.css') }}" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
@@ -13,10 +14,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     {{-- CodeMirror para editor de CSS --}}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+    <link rel="stylesheet" href="{{ asset('vendor/codemirror/codemirror.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/codemirror/monokai.min.css') }}">
+    <script src="{{ asset('vendor/codemirror/codemirror.min.js') }}"></script>
+    <script src="{{ asset('vendor/codemirror/css.min.js') }}"></script>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; }
         #gjs { height: 100% !important; }
@@ -453,11 +454,22 @@
 
     <div id="gjs">{!! $html !!}</div>
 
-    <script src="https://unpkg.com/grapesjs"></script>
-    <script src="https://unpkg.com/grapesjs-blocks-basic"></script>
-    <script src="https://unpkg.com/grapesjs-preset-webpage"></script>
-    <script src="https://unpkg.com/grapesjs-tabs"></script>
+    {{-- Cargar GrapesJS desde copias locales (sin depender del CDN) --}}
+    <script src="{{ asset('vendor/grapesjs/grapes.min.js') }}"></script>
+    <script src="{{ asset('vendor/grapesjs/grapesjs-blocks-basic.min.js') }}"></script>
+    <script src="{{ asset('vendor/grapesjs/grapesjs-preset-webpage.min.js') }}"></script>
     <script src="{{ asset('js/builder-custom-blocks.js') }}"></script>
+    {{-- Cargar grapesjs-tabs de forma opcional --}}
+    <script>
+    (function() {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/grapesjs-tabs@1.0.6';
+        script.onerror = function() {
+            console.warn('grapesjs-tabs no se pudo cargar, continuando sin él');
+        };
+        document.head.appendChild(script);
+    })();
+    </script>
     <script>
     let editor;
     
@@ -493,8 +505,8 @@
         return temp.innerHTML;
     }
     
-    // Esperar a que el DOM esté completamente cargado
-    document.addEventListener('DOMContentLoaded', function() {
+    // Función para inicializar el editor
+    function initializeEditor() {
         try {
             // Verificar que el contenedor existe
             const container = document.getElementById('gjs');
@@ -505,7 +517,20 @@
             
             // Limpiar el HTML antes de que GrapesJS lo procese
             const originalHtml = container.innerHTML;
-            container.innerHTML = cleanHtmlForGrapesJS(originalHtml);
+            let cleanedHtml = cleanHtmlForGrapesJS(originalHtml);
+            
+            // FORZAR que los h1 con data-gjs-editable sean tratados como texto editable
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = cleanedHtml;
+            const h1Elements = tempDiv.querySelectorAll('h1[data-gjs-editable="true"]');
+            h1Elements.forEach(h1 => {
+                // Asegurar que el h1 tenga contenteditable
+                h1.setAttribute('contenteditable', 'true');
+                // Remover data-gjs-editable después de procesar
+                h1.removeAttribute('data-gjs-editable');
+            });
+            cleanedHtml = tempDiv.innerHTML;
+            container.innerHTML = cleanedHtml;
             
             editor = grapesjs.init({
                 container: '#gjs',
@@ -514,13 +539,11 @@
                 plugins: [
                     'gjs-blocks-basic',
                     'grapesjs-preset-webpage',
-                    'grapesjs-tabs',
                     'custom-blocks'
                 ],
                 pluginsOpts: {
                     'gjs-blocks-basic': {},
                     'grapesjs-preset-webpage': {},
-                    'grapesjs-tabs': {},
                     'custom-blocks': {}
                 },
         assetManager: {
@@ -538,6 +561,10 @@
             autoload: false, // Desactivado porque usamos fromElement: true
             autosave: false, // Desactivado - se guarda manualmente
             stepsBeforeSave: 999, // Número alto para evitar autoguardado
+        },
+        // Habilitar Rich Text Editor para elementos de texto
+        richTextEditor: {
+            actions: ['bold', 'italic', 'underline', 'strikethrough', 'link'],
         },
         canvas: {
             styles: [
@@ -893,6 +920,269 @@
         });
 
         // ================================
+        // Comando para editar texto directamente usando Rich Text Editor
+        // ================================
+        editor.Commands.add('edit-text', {
+            run(ed) {
+                const selected = ed.getSelected();
+                if (!selected) {
+                    showNotification('Selecciona primero un elemento de texto para editar.', 'info');
+                    return;
+                }
+                
+                const tagName = (selected.get('tagName') || '').toLowerCase();
+                const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
+                
+                if (!textElements.includes(tagName)) {
+                    showNotification('Este elemento no es un elemento de texto editable.', 'warning');
+                    return;
+                }
+                
+                // Usar el Rich Text Editor de GrapesJS si está disponible
+                if (ed.RichTextEditor) {
+                    const rte = ed.RichTextEditor;
+                    if (rte.isActive()) {
+                        rte.stop();
+                    } else {
+                        rte.enable(selected);
+                    }
+                } else {
+                    // Fallback: hacer editable directamente
+                    const el = selected.getEl();
+                    if (el) {
+                        el.setAttribute('contenteditable', 'true');
+                        el.style.cursor = 'text';
+                        el.style.userSelect = 'text';
+                        el.focus();
+                        
+                        const frameWin = ed.Canvas.getWindow();
+                        const frameDoc = ed.Canvas.getDocument();
+                        if (frameWin.getSelection) {
+                            const selection = frameWin.getSelection();
+                            const range = frameDoc.createRange();
+                            range.selectNodeContents(el);
+                            selection.removeAllRanges();
+                            selection.addRange(range);
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Añadir botón para editar texto en la barra de herramientas
+        editor.Panels.addButton('options', {
+            id: 'edit-text-btn',
+            className: 'fa fa-edit',
+            command: 'edit-text',
+            attributes: { title: 'Editar texto' }
+        });
+        
+        // ================================
+        // COMANDO ESPECÍFICO PARA EDITAR H1 - SOLUCIÓN SIN RICH TEXT EDITOR
+        // ================================
+        editor.Commands.add('edit-h1-title', {
+            run(ed) {
+                // Buscar todos los h1 en el editor
+                const allComponents = ed.getComponents();
+                let h1Component = null;
+                
+                const findH1 = (comp) => {
+                    if (comp.get('tagName') === 'h1') {
+                        h1Component = comp;
+                        return;
+                    }
+                    const children = comp.components();
+                    if (children && children.length > 0) {
+                        children.each(child => findH1(child));
+                    }
+                };
+                
+                allComponents.each(comp => findH1(comp));
+                
+                if (!h1Component) {
+                    showNotification('No se encontró ningún título h1 para editar', 'warning');
+                    return;
+                }
+                
+                // Seleccionar el h1
+                ed.select(h1Component);
+                
+                // SOLUCIÓN DIRECTA: Hacer editable sin Rich Text Editor
+                setTimeout(() => {
+                    const el = h1Component.getEl();
+                    if (!el) {
+                        showNotification('No se pudo encontrar el elemento h1', 'error');
+                        return;
+                    }
+                    
+                    // Forzar contenteditable directamente
+                    el.setAttribute('contenteditable', 'true');
+                    el.style.cursor = 'text';
+                    el.style.userSelect = 'text';
+                    el.style.webkitUserSelect = 'text';
+                    el.style.outline = '2px solid #007bff';
+                    el.style.outlineOffset = '2px';
+                    
+                    // Enfocar y seleccionar todo el texto
+                    el.focus();
+                    const frameWin = ed.Canvas.getWindow();
+                    const frameDoc = ed.Canvas.getDocument();
+                    if (frameWin && frameWin.getSelection) {
+                        const selection = frameWin.getSelection();
+                        const range = frameDoc.createRange();
+                        range.selectNodeContents(el);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+                    
+                    // Guardar cambios - función mejorada
+                    const saveChanges = function() {
+                        if (!ed || typeof ed.getComponent !== 'function') return;
+                        const comp = ed.getComponent(this);
+                        if (!comp) return;
+                        
+                        // Obtener el contenido actual
+                        const newContent = this.innerHTML || this.textContent || '';
+                        
+                        // Actualizar el componente
+                        comp.set('content', newContent);
+                        
+                        // Forzar actualización visual
+                        if (comp.view) {
+                            comp.view.render();
+                        }
+                        
+                        // Actualizar el modelo completo
+                        comp.set('components', newContent);
+                        
+                        // Disparar eventos para que GrapesJS sepa que hubo cambios
+                        ed.trigger('component:update', comp);
+                        ed.trigger('update');
+                        
+                        // IMPORTANTE: Marcar como cambiado para que se habilite el botón de guardar
+                        if (typeof markAsChanged === 'function') {
+                            markAsChanged();
+                        } else {
+                            // Si la función no existe, habilitar el botón directamente
+                            const saveButton = document.getElementById('saveButton');
+                            if (saveButton) {
+                                saveButton.disabled = false;
+                                saveButton.classList.remove('btn-primary');
+                                saveButton.classList.add('btn-warning');
+                            }
+                            const saveStatus = document.getElementById('saveStatus');
+                            if (saveStatus) {
+                                saveStatus.className = 'badge bg-warning';
+                                saveStatus.innerHTML = '<i class="bi bi-exclamation-circle"></i> Cambios sin guardar';
+                            }
+                        }
+                        
+                        // Abrir el panel superior automáticamente si está cerrado
+                        const panel = document.getElementById('builderPanel');
+                        const toggle = document.getElementById('builderToggle');
+                        if (panel && toggle && !panel.classList.contains('show')) {
+                            panel.classList.add('show');
+                            const icon = document.getElementById('arrowIcon');
+                            if (icon) {
+                                icon.classList.remove('bi-chevron-down');
+                                icon.classList.add('bi-chevron-up');
+                            }
+                        }
+                        
+                        this.style.outline = 'none';
+                        console.log('Cambios guardados en h1:', newContent);
+                    };
+                    
+                    // Guardar en blur (cada vez, no solo una vez)
+                    el.addEventListener('blur', saveChanges);
+                    
+                    // Guardar también en input para cambios en tiempo real
+                    el.addEventListener('input', function() {
+                        // Guardar después de un pequeño delay para no saturar
+                        clearTimeout(this._saveTimeout);
+                        this._saveTimeout = setTimeout(() => {
+                            if (!ed || typeof ed.getComponent !== 'function') return;
+                            const comp = ed.getComponent(this);
+                            if (comp) {
+                                const newContent = this.innerHTML || this.textContent || '';
+                                comp.set('content', newContent);
+                                comp.set('components', newContent);
+                                ed.trigger('component:update', comp);
+                            }
+                        }, 300);
+                    });
+                    
+                    // Guardar cuando se presiona Enter
+                    el.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            saveChanges.call(this);
+                        }
+                    });
+                    
+                    showNotification('Título editable. Escribe directamente para cambiar el texto.', 'success');
+                }, 100);
+            }
+        });
+        
+        // Añadir botón visible para editar el título h1
+        editor.Panels.addButton('options', {
+            id: 'edit-h1-title-btn',
+            className: 'fa fa-heading',
+            command: 'edit-h1-title',
+            attributes: { title: 'Editar título principal (h1)' },
+            active: false
+        });
+        
+        // ================================
+        // ELIMINAR COMANDO DUPLICADO - Ya está definido arriba
+        // ================================
+        
+        // Añadir botón visible para editar el título h1
+        editor.Panels.addButton('options', {
+            id: 'edit-h1-title-btn',
+            className: 'fa fa-heading',
+            command: 'edit-h1-title',
+            attributes: { title: 'Editar título principal (h1)' },
+            active: false
+        });
+        
+        // ================================
+        // BOTÓN DE GUARDAR VISIBLE EN LA BARRA DE HERRAMIENTAS
+        // ================================
+        editor.Commands.add('save-changes-visible', {
+            run(ed) {
+                // Abrir el panel si está cerrado
+                const panel = document.getElementById('builderPanel');
+                const toggle = document.getElementById('builderToggle');
+                if (panel && toggle && !panel.classList.contains('show')) {
+                    panel.classList.add('show');
+                    const icon = document.getElementById('arrowIcon');
+                    if (icon) {
+                        icon.classList.remove('bi-chevron-down');
+                        icon.classList.add('bi-chevron-up');
+                    }
+                }
+                
+                // Ejecutar el guardado
+                if (typeof confirmSave === 'function') {
+                    confirmSave();
+                } else {
+                    showNotification('Haz clic en el botón "Guardar Cambios" en el panel superior', 'info');
+                }
+            }
+        });
+        
+        // Añadir botón de guardar visible en la barra de opciones de GrapesJS
+        editor.Panels.addButton('options', {
+            id: 'save-changes-btn',
+            className: 'fa fa-save',
+            command: 'save-changes-visible',
+            attributes: { title: 'Guardar cambios (Ctrl+S)' },
+            active: false
+        });
+        
+        // ================================
         // Editor de atributos como JSON (modal)
         // ================================
         editor.Commands.add('open-attributes-code-modal', {
@@ -1055,8 +1345,228 @@
         }
     });
     
+    // Configurar componentes de texto para que sean editables
+    editor.on('load', () => {
+        const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
+        
+        // Configurar cada tipo de elemento de texto para que sea editable
+        textElements.forEach(tagName => {
+            const compType = editor.DomComponents.getType(tagName);
+            if (compType) {
+                // ESPECIALMENTE PARA H1: Usar tipo "text" de GrapesJS para edición directa
+                if (tagName === 'h1') {
+                    // Registrar h1 como tipo "text" que permite edición directa
+                    editor.DomComponents.addType('h1', {
+                        extend: 'text', // Extender del tipo "text" que es editable por defecto
+                        model: {
+                            defaults: Object.assign({}, {
+                                tagName: 'h1',
+                                editable: true,
+                                droppable: false,
+                                highlightable: true,
+                            })
+                        }
+                    });
+                } else {
+                    // Para otros elementos, configuración normal
+                    editor.DomComponents.addType(tagName, {
+                        model: {
+                            defaults: Object.assign({}, compType.model.prototype.defaults || {}, {
+                                editable: true,
+                                selectable: true,
+                                hoverable: true,
+                            }),
+                            init() {
+                                this.set('editable', true);
+                                if (compType.model.prototype.init) {
+                                    compType.model.prototype.init.call(this);
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        
+        // Hacer editables todos los componentes de texto existentes
+        const makeTextEditable = (comp) => {
+            if (!comp) return;
+            
+            const tagName = (comp.get('tagName') || '').toLowerCase();
+            if (textElements.includes(tagName)) {
+                // ESPECIALMENTE PARA H1: Convertir a tipo "text" si no lo es ya
+                if (tagName === 'h1' && comp.get('type') !== 'text') {
+                    // Obtener el contenido actual
+                    const content = comp.get('content') || '';
+                    const attributes = comp.getAttributes() || {};
+                    
+                    // Crear un nuevo componente de tipo "text" con tagName h1
+                    const parent = comp.parent();
+                    const index = parent ? parent.components().indexOf(comp) : -1;
+                    
+                    // Reemplazar el componente
+                    const newComp = editor.Components.addComponent({
+                        type: 'text',
+                        tagName: 'h1',
+                        content: content,
+                        attributes: attributes,
+                        editable: true,
+                    });
+                    
+                    if (parent && index >= 0) {
+                        parent.components().remove(comp);
+                        parent.components().add(newComp, { at: index });
+                    }
+                    
+                    return; // Ya procesado
+                }
+                
+                comp.set('editable', true);
+                comp.set('selectable', true);
+                comp.set('hoverable', true);
+                
+                // Procesar hijos recursivamente
+                const children = comp.components();
+                if (children && children.length > 0) {
+                    children.each(child => makeTextEditable(child));
+                }
+            } else {
+                // Procesar hijos recursivamente
+                const children = comp.components();
+                if (children && children.length > 0) {
+                    children.each(child => makeTextEditable(child));
+                }
+            }
+        };
+        
+        const allComponents = editor.getComponents();
+        allComponents.each(comp => makeTextEditable(comp));
+    });
+    
+    // Edición directa de texto en el canvas con mínimo impacto de performance
+    editor.on('canvas:frame:load', () => {
+        if (!editor || !editor.Canvas) return;
+        const frameDoc = editor.Canvas.getDocument();
+        const frameWin = editor.Canvas.getWindow();
+        if (!frameDoc || !frameWin) return;
+        const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
+
+        const enableTextEditing = () => {
+            textElements.forEach(tagName => {
+                frameDoc.querySelectorAll(tagName).forEach(el => {
+                    if (!el || el.nodeType !== 1) return;
+                    el.setAttribute('contenteditable', 'true');
+                    el.style.cursor = 'text';
+                    el.style.outline = 'none';
+                    el.style.userSelect = 'text';
+                    el.style.webkitUserSelect = 'text';
+
+                    // Solo bindear una vez
+                    if (el._gjsTextBind) return;
+                    el._gjsTextBind = true;
+
+                    el.addEventListener('mousedown', (e) => {
+                        e.stopPropagation();
+                    }, true);
+
+                    el.addEventListener('blur', function() {
+                        if (!editor || typeof editor.getComponent !== 'function') return;
+                        const component = editor.getComponent(this);
+                        if (component) {
+                            component.set('content', this.innerHTML);
+                            component.view && component.view.render();
+                            editor.trigger('component:update', component);
+                            editor.trigger('update');
+                        }
+                    });
+
+                    el.addEventListener('dblclick', function(e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        this.focus();
+                        if (frameWin.getSelection) {
+                            const selection = frameWin.getSelection();
+                            const range = frameDoc.createRange();
+                            range.selectNodeContents(this);
+                            selection.removeAllRanges();
+                            selection.addRange(range);
+                        }
+                    }, true);
+                });
+            });
+        };
+
+        // Aplicar inmediatamente y una par de veces por seguridad
+        enableTextEditing();
+        setTimeout(enableTextEditing, 150);
+        setTimeout(enableTextEditing, 600);
+
+        // Observer solo para nuevos nodos (evita bucles por attributes)
+        const observer = new MutationObserver((mutations) => {
+            let needsApply = false;
+            mutations.forEach(m => {
+                if (m.addedNodes && m.addedNodes.length) needsApply = true;
+            });
+            if (needsApply) enableTextEditing();
+        });
+
+        observer.observe(frameDoc.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+    
+    // También aplicar cuando se añaden nuevos componentes
+    editor.on('component:add', (component) => {
+        if (!editor || !editor.Canvas) return;
+        const tagName = (component.get('tagName') || '').toLowerCase();
+        const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
+        
+        if (textElements.includes(tagName)) {
+            component.set('editable', true);
+            component.set('selectable', true);
+            component.set('hoverable', true);
+            
+            setTimeout(() => {
+                if (!editor || !editor.Canvas) return;
+                const frameDoc = editor.Canvas.getDocument();
+                if (frameDoc) {
+                    const el = component.getEl();
+                    if (el) {
+                        el.setAttribute('contenteditable', 'true');
+                        el.style.cursor = 'text';
+                        el.style.userSelect = 'text';
+                        el.style.webkitUserSelect = 'text';
+                        el.style.outline = 'none';
+                    }
+                }
+            }, 100);
+        }
+    });
+    
+    // Asegurar que los componentes se mantengan editables cuando se renderizan
+    editor.on('component:update', (component) => {
+        if (!editor) return;
+        const tagName = (component.get('tagName') || '').toLowerCase();
+        const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
+        
+        if (textElements.includes(tagName)) {
+            setTimeout(() => {
+                if (!editor) return;
+                const el = component.getEl();
+                if (el) {
+                    el.setAttribute('contenteditable', 'true');
+                    el.style.cursor = 'text';
+                    el.style.userSelect = 'text';
+                    el.style.webkitUserSelect = 'text';
+                }
+            }, 50);
+        }
+    });
+    
     // Listener para cuando se selecciona un componente
     editor.on('component:selected', (component) => {
+        if (!editor || !editor.Canvas) return;
         // Si se selecciona un div con clase ab_img, mostrar ayuda para seleccionar la imagen
         if (component && component.get('tagName') === 'div') {
             const classes = component.get('classes');
@@ -1066,6 +1576,177 @@
                 if (imgComponent) {
                     console.log('Imagen encontrada dentro del contenedor. Usa doble clic o navega en Layers para seleccionarla directamente.');
                 }
+            }
+        }
+        
+        // Asegurar que los elementos de texto seleccionados sean editables
+        if (component) {
+            const tagName = (component.get('tagName') || '').toLowerCase();
+            const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
+            if (textElements.includes(tagName)) {
+                component.set('editable', true);
+                component.set('selectable', true);
+                component.set('hoverable', true);
+                
+                // SOLUCIÓN DEFINITIVA PARA H1: Forzar edición directa
+                setTimeout(() => {
+                    if (!editor || !editor.Canvas) return;
+                    const frameDoc = editor.Canvas.getDocument();
+                    const frameWin = editor.Canvas.getWindow();
+                    const el = component.getEl();
+                    if (el && frameDoc && frameWin) {
+                        // ESPECIALMENTE PARA H1: Forzar que sea editable directamente
+                        if (tagName === 'h1') {
+                            // Hacer el h1 completamente editable
+                            el.setAttribute('contenteditable', 'true');
+                            el.style.cursor = 'text';
+                            el.style.userSelect = 'text';
+                            el.style.webkitUserSelect = 'text';
+                            el.style.pointerEvents = 'auto';
+                            el.style.outline = 'none';
+                            
+                            // Hacer que los hijos también sean editables
+                            const children = el.querySelectorAll('*');
+                            children.forEach(child => {
+                                child.setAttribute('contenteditable', 'true');
+                                child.style.cursor = 'text';
+                                child.style.userSelect = 'text';
+                            });
+                            
+                            // Permitir edición con un solo clic
+                            el.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                setTimeout(() => {
+                                    this.focus();
+                                }, 50);
+                            }, true);
+                            
+                            // Guardar cambios en tiempo real mientras se escribe
+                            el.addEventListener('input', function() {
+                                if (!editor || typeof editor.getComponent !== 'function') return;
+                                const comp = editor.getComponent(this);
+                                if (comp) {
+                                    const newContent = this.innerHTML || this.textContent || '';
+                                    comp.set('content', newContent);
+                                    comp.set('components', newContent);
+                                    comp.view && comp.view.render();
+                                    editor.trigger('component:update', comp);
+                                    editor.trigger('update');
+                                    markAsChanged(); // Marcar que hay cambios sin guardar
+                                }
+                            });
+                            
+                            // Guardar cambios al perder el foco
+                            el.addEventListener('blur', function() {
+                                if (!editor || typeof editor.getComponent !== 'function') return;
+                                const comp = editor.getComponent(this);
+                                if (comp) {
+                                    const newContent = this.innerHTML || this.textContent || '';
+                                    comp.set('content', newContent);
+                                    comp.set('components', newContent);
+                                    comp.view && comp.view.render();
+                                    editor.trigger('component:update', comp);
+                                    editor.trigger('update');
+                                    markAsChanged(); // Marcar que hay cambios sin guardar
+                                }
+                            });
+                            
+                            // Guardar cambios al presionar Enter
+                            el.addEventListener('keydown', function(e) {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    if (!editor || typeof editor.getComponent !== 'function') return;
+                                    const comp = editor.getComponent(this);
+                                    if (comp) {
+                                        const newContent = this.innerHTML || this.textContent || '';
+                                        comp.set('content', newContent);
+                                        comp.set('components', newContent);
+                                        comp.view && comp.view.render();
+                                        editor.trigger('component:update', comp);
+                                        editor.trigger('update');
+                                        markAsChanged(); // Marcar que hay cambios sin guardar
+                                        this.blur(); // Quitar el foco después de Enter
+                                    }
+                                }
+                            });
+                            
+                            return; // Salir temprano para h1
+                        }
+                        
+                        // Para otros elementos, verificar si tiene hijos
+                        const hasChildren = el.children.length > 0 || (el.textContent && el.textContent.trim() && el.innerHTML !== el.textContent);
+                        
+                        if (hasChildren) {
+                            // Para elementos con hijos, usar Rich Text Editor
+                            component.set('editable', true);
+                            component.set('selectable', true);
+                            component.set('hoverable', true);
+                            
+                            el.setAttribute('contenteditable', 'true');
+                            el.style.cursor = 'text';
+                            el.style.userSelect = 'text';
+                            el.style.webkitUserSelect = 'text';
+                            
+                            // Habilitar Rich Text Editor cuando se hace doble clic
+                            el.addEventListener('dblclick', function(e) {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                
+                                if (editor.RichTextEditor) {
+                                    const rte = editor.RichTextEditor;
+                                    if (!rte.isActive()) {
+                                        setTimeout(() => {
+                                            rte.enable(component);
+                                        }, 50);
+                                    }
+                                } else {
+                                    el.focus();
+                                    if (frameWin && frameWin.getSelection) {
+                                        const selection = frameWin.getSelection();
+                                        const range = frameDoc.createRange();
+                                        range.selectNodeContents(el);
+                                        selection.removeAllRanges();
+                                        selection.addRange(range);
+                                    }
+                                }
+                            }, true);
+                        } else {
+                            // Para elementos sin hijos, edición directa
+                            if (el._gjsTextEditBound) return;
+                            el._gjsTextEditBound = true;
+                            
+                            el.setAttribute('contenteditable', 'true');
+                            el.style.cursor = 'text';
+                            el.style.userSelect = 'text';
+                            el.style.webkitUserSelect = 'text';
+                            el.style.outline = 'none';
+                            el.style.pointerEvents = 'auto';
+                            
+                            el.addEventListener('mousedown', function(e) {
+                                e.stopPropagation();
+                                e.stopImmediatePropagation();
+                            }, true);
+                            
+                            el.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                setTimeout(() => {
+                                    this.focus();
+                                }, 50);
+                            }, true);
+                            
+                            el.addEventListener('blur', function() {
+                                if (!editor || typeof editor.getComponent !== 'function') return;
+                                const comp = editor.getComponent(this);
+                                if (comp) {
+                                    comp.set('content', this.innerHTML);
+                                    comp.view && comp.view.render();
+                                    editor.trigger('component:update', comp);
+                                    editor.trigger('update');
+                                }
+                            });
+                        }
+                    }
+                }, 100);
             }
         }
         
@@ -1140,7 +1821,15 @@
                 container.innerHTML = '<div style="padding: 20px; color: red; background: #fff; border-radius: 8px; margin: 20px;"><h3>Error al cargar el editor</h3><p>' + error.message + '</p><p>Por favor, recarga la página.</p></div>';
             }
         }
-    }); // Cierre del DOMContentLoaded
+    } // Cierre de initializeEditor
+    
+    // Inicializar el editor cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeEditor);
+    } else {
+        // DOM ya está listo, esperar un poco para que los scripts se carguen
+        setTimeout(initializeEditor, 100);
+    }
     </script>
 <script>
     const toggle = document.getElementById('builderToggle');
@@ -1319,8 +2008,44 @@ function executeSave() {
         return;
     }
     
+    // Forzar actualización de todos los componentes antes de obtener el HTML
+    // Esto asegura que los cambios en contenteditable se reflejen en el modelo
+    const allComponents = editor.getComponents();
+    const updateComponentContent = (comp) => {
+        if (!comp) return;
+        const view = comp.view;
+        if (view && view.el) {
+            const el = view.el;
+            // Si el elemento tiene contenteditable y ha sido modificado, actualizar el modelo
+            if (el.hasAttribute('contenteditable') && el.getAttribute('contenteditable') === 'true') {
+                const currentContent = el.innerHTML || el.textContent || '';
+                const modelContent = comp.get('content') || '';
+                if (currentContent !== modelContent) {
+                    comp.set('content', currentContent);
+                    comp.set('components', currentContent);
+                }
+            }
+        }
+        // Procesar hijos recursivamente
+        const children = comp.components();
+        if (children && children.length > 0) {
+            children.each(child => updateComponentContent(child));
+        }
+    };
+    allComponents.each(comp => updateComponentContent(comp));
+    
+    // Ahora obtener el HTML actualizado
     const html = editor.getHtml();
     const css = editor.getCss();
+    
+    // DEBUG: Verificar que el h1 esté en el HTML
+    console.log('HTML a guardar (primeros 500 caracteres):', html.substring(0, 500));
+    const h1Match = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
+    if (h1Match) {
+        console.log('Contenido del h1 encontrado:', h1Match[1]);
+    } else {
+        console.warn('⚠️ No se encontró h1 en el HTML a guardar');
+    }
     
     // Combinar CSS del editor con CSS personalizado
     const finalCss = customCss ? `${css}\n\n/* CSS Personalizado */\n${customCss}` : css;
