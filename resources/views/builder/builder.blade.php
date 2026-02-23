@@ -551,12 +551,11 @@
     <script>
     (function() {
         // Lista de plugins a cargar
+        // Nota: Solo grapesjs-tabs está disponible en CDN público
+        // Los otros plugins (user-blocks, templates, toolbox, code-editor) 
+        // requieren instalación manual o no están disponibles públicamente
         const plugins = [
-            { name: 'grapesjs-tabs', url: 'https://cdn.jsdelivr.net/npm/grapesjs-tabs@1.0.6' },
-            { name: 'grapesjs-user-blocks', url: 'https://cdn.jsdelivr.net/npm/grapesjs-user-blocks@1.0.0/dist/grapesjs-user-blocks.min.js' },
-            { name: 'grapesjs-templates', url: 'https://cdn.jsdelivr.net/npm/grapesjs-templates@1.0.0/dist/grapesjs-templates.min.js' },
-            { name: 'grapesjs-plugin-toolbox', url: 'https://cdn.jsdelivr.net/npm/grapesjs-plugin-toolbox@1.0.0/dist/grapesjs-plugin-toolbox.min.js' },
-            { name: 'grapesjs-component-code-editor', url: 'https://cdn.jsdelivr.net/npm/grapesjs-component-code-editor@1.0.0/dist/grapesjs-component-code-editor.min.js' }
+            { name: 'grapesjs-tabs', url: 'https://cdn.jsdelivr.net/npm/grapesjs-tabs@1.0.6/dist/grapesjs-tabs.min.js', required: false }
         ];
         
         let loadedCount = 0;
@@ -650,27 +649,15 @@
                     'gjs-blocks-basic',
                     'grapesjs-preset-webpage',
                     'custom-blocks',
-                    'grapesjs-tabs',
-                    'grapesjs-user-blocks',
-                    'grapesjs-templates',
-                    'grapesjs-plugin-toolbox',
-                    'grapesjs-component-code-editor'
+                    'grapesjs-tabs'
+                    // Nota: Los otros plugins se añaden solo si se cargaron correctamente
+                    // Se añaden dinámicamente después de verificar su disponibilidad
                 ],
                 pluginsOpts: {
                     'gjs-blocks-basic': {},
                     'grapesjs-preset-webpage': {},
                     'custom-blocks': {},
-                    'grapesjs-tabs': {},
-                    'grapesjs-user-blocks': {
-                        storageKey: 'gjs-user-blocks',
-                        storageType: 'local'
-                    },
-                    'grapesjs-templates': {
-                        storageKey: 'gjs-templates',
-                        storageType: 'local'
-                    },
-                    'grapesjs-plugin-toolbox': {},
-                    'grapesjs-component-code-editor': {}
+                    'grapesjs-tabs': {}
                 },
         assetManager: {
             upload: '/builder/upload',
@@ -2143,23 +2130,35 @@ function executeSave() {
     const allComponents = editor.getComponents();
     const updateComponentContent = (comp) => {
         if (!comp) return;
-        const view = comp.view;
-        if (view && view.el) {
-            const el = view.el;
-            // Si el elemento tiene contenteditable y ha sido modificado, actualizar el modelo
-            if (el.hasAttribute('contenteditable') && el.getAttribute('contenteditable') === 'true') {
-                const currentContent = el.innerHTML || el.textContent || '';
-                const modelContent = comp.get('content') || '';
-                if (currentContent !== modelContent) {
-                    comp.set('content', currentContent);
-                    comp.set('components', currentContent);
+        try {
+            const view = comp.view;
+            if (view && view.el) {
+                const el = view.el;
+                // Verificar que el elemento es un nodo DOM válido
+                if (el && typeof el.hasAttribute === 'function') {
+                    // Si el elemento tiene contenteditable y ha sido modificado, actualizar el modelo
+                    if (el.hasAttribute('contenteditable') && el.getAttribute('contenteditable') === 'true') {
+                        const currentContent = el.innerHTML || el.textContent || '';
+                        const modelContent = comp.get('content') || '';
+                        if (currentContent !== modelContent) {
+                            comp.set('content', currentContent);
+                            comp.set('components', currentContent);
+                        }
+                    }
                 }
             }
+        } catch (error) {
+            // Ignorar errores en componentes problemáticos
+            console.warn('Error al actualizar componente:', error);
         }
         // Procesar hijos recursivamente
-        const children = comp.components();
-        if (children && children.length > 0) {
-            children.each(child => updateComponentContent(child));
+        try {
+            const children = comp.components();
+            if (children && children.length > 0) {
+                children.each(child => updateComponentContent(child));
+            }
+        } catch (error) {
+            console.warn('Error al procesar hijos del componente:', error);
         }
     };
     allComponents.each(comp => updateComponentContent(comp));
