@@ -169,6 +169,9 @@
                         <button type="button" class="btn btn-info text-white" onclick="showMenuManager()" title="Gestionar menú de navegación">
                             <i class="bi bi-list-ul"></i> Menú
                         </button>
+                        <button type="button" class="btn btn-secondary text-white" onclick="showPageMetadataEditor()" title="Editar URL y metadatos SEO">
+                            <i class="bi bi-link-45deg"></i> URL/SEO
+                        </button>
                         <button type="button" class="btn btn-warning text-white" onclick="showCssEditor()" title="Editor CSS personalizado">
                             <i class="bi bi-code-slash"></i> CSS
                         </button>
@@ -392,6 +395,90 @@
         </div>
     </div>
 
+    {{-- Modal Editor de URL y Metadatos SEO --}}
+    <div id="pageMetadataModal" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-secondary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-link-45deg"></i> URL y Metadatos SEO
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Nota:</strong> Configura la URL amigable y los metadatos SEO para mejorar el posicionamiento de la página.
+                    </div>
+                    <form id="pageMetadataForm">
+                        <input type="hidden" id="metadataView" name="view" value="{{ str_replace('webacademia/pages/', '', $currentView) }}">
+                        
+                        <div class="mb-3">
+                            <label for="metadataSlug" class="form-label">URL Amigable (Slug) *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">{{ url('/web/') }}</span>
+                                <input type="text" class="form-control" id="metadataSlug" name="slug" 
+                                       pattern="[a-z0-9-]+" 
+                                       placeholder="ej: nueva-pagina"
+                                       required>
+                            </div>
+                            <small class="form-text text-muted">Solo letras minúsculas, números y guiones. La URL será: {{ url('/web/') }}<span id="slugPreview"></span></small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="metadataTitle" class="form-label">Título SEO (máx. 60 caracteres)</label>
+                            <input type="text" class="form-control" id="metadataTitle" name="title" maxlength="60">
+                            <small class="form-text text-muted"><span id="titleCount">0</span>/60 caracteres</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="metadataDescription" class="form-label">Descripción SEO (máx. 160 caracteres)</label>
+                            <textarea class="form-control" id="metadataDescription" name="description" rows="3" maxlength="160"></textarea>
+                            <small class="form-text text-muted"><span id="descriptionCount">0</span>/160 caracteres</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="metadataKeywords" class="form-label">Palabras clave (opcional)</label>
+                            <input type="text" class="form-control" id="metadataKeywords" name="keywords" 
+                                   placeholder="palabra1, palabra2, palabra3">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="metadataOgTitle" class="form-label">Título Open Graph</label>
+                                    <input type="text" class="form-control" id="metadataOgTitle" name="og_title" maxlength="60">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="metadataRobots" class="form-label">Robots</label>
+                                    <select class="form-select" id="metadataRobots" name="robots">
+                                        <option value="">index, follow</option>
+                                        <option value="noindex, nofollow">noindex, nofollow</option>
+                                        <option value="noindex, follow">noindex, follow</option>
+                                        <option value="index, nofollow">index, nofollow</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="metadataOgDescription" class="form-label">Descripción Open Graph</label>
+                            <textarea class="form-control" id="metadataOgDescription" name="og_description" rows="2" maxlength="160"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="savePageMetadata()">
+                        <i class="bi bi-save"></i> Guardar Metadatos
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Modal Editor de Atributos (como código JSON) --}}
     <div id="attributesCodeModal" class="modal fade" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -459,15 +546,38 @@
     <script src="{{ asset('vendor/grapesjs/grapesjs-blocks-basic.min.js') }}"></script>
     <script src="{{ asset('vendor/grapesjs/grapesjs-preset-webpage.min.js') }}"></script>
     <script src="{{ asset('js/builder-custom-blocks.js') }}"></script>
-    {{-- Cargar grapesjs-tabs de forma opcional --}}
+    
+    {{-- Cargar plugins adicionales de GrapeJS desde CDN --}}
     <script>
     (function() {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/grapesjs-tabs@1.0.6';
-        script.onerror = function() {
-            console.warn('grapesjs-tabs no se pudo cargar, continuando sin él');
-        };
-        document.head.appendChild(script);
+        // Lista de plugins a cargar
+        const plugins = [
+            { name: 'grapesjs-tabs', url: 'https://cdn.jsdelivr.net/npm/grapesjs-tabs@1.0.6' },
+            { name: 'grapesjs-user-blocks', url: 'https://cdn.jsdelivr.net/npm/grapesjs-user-blocks@1.0.0/dist/grapesjs-user-blocks.min.js' },
+            { name: 'grapesjs-templates', url: 'https://cdn.jsdelivr.net/npm/grapesjs-templates@1.0.0/dist/grapesjs-templates.min.js' },
+            { name: 'grapesjs-plugin-toolbox', url: 'https://cdn.jsdelivr.net/npm/grapesjs-plugin-toolbox@1.0.0/dist/grapesjs-plugin-toolbox.min.js' },
+            { name: 'grapesjs-component-code-editor', url: 'https://cdn.jsdelivr.net/npm/grapesjs-component-code-editor@1.0.0/dist/grapesjs-component-code-editor.min.js' }
+        ];
+        
+        let loadedCount = 0;
+        const totalPlugins = plugins.length;
+        
+        plugins.forEach(plugin => {
+            const script = document.createElement('script');
+            script.src = plugin.url;
+            script.onload = function() {
+                loadedCount++;
+                console.log(`✓ Plugin ${plugin.name} cargado correctamente`);
+                if (loadedCount === totalPlugins) {
+                    console.log('Todos los plugins de GrapeJS cargados');
+                }
+            };
+            script.onerror = function() {
+                console.warn(`⚠ Plugin ${plugin.name} no se pudo cargar, continuando sin él`);
+                loadedCount++;
+            };
+            document.head.appendChild(script);
+        });
     })();
     </script>
     <script>
@@ -539,15 +649,31 @@
                 plugins: [
                     'gjs-blocks-basic',
                     'grapesjs-preset-webpage',
-                    'custom-blocks'
+                    'custom-blocks',
+                    'grapesjs-tabs',
+                    'grapesjs-user-blocks',
+                    'grapesjs-templates',
+                    'grapesjs-plugin-toolbox',
+                    'grapesjs-component-code-editor'
                 ],
                 pluginsOpts: {
                     'gjs-blocks-basic': {},
                     'grapesjs-preset-webpage': {},
-                    'custom-blocks': {}
+                    'custom-blocks': {},
+                    'grapesjs-tabs': {},
+                    'grapesjs-user-blocks': {
+                        storageKey: 'gjs-user-blocks',
+                        storageType: 'local'
+                    },
+                    'grapesjs-templates': {
+                        storageKey: 'gjs-templates',
+                        storageType: 'local'
+                    },
+                    'grapesjs-plugin-toolbox': {},
+                    'grapesjs-component-code-editor': {}
                 },
         assetManager: {
-            upload: '/builder/upload', // Tu ruta Laravel para POST
+            upload: '/builder/upload',
             uploadName: 'file',
             autoAdd: true,
             headers: {
@@ -555,6 +681,10 @@
             },
             custom: false,
             modalTitle: 'Gestor de medios',
+            assets: [],
+            uploadText: 'Subir archivos',
+            addBtnText: 'Añadir imagen',
+            multiUpload: true
         },
         storageManager: {
             type: 'laravel',
@@ -2069,19 +2199,34 @@ function executeSave() {
         }),
         signal: controller.signal
     })
-    .then(response => {
+    .then(async response => {
         clearTimeout(timeoutId);
         
         // Log para debugging
         console.log('Respuesta del servidor:', response.status, response.statusText);
         
+        // Leer el contenido de la respuesta primero
+        const responseText = await response.text();
+        console.log('Respuesta del servidor (texto):', responseText.substring(0, 200));
+        
         if (!response.ok) {
-            return response.json().then(data => {
+            try {
+                const data = JSON.parse(responseText);
                 console.error('Error del servidor:', data);
                 throw new Error(data.error || `Error HTTP: ${response.status}`);
-            });
+            } catch (e) {
+                throw new Error(`Error HTTP: ${response.status} - ${responseText.substring(0, 100)}`);
+            }
         }
-        return response.json();
+        
+        // Intentar parsear como JSON
+        try {
+            return JSON.parse(responseText);
+        } catch (e) {
+            // Si no es JSON válido, pero la respuesta es OK, asumir éxito
+            console.warn('Respuesta no es JSON válido, pero status es OK');
+            return { status: 'ok' };
+        }
     })
     .then(data => {
         console.log('Datos recibidos del servidor:', data);
@@ -2410,6 +2555,150 @@ function showCssEditor() {
     if (cssEditorModal) {
         cssEditorModal.show();
     }
+}
+
+// ============================================
+// EDITOR DE URL Y METADATOS SEO
+// ============================================
+
+let pageMetadataModal = null;
+
+// Inicializar modal de metadatos
+setTimeout(function() {
+    const modalElement = document.getElementById('pageMetadataModal');
+    if (modalElement) {
+        pageMetadataModal = new bootstrap.Modal(modalElement);
+        
+        // Contadores de caracteres
+        const titleInput = document.getElementById('metadataTitle');
+        const descriptionInput = document.getElementById('metadataDescription');
+        const slugInput = document.getElementById('metadataSlug');
+        
+        if (titleInput) {
+            titleInput.addEventListener('input', function() {
+                document.getElementById('titleCount').textContent = this.value.length;
+            });
+        }
+        
+        if (descriptionInput) {
+            descriptionInput.addEventListener('input', function() {
+                document.getElementById('descriptionCount').textContent = this.value.length;
+            });
+        }
+        
+        if (slugInput) {
+            slugInput.addEventListener('input', function() {
+                // Convertir a minúsculas y reemplazar espacios y caracteres especiales
+                let value = this.value.toLowerCase()
+                    .replace(/[^a-z0-9-]/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
+                this.value = value;
+                document.getElementById('slugPreview').textContent = value || 'slug';
+            });
+        }
+    }
+}, 500);
+
+function showPageMetadataEditor() {
+    if (!pageMetadataModal) {
+        console.error('Modal de metadatos no inicializado');
+        return;
+    }
+    
+    const view = '{{ str_replace("webacademia/pages/", "", $currentView) }}';
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    // Cargar metadatos existentes
+    fetch(`/builder/page-metadata?view=${encodeURIComponent(view)}`, {
+        headers: {
+            'X-CSRF-TOKEN': token,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            console.error('Error al cargar metadatos:', data.error);
+            showNotification('Error al cargar metadatos', 'danger');
+            return;
+        }
+        
+        // Rellenar formulario
+        document.getElementById('metadataView').value = view;
+        document.getElementById('metadataSlug').value = data.slug || view;
+        document.getElementById('metadataTitle').value = data.title || '';
+        document.getElementById('metadataDescription').value = data.description || '';
+        document.getElementById('metadataKeywords').value = data.keywords || '';
+        document.getElementById('metadataOgTitle').value = data.og_title || '';
+        document.getElementById('metadataOgDescription').value = data.og_description || '';
+        document.getElementById('metadataRobots').value = data.robots || '';
+        
+        // Actualizar contadores
+        document.getElementById('titleCount').textContent = (data.title || '').length;
+        document.getElementById('descriptionCount').textContent = (data.description || '').length;
+        document.getElementById('slugPreview').textContent = data.slug || view;
+        
+        // Mostrar modal
+        pageMetadataModal.show();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error al cargar metadatos', 'danger');
+    });
+}
+
+function savePageMetadata() {
+    const form = document.getElementById('pageMetadataForm');
+    const formData = new FormData(form);
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    // Convertir FormData a objeto
+    const data = {};
+    formData.forEach((value, key) => {
+        data[key] = value;
+    });
+    
+    // Validar slug
+    if (!data.slug || !/^[a-z0-9-]+$/.test(data.slug)) {
+        showNotification('El slug solo puede contener letras minúsculas, números y guiones', 'danger');
+        return;
+    }
+    
+    // Deshabilitar botón y mostrar loading
+    const saveButton = event.target;
+    const originalText = saveButton.innerHTML;
+    saveButton.disabled = true;
+    saveButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+    
+    fetch('/builder/page-metadata/save', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.status === 'ok' || !result.error) {
+            showNotification('Metadatos guardados correctamente', 'success');
+            if (pageMetadataModal) {
+                pageMetadataModal.hide();
+            }
+        } else {
+            showNotification(result.error || 'Error al guardar metadatos', 'danger');
+        }
+        saveButton.disabled = false;
+        saveButton.innerHTML = originalText;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error al guardar metadatos', 'danger');
+        saveButton.disabled = false;
+        saveButton.innerHTML = originalText;
+    });
 }
 
 function saveCustomCss() {

@@ -76,6 +76,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/builder/delete', [BuilderController::class, 'delete'])->name('builder.delete');
     Route::get('/builder/seo/{view}', [BuilderController::class, 'seo'])->name('builder.seo');
     Route::post('/builder/seo/save', [BuilderController::class, 'saveSeo'])->name('builder.seo.save');
+    Route::get('/builder/page-metadata', [BuilderController::class, 'getPageMetadata'])->name('builder.page-metadata');
+    Route::post('/builder/page-metadata/save', [BuilderController::class, 'savePageMetadata'])->name('builder.page-metadata.save');
     Route::post('/builder/duplicate', [BuilderController::class, 'duplicate'])->name('builder.duplicate');
 
     // Rutas para gestión del menú

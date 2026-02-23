@@ -480,6 +480,102 @@ class BuilderController extends Controller
         return redirect()->route('builder.seo', ['view' => $view])->with('status', 'SEO guardado correctamente');
     }
 
+    /**
+     * Obtener metadatos de una página (URL, SEO, etc.)
+     */
+    public function getPageMetadata(Request $request)
+    {
+        $view = $request->get('view');
+        
+        if (!$view) {
+            return response()->json(['error' => 'No se especificó la vista'], 400);
+        }
+        
+        // Extraer solo el nombre del archivo
+        $view = urldecode($view);
+        if (strpos($view, '/') !== false) {
+            $viewParts = explode('/', $view);
+            $view = end($viewParts);
+        }
+        $view = preg_replace('/[^a-zA-Z0-9_-]/', '', $view);
+        
+        $seoPath = resource_path("views/webacademia/seo/seo_{$view}.blade.php");
+        $seo = [
+            'title' => '',
+            'description' => '',
+            'keywords' => '',
+            'canonical' => '',
+            'robots' => '',
+            'og_title' => '',
+            'og_description' => '',
+            'slug' => $view, // Por defecto el slug es el nombre de la vista
+        ];
+        
+        if (File::exists($seoPath)) {
+            $content = File::get($seoPath);
+            if (preg_match('/<title>(.*?)<\/title>/s', $content, $m)) {
+                $seo['title'] = trim($m[1]);
+            }
+            if (preg_match('/<meta\s+name=["\']description["\']\s+content=["\'](.*?)["\']/si', $content, $m)) {
+                $seo['description'] = trim($m[1]);
+            }
+            if (preg_match('/<meta\s+name=["\']keywords["\']\s+content=["\'](.*?)["\']/si', $content, $m)) {
+                $seo['keywords'] = trim($m[1]);
+            }
+            if (preg_match('/<link\s+rel=["\']canonical["\']\s+href=["\'](.*?)["\']/si', $content, $m)) {
+                $seo['canonical'] = trim($m[1]);
+            }
+            if (preg_match('/<meta\s+name=["\']robots["\']\s+content=["\'](.*?)["\']/si', $content, $m)) {
+                $seo['robots'] = trim($m[1]);
+            }
+            if (preg_match('/<meta\s+property=["\']og:title["\']\s+content=["\'](.*?)["\']/si', $content, $m)) {
+                $seo['og_title'] = trim($m[1]);
+            }
+            if (preg_match('/<meta\s+property=["\']og:description["\']\s+content=["\'](.*?)["\']/si', $content, $m)) {
+                $seo['og_description'] = trim($m[1]);
+            }
+            // Extraer slug de canonical si existe
+            if (!empty($seo['canonical'])) {
+                $parsed = parse_url($seo['canonical']);
+                if (isset($parsed['path'])) {
+                    $seo['slug'] = trim($parsed['path'], '/');
+                }
+            }
+        }
+        
+        return response()->json($seo);
+    }
+
+    /**
+     * Guardar metadatos de página incluyendo URL amigable
+     */
+    public function savePageMetadata(Request $request)
+    {
+        $data = $request->validate([
+            'view' => 'required|string',
+            'slug' => 'nullable|string|max:255|regex:/^[a-z0-9-]+$/',
+            'title' => 'nullable|string|max:60',
+            'description' => 'nullable|string|max:160',
+            'keywords' => 'nullable|string|max:255',
+            'canonical' => 'nullable|string|max:255',
+            'robots' => 'nullable|string|max:50',
+            'og_title' => 'nullable|string|max:60',
+            'og_description' => 'nullable|string|max:160',
+        ]);
+        
+        $view = $data['view'];
+        $slug = $data['slug'] ?? $view;
+        
+        // Si se proporciona un slug, actualizar el canonical
+        if (!empty($slug)) {
+            $data['canonical'] = url("/web/{$slug}");
+        }
+        
+        // Guardar usando el método existente saveSeo
+        $request->merge($data);
+        return $this->saveSeo($request);
+    }
+
     public function duplicate(Request $request)
     {
         $sourceView = $request->input('source_view');
