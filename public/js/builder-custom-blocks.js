@@ -1350,18 +1350,7 @@
                         classes: ['form-field'],
                         attributes: {
                             'data-field-type': fieldType,
-                            'data-required': 'false',
-                            'field-label': type === 'text' ? 'Campo de texto' : 
-                                          type === 'email' ? 'Email' : 
-                                          type === 'textarea' ? 'Mensaje' : 
-                                          type === 'select' ? 'Selecciona una opción' : 
-                                          type === 'checkbox' ? 'Acepto los términos' : 
-                                          'Subir archivo',
-                            'field-placeholder': type === 'text' ? 'Escribe aquí...' : 
-                                               type === 'email' ? 'tu@email.com' : 
-                                               type === 'textarea' ? 'Escribe tu mensaje...' : '',
-                            'field-name': `field_${type}`,
-                            'field-required': 'true'
+                            'data-required': 'false'
                         },
                         traits: [
                             {
@@ -1369,21 +1358,31 @@
                                 name: 'field-label',
                                 label: 'Etiqueta (Label)',
                                 placeholder: 'Campo de texto',
-                                changeProp: 1
+                                changeProp: 1,
+                                default: type === 'text' ? 'Campo de texto' : 
+                                        type === 'email' ? 'Email' : 
+                                        type === 'textarea' ? 'Mensaje' : 
+                                        type === 'select' ? 'Selecciona una opción' : 
+                                        type === 'checkbox' ? 'Acepto los términos' : 
+                                        'Subir archivo'
                             },
                             {
                                 type: 'text',
                                 name: 'field-placeholder',
                                 label: 'Placeholder',
                                 placeholder: 'Escribe aquí...',
-                                changeProp: 1
+                                changeProp: 1,
+                                default: type === 'text' ? 'Escribe aquí...' : 
+                                        type === 'email' ? 'tu@email.com' : 
+                                        type === 'textarea' ? 'Escribe tu mensaje...' : ''
                             },
                             {
                                 type: 'text',
                                 name: 'field-name',
                                 label: 'Nombre del campo (name)',
                                 placeholder: 'field_text',
-                                changeProp: 1
+                                changeProp: 1,
+                                default: `field_${type}`
                             },
                             {
                                 type: 'checkbox',
@@ -1391,7 +1390,8 @@
                                 label: 'Campo obligatorio',
                                 valueTrue: 'true',
                                 valueFalse: 'false',
-                                changeProp: 1
+                                changeProp: 1,
+                                default: true
                             }
                         ],
                         selectable: true,
@@ -1400,51 +1400,149 @@
                         droppable: false
                     },
                     init() {
-                        // Extraer valores iniciales del HTML si existen (solo si no están ya definidos)
+                        // Inicializar valores por defecto si no existen
+                        const attrs = this.getAttributes() || {};
+                        let needsUpdate = false;
+                        
+                        if (!attrs['field-label']) {
+                            attrs['field-label'] = type === 'text' ? 'Campo de texto' : 
+                                                  type === 'email' ? 'Email' : 
+                                                  type === 'textarea' ? 'Mensaje' : 
+                                                  type === 'select' ? 'Selecciona una opción' : 
+                                                  type === 'checkbox' ? 'Acepto los términos' : 
+                                                  'Subir archivo';
+                            needsUpdate = true;
+                        }
+                        
+                        if (!attrs['field-placeholder']) {
+                            attrs['field-placeholder'] = type === 'text' ? 'Escribe aquí...' : 
+                                                         type === 'email' ? 'tu@email.com' : 
+                                                         type === 'textarea' ? 'Escribe tu mensaje...' : '';
+                            needsUpdate = true;
+                        }
+                        
+                        if (!attrs['field-name']) {
+                            attrs['field-name'] = `field_${type}`;
+                            needsUpdate = true;
+                        }
+                        
+                        if (!attrs['field-required']) {
+                            attrs['field-required'] = 'true';
+                            needsUpdate = true;
+                        }
+                        
+                        if (needsUpdate) {
+                            this.setAttributes(attrs);
+                        }
+                        
+                        // Extraer valores iniciales del HTML si existen (después de que se renderice)
                         setTimeout(() => {
                             const view = this.view;
                             if (view && view.el) {
-                                const attrs = this.getAttributes() || {};
+                                const currentAttrs = this.getAttributes() || {};
                                 let updated = false;
                                 
                                 const labelEl = view.el.querySelector('label');
                                 const input = view.el.querySelector('input, textarea, select');
                                 
-                                if (labelEl && !attrs['field-label']) {
+                                if (labelEl) {
                                     const labelText = labelEl.textContent.replace(/\s*\*\s*$/, '').trim();
-                                    attrs['field-label'] = labelText;
-                                    updated = true;
+                                    if (labelText && (!currentAttrs['field-label'] || currentAttrs['field-label'] === '')) {
+                                        currentAttrs['field-label'] = labelText;
+                                        updated = true;
+                                    }
                                 }
                                 
                                 if (input) {
-                                    if (!attrs['field-placeholder'] && input.getAttribute('placeholder')) {
-                                        attrs['field-placeholder'] = input.getAttribute('placeholder');
+                                    const placeholder = input.getAttribute('placeholder');
+                                    if (placeholder && (!currentAttrs['field-placeholder'] || currentAttrs['field-placeholder'] === '')) {
+                                        currentAttrs['field-placeholder'] = placeholder;
                                         updated = true;
                                     }
-                                    if (!attrs['field-name'] && input.getAttribute('name')) {
-                                        attrs['field-name'] = input.getAttribute('name');
+                                    
+                                    const name = input.getAttribute('name');
+                                    if (name && (!currentAttrs['field-name'] || currentAttrs['field-name'] === '')) {
+                                        currentAttrs['field-name'] = name;
                                         updated = true;
                                     }
-                                    if (!attrs['field-required']) {
-                                        const isRequired = input.hasAttribute('required') || 
-                                                          view.el.getAttribute('data-required') === 'true' ||
-                                                          (labelEl && labelEl.querySelector('.required') !== null);
-                                        attrs['field-required'] = isRequired ? 'true' : 'false';
+                                    
+                                    const isRequired = input.hasAttribute('required') || 
+                                                      view.el.getAttribute('data-required') === 'true' ||
+                                                      (labelEl && labelEl.querySelector('.required') !== null);
+                                    const requiredValue = isRequired ? 'true' : 'false';
+                                    if (!currentAttrs['field-required'] || currentAttrs['field-required'] === '') {
+                                        currentAttrs['field-required'] = requiredValue;
                                         updated = true;
                                     }
                                 }
                                 
                                 if (updated) {
-                                    this.setAttributes(attrs);
+                                    this.setAttributes(currentAttrs);
+                                    // Forzar actualización de la vista
+                                    if (view && view.onRender) {
+                                        view.onRender();
+                                    }
                                 }
                             }
-                        }, 100);
+                        }, 300);
                         
-                        // Listeners para actualizar cuando cambian los traits
-                        this.on('change:attributes:field-label change:attributes:field-placeholder change:attributes:field-name change:attributes:field-required', () => {
+                        // Listeners individuales para actualizar cuando cambian los traits
+                        this.on('change:attributes:field-label', () => {
+                            const attrs = this.getAttributes() || {};
+                            const label = attrs['field-label'] || '';
                             const view = this.view;
-                            if (view && view.onRender) {
-                                view.onRender();
+                            if (view && view.el) {
+                                const labelEl = view.el.querySelector('label');
+                                if (labelEl) {
+                                    const required = attrs['field-required'] === 'true';
+                                    labelEl.innerHTML = label + (required ? ' <span class="required">*</span>' : '');
+                                }
+                            }
+                        });
+                        
+                        this.on('change:attributes:field-placeholder', () => {
+                            const attrs = this.getAttributes() || {};
+                            const placeholder = attrs['field-placeholder'] || '';
+                            const view = this.view;
+                            if (view && view.el) {
+                                const input = view.el.querySelector('input, textarea, select');
+                                if (input) {
+                                    input.setAttribute('placeholder', placeholder);
+                                }
+                            }
+                        });
+                        
+                        this.on('change:attributes:field-name', () => {
+                            const attrs = this.getAttributes() || {};
+                            const name = attrs['field-name'] || '';
+                            const view = this.view;
+                            if (view && view.el) {
+                                const input = view.el.querySelector('input, textarea, select');
+                                if (input) {
+                                    input.setAttribute('name', name);
+                                }
+                            }
+                        });
+                        
+                        this.on('change:attributes:field-required', () => {
+                            const attrs = this.getAttributes() || {};
+                            const required = attrs['field-required'] === 'true';
+                            const view = this.view;
+                            if (view && view.el) {
+                                view.el.setAttribute('data-required', required ? 'true' : 'false');
+                                const labelEl = view.el.querySelector('label');
+                                if (labelEl) {
+                                    const label = attrs['field-label'] || labelEl.textContent.replace(/\s*\*\s*$/, '').trim();
+                                    labelEl.innerHTML = label + (required ? ' <span class="required">*</span>' : '');
+                                }
+                                const input = view.el.querySelector('input, textarea, select');
+                                if (input) {
+                                    if (required) {
+                                        input.setAttribute('required', 'required');
+                                    } else {
+                                        input.removeAttribute('required');
+                                    }
+                                }
                             }
                         });
                     }
