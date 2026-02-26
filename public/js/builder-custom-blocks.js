@@ -1314,35 +1314,6 @@
 
         // Registrar componentes de campos de formulario con traits editables
         const registerFormFieldComponent = (type, fieldType) => {
-            // Función para generar el HTML del campo según el tipo
-            const getFieldHTML = (attrs) => {
-                const label = attrs['field-label'] || 'Campo';
-                const placeholder = attrs['field-placeholder'] || '';
-                const name = attrs['field-name'] || `field_${type}`;
-                const required = attrs['field-required'] === 'true';
-                const requiredSpan = required ? ' <span class="required">*</span>' : '';
-                
-                let inputHTML = '';
-                if (fieldType === 'textarea') {
-                    inputHTML = `<textarea name="${name}" rows="4" placeholder="${placeholder}"></textarea>`;
-                } else if (fieldType === 'select') {
-                    inputHTML = `<select name="${name}">
-                        <option value="">Selecciona...</option>
-                        <option value="opcion1">Opción 1</option>
-                        <option value="opcion2">Opción 2</option>
-                    </select>`;
-                } else if (fieldType === 'checkbox') {
-                    inputHTML = `<input type="checkbox" name="${name}"${required ? ' required' : ''}>`;
-                } else if (fieldType === 'file') {
-                    inputHTML = `<input type="file" name="${name}"${required ? ' required' : ''}>`;
-                } else {
-                    const inputType = fieldType === 'email' ? 'email' : 'text';
-                    inputHTML = `<input type="${inputType}" name="${name}" placeholder="${placeholder}"${required ? ' required' : ''}>`;
-                }
-                
-                return `<label>${label}${requiredSpan}</label>${inputHTML}`;
-            };
-            
             domc.addType(`form-field-${type}`, {
                 model: {
                     defaults: {
@@ -1573,12 +1544,14 @@
                     const fieldType = attrs['data-field-type'] || type;
                     
                     // Generar HTML del campo
-                    const label = attrs['field-label'] || (type === 'text' ? 'Campo de texto' : 
-                                                          type === 'email' ? 'Email' : 
-                                                          type === 'textarea' ? 'Mensaje' : 
-                                                          type === 'select' ? 'Selecciona una opción' : 
-                                                          type === 'checkbox' ? 'Acepto los términos' : 
-                                                          'Subir archivo');
+                    let defaultLabel = 'Campo de texto';
+                    if (type === 'email') defaultLabel = 'Email';
+                    else if (type === 'textarea') defaultLabel = 'Mensaje';
+                    else if (type === 'select') defaultLabel = 'Selecciona una opción';
+                    else if (type === 'checkbox') defaultLabel = 'Acepto los términos';
+                    else if (type === 'file') defaultLabel = 'Subir archivo';
+                    
+                    const label = attrs['field-label'] || defaultLabel;
                     const placeholder = attrs['field-placeholder'] || '';
                     const name = attrs['field-name'] || `field_${type}`;
                     const required = attrs['field-required'] === 'true';
