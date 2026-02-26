@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Mail;
 
 class BuilderController extends Controller
 {
@@ -342,6 +343,40 @@ class BuilderController extends Controller
         return response()->json(['data' => $urls]);
     }
 
+    /**
+     * Listar imágenes y videos existentes para el assetManager
+     */
+    public function listAssets()
+    {
+        $assets = [];
+        
+        // Obtener imágenes de storage/app/public/images
+        $imagesPath = storage_path('app/public/images');
+        if (File::exists($imagesPath)) {
+            $imageFiles = File::files($imagesPath);
+            foreach ($imageFiles as $file) {
+                $assets[] = [
+                    'src' => asset('storage/images/' . $file->getFilename()),
+                    'type' => 'image'
+                ];
+            }
+        }
+        
+        // Obtener videos de storage/app/public/videos
+        $videosPath = storage_path('app/public/videos');
+        if (File::exists($videosPath)) {
+            $videoFiles = File::files($videosPath);
+            foreach ($videoFiles as $file) {
+                $assets[] = [
+                    'src' => asset('storage/videos/' . $file->getFilename()),
+                    'type' => 'video'
+                ];
+            }
+        }
+        
+        return response()->json(['data' => $assets]);
+    }
+
     public function create(Request $request)
     {
          $viewName = $request->input('new_view');
@@ -574,6 +609,97 @@ class BuilderController extends Controller
         // Guardar usando el método existente saveSeo
         $request->merge($data);
         return $this->saveSeo($request);
+    }
+
+    /**
+     * Obtener texto de cookies
+     */
+    public function getCookiesText()
+    {
+        $cookiesPath = resource_path('views/webacademia/partials/cookies_text.blade.php');
+        $text = '';
+        
+        if (File::exists($cookiesPath)) {
+            $text = File::get($cookiesPath);
+            // Remover tags blade si existen
+            $text = preg_replace('/@[a-zA-Z]+/i', '', $text);
+            $text = preg_replace('/\{\{[^}]+\}\}/', '', $text);
+        }
+        
+        return response()->json(['text' => $text]);
+    }
+
+    /**
+     * Guardar texto de cookies
+     */
+    public function saveCookiesText(Request $request)
+    {
+        $data = $request->validate([
+            'text' => 'required|string'
+        ]);
+        
+        $cookiesPath = resource_path('views/webacademia/partials');
+        
+        // Crear directorio si no existe
+        if (!File::exists($cookiesPath)) {
+            File::makeDirectory($cookiesPath, 0755, true);
+        }
+        
+        $filePath = $cookiesPath . '/cookies_text.blade.php';
+        
+        // Sanitizar el texto
+        $text = strip_tags($data['text'], '<p><br><strong><em><a><ul><ol><li><h1><h2><h3><h4><h5><h6>');
+        
+        File::put($filePath, $text);
+        
+        return response()->json(['status' => 'ok', 'message' => 'Texto de cookies guardado correctamente']);
+    }
+
+    /**
+     * Manejar envío de formularios avanzados desde el builder
+     */
+    public function handleFormSubmit(Request $request)
+    {
+        $data = $request->validate([
+            'form_id' => 'nullable|string',
+            'form_email' => 'required|email',
+            'privacy_policy' => 'required|accepted'
+        ]);
+        
+        // Obtener todos los campos del formulario excepto los de control
+        $formData = $request->except(['_token', 'form_id', 'form_email', 'privacy_policy']);
+        
+        // Construir el mensaje del email
+        $message = "Nuevo formulario enviado desde el sitio web\n\n";
+        $message .= "Detalles del formulario:\n";
+        $message .= str_repeat('=', 50) . "\n\n";
+        
+        foreach ($formData as $key => $value) {
+            $label = ucfirst(str_replace('_', ' ', $key));
+            $message .= "{$label}: {$value}\n";
+        }
+        
+        $message .= "\n" . str_repeat('=', 50) . "\n";
+        $message .= "Fecha: " . now()->format('d/m/Y H:i:s') . "\n";
+        
+        // Enviar email
+        try {
+            Mail::raw($message, function ($mail) use ($data) {
+                $mail->to($data['form_email'])
+                    ->subject('Nuevo formulario enviado desde el sitio web');
+            });
+            
+            return response()->json([
+                'status' => 'ok',
+                'message' => 'Formulario enviado correctamente'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error al enviar formulario: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al enviar el formulario. Por favor, inténtalo de nuevo.'
+            ], 500);
+        }
     }
 
     public function duplicate(Request $request)

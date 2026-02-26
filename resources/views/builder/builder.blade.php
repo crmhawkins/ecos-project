@@ -172,6 +172,9 @@
                         <button type="button" class="btn btn-secondary text-white" onclick="showPageMetadataEditor()" title="Editar URL y metadatos SEO">
                             <i class="bi bi-link-45deg"></i> URL/SEO
                         </button>
+                        <button type="button" class="btn btn-success text-white" onclick="showCookiesEditor()" title="Editor de texto de cookies">
+                            <i class="bi bi-shield-check"></i> Cookies
+                        </button>
                         <button type="button" class="btn btn-warning text-white" onclick="showCssEditor()" title="Editor CSS personalizado">
                             <i class="bi bi-code-slash"></i> CSS
                         </button>
@@ -479,6 +482,39 @@
         </div>
     </div>
 
+    {{-- Modal Editor de Cookies --}}
+    <div id="cookiesEditorModal" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-shield-check"></i> Editor de Texto de Cookies
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Nota:</strong> Edita el texto que aparecerá en el banner de cookies. Este texto debe cumplir con la normativa de protección de datos.
+                    </div>
+                    <div class="mb-3">
+                        <label for="cookiesTextEditor" class="form-label">Texto del Banner de Cookies:</label>
+                        <textarea id="cookiesTextEditor" class="form-control" rows="10" placeholder="Escribe aquí el texto de la política de cookies..."></textarea>
+                        <small class="form-text text-muted">
+                            Puedes usar HTML básico: &lt;p&gt;, &lt;strong&gt;, &lt;a&gt;, &lt;br&gt;, etc.
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCookiesText()">
+                        <i class="bi bi-save"></i> Guardar Texto
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Modal Editor de Atributos (como código JSON) --}}
     <div id="attributesCodeModal" class="modal fade" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -545,40 +581,15 @@
     <script src="{{ asset('vendor/grapesjs/grapes.min.js') }}"></script>
     <script src="{{ asset('vendor/grapesjs/grapesjs-blocks-basic.min.js') }}"></script>
     <script src="{{ asset('vendor/grapesjs/grapesjs-preset-webpage.min.js') }}"></script>
-    <script src="{{ asset('js/builder-custom-blocks.js') }}"></script>
     
-    {{-- Cargar plugins adicionales de GrapeJS desde CDN --}}
-    <script>
-    (function() {
-        // Lista de plugins a cargar
-        // Nota: Solo grapesjs-tabs está disponible en CDN público
-        // Los otros plugins (user-blocks, templates, toolbox, code-editor) 
-        // requieren instalación manual o no están disponibles públicamente
-        const plugins = [
-            { name: 'grapesjs-tabs', url: 'https://cdn.jsdelivr.net/npm/grapesjs-tabs@1.0.6/dist/grapesjs-tabs.min.js', required: false }
-        ];
-        
-        let loadedCount = 0;
-        const totalPlugins = plugins.length;
-        
-        plugins.forEach(plugin => {
-            const script = document.createElement('script');
-            script.src = plugin.url;
-            script.onload = function() {
-                loadedCount++;
-                console.log(`✓ Plugin ${plugin.name} cargado correctamente`);
-                if (loadedCount === totalPlugins) {
-                    console.log('Todos los plugins de GrapeJS cargados');
-                }
-            };
-            script.onerror = function() {
-                console.warn(`⚠ Plugin ${plugin.name} no se pudo cargar, continuando sin él`);
-                loadedCount++;
-            };
-            document.head.appendChild(script);
-        });
-    })();
-    </script>
+    {{-- Cargar plugins adicionales de GrapeJS desde archivos locales --}}
+    <script src="{{ asset('vendor/grapesjs/grapesjs-tabs.min.js') }}"></script>
+    <script src="{{ asset('vendor/grapesjs/grapesjs-user-blocks.min.js') }}"></script>
+    <script src="{{ asset('vendor/grapesjs/grapesjs-templates.min.js') }}"></script>
+    <script src="{{ asset('vendor/grapesjs/grapesjs-plugin-toolbox.min.js') }}"></script>
+    <script src="{{ asset('vendor/grapesjs/grapesjs-component-code-editor.min.js') }}"></script>
+    
+    <script src="{{ asset('js/builder-custom-blocks.js') }}"></script>
     <script>
     let editor;
     
@@ -614,6 +625,32 @@
         return temp.innerHTML;
     }
     
+    // Función para verificar que los plugins estén disponibles
+    function checkPluginsAvailable() {
+        const requiredPlugins = {
+            'grapesjs-tabs': window['grapesjs-tabs'],
+            'grapesjs-user-blocks': window['grapesjs-user-blocks'],
+            'grapesjs-templates': window['grapesjs-templates'],
+            'grapesjs-plugin-toolbox': window['grapesjs-plugin-toolbox'],
+            'grapesjs-component-code-editor': window['grapesjs-component-code-editor']
+        };
+        
+        const available = [];
+        const missing = [];
+        
+        for (const [name, plugin] of Object.entries(requiredPlugins)) {
+            if (plugin) {
+                available.push(name);
+                console.log(`✓ Plugin ${name} disponible`);
+            } else {
+                missing.push(name);
+                console.warn(`⚠ Plugin ${name} no disponible`);
+            }
+        }
+        
+        return { available, missing };
+    }
+    
     // Función para inicializar el editor
     function initializeEditor() {
         try {
@@ -622,6 +659,13 @@
             if (!container) {
                 console.error('Contenedor #gjs no encontrado');
                 return;
+            }
+            
+            // Verificar plugins disponibles
+            const { available, missing } = checkPluginsAvailable();
+            if (missing.length > 0) {
+                console.warn('Algunos plugins no están disponibles:', missing);
+                console.log('Plugins disponibles:', available);
             }
             
             // Limpiar el HTML antes de que GrapesJS lo procese
@@ -641,23 +685,82 @@
             cleanedHtml = tempDiv.innerHTML;
             container.innerHTML = cleanedHtml;
             
+            // Construir lista de plugins dinámicamente basada en disponibilidad
+            const pluginsToLoad = [
+                'gjs-blocks-basic',
+                'grapesjs-preset-webpage',
+                'custom-blocks'
+            ];
+            
+            // Añadir plugins solo si están disponibles
+            if (window['grapesjs-tabs']) pluginsToLoad.push('grapesjs-tabs');
+            if (window['grapesjs-user-blocks']) pluginsToLoad.push('grapesjs-user-blocks');
+            if (window['grapesjs-templates']) pluginsToLoad.push('grapesjs-templates');
+            if (window['grapesjs-plugin-toolbox']) pluginsToLoad.push('grapesjs-plugin-toolbox');
+            if (window['grapesjs-component-code-editor']) pluginsToLoad.push('grapesjs-component-code-editor');
+            
             editor = grapesjs.init({
                 container: '#gjs',
                 fromElement: true,
                 autoload: false, // Desactivar autoload para evitar conflictos
-                plugins: [
-                    'gjs-blocks-basic',
-                    'grapesjs-preset-webpage',
-                    'custom-blocks',
-                    'grapesjs-tabs'
-                    // Nota: Los otros plugins se añaden solo si se cargaron correctamente
-                    // Se añaden dinámicamente después de verificar su disponibilidad
-                ],
+                plugins: pluginsToLoad,
                 pluginsOpts: {
                     'gjs-blocks-basic': {},
                     'grapesjs-preset-webpage': {},
                     'custom-blocks': {},
-                    'grapesjs-tabs': {}
+                    'grapesjs-tabs': {},
+                    'grapesjs-user-blocks': {
+                        blockLabel: 'Nombre',
+                        categoryLabel: 'Categoría',
+                        buttonSaveLabel: 'Guardar',
+                        buttonResetLabel: 'Resetear',
+                        buttonEditLabel: 'Editar Bloques',
+                        buttonDeleteLabel: 'Eliminar',
+                        modalSaveTitle: 'Guardar Bloque',
+                        modalEditTitle: 'Editar Bloques',
+                        messageDeleteBlock: '¿Estás seguro de que deseas eliminar este bloque?',
+                        newCategoryLabel: 'Nueva Categoría'
+                    },
+                    'grapesjs-templates': {
+                        i18n: {
+                            es: {
+                                'grapesjs-templates': {
+                                    'templates': 'Plantillas',
+                                    'save': 'Guardar',
+                                    'load': 'Cargar',
+                                    'delete': 'Eliminar',
+                                    'cancel': 'Cancelar',
+                                    'name': 'Nombre',
+                                    'description': 'Descripción'
+                                }
+                            }
+                        }
+                    },
+                    'grapesjs-plugin-toolbox': {
+                        panels: 0,
+                        resizer: 1,
+                        breadcrumbs: 1,
+                        labelGrid: 'Grid',
+                        categoryGrid: 'Básico'
+                    },
+                    'grapesjs-component-code-editor': {
+                        panelId: 'views-container',
+                        codeViewOptions: {
+                            theme: 'hopscotch',
+                            readOnly: 0,
+                            autoBeautify: 1,
+                            autoCloseTags: 1,
+                            autoCloseBrackets: 1,
+                            styleActiveLine: 1,
+                            smartIndent: 1
+                        },
+                        preserveWidth: false,
+                        clearData: false,
+                        cleanCssBtn: true,
+                        htmlBtnText: 'Aplicar',
+                        cssBtnText: 'Aplicar',
+                        cleanCssBtnText: 'Eliminar'
+                    }
                 },
         assetManager: {
             upload: '/builder/upload',
@@ -1462,6 +1565,31 @@
         }
     });
     
+    // Cargar imágenes existentes al iniciar el editor
+    editor.on('load', () => {
+        // Cargar imágenes existentes en el assetManager
+        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        fetch('/builder/assets', {
+            headers: {
+                'X-CSRF-TOKEN': token,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.data && Array.isArray(data.data)) {
+                const assetManager = editor.AssetManager;
+                data.data.forEach(asset => {
+                    assetManager.add(asset.src);
+                });
+                console.log('Imágenes existentes cargadas en el assetManager:', data.data.length);
+            }
+        })
+        .catch(error => {
+            console.warn('Error al cargar imágenes existentes:', error);
+        });
+    });
+    
     // Configurar componentes de texto para que sean editables
     editor.on('load', () => {
         const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
@@ -1940,12 +2068,40 @@
         }
     } // Cierre de initializeEditor
     
-    // Inicializar el editor cuando el DOM esté listo
+    // Función para esperar a que los plugins estén disponibles
+    function waitForPlugins(callback, maxAttempts = 50, attempt = 0) {
+        const requiredPlugins = [
+            'grapesjs-tabs',
+            'grapesjs-user-blocks',
+            'grapesjs-templates',
+            'grapesjs-plugin-toolbox',
+            'grapesjs-component-code-editor'
+        ];
+        
+        const allAvailable = requiredPlugins.every(name => {
+            return window[name] !== undefined;
+        });
+        
+        if (allAvailable || attempt >= maxAttempts) {
+            if (allAvailable) {
+                console.log('✓ Todos los plugins están disponibles');
+            } else {
+                console.warn('⚠ Algunos plugins no están disponibles después de esperar');
+            }
+            callback();
+        } else {
+            setTimeout(() => waitForPlugins(callback, maxAttempts, attempt + 1), 100);
+        }
+    }
+    
+    // Inicializar el editor cuando el DOM esté listo y los plugins estén disponibles
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeEditor);
+        document.addEventListener('DOMContentLoaded', () => {
+            waitForPlugins(initializeEditor);
+        });
     } else {
-        // DOM ya está listo, esperar un poco para que los scripts se carguen
-        setTimeout(initializeEditor, 100);
+        // DOM ya está listo, esperar a que los plugins se carguen
+        waitForPlugins(initializeEditor);
     }
     </script>
 <script>
@@ -2695,6 +2851,104 @@ function savePageMetadata() {
     .catch(error => {
         console.error('Error:', error);
         showNotification('Error al guardar metadatos', 'danger');
+        saveButton.disabled = false;
+        saveButton.innerHTML = originalText;
+    });
+}
+
+// ============================================
+// EDITOR DE COOKIES
+// ============================================
+
+let cookiesEditorModal = null;
+
+// Inicializar modal de cookies
+setTimeout(function() {
+    const modalElement = document.getElementById('cookiesEditorModal');
+    if (modalElement) {
+        cookiesEditorModal = new bootstrap.Modal(modalElement);
+    }
+}, 500);
+
+function showCookiesEditor() {
+    if (!cookiesEditorModal) {
+        console.error('Modal de cookies no inicializado');
+        return;
+    }
+    
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    // Cargar texto existente
+    fetch('/builder/cookies', {
+        headers: {
+            'X-CSRF-TOKEN': token,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            console.error('Error al cargar texto de cookies:', data.error);
+            showNotification('Error al cargar texto de cookies', 'danger');
+            return;
+        }
+        
+        // Rellenar editor
+        const editor = document.getElementById('cookiesTextEditor');
+        if (editor) {
+            editor.value = data.text || '';
+        }
+        
+        // Mostrar modal
+        cookiesEditorModal.show();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error al cargar texto de cookies', 'danger');
+    });
+}
+
+function saveCookiesText() {
+    const editor = document.getElementById('cookiesTextEditor');
+    if (!editor) {
+        showNotification('Editor de cookies no encontrado', 'danger');
+        return;
+    }
+    
+    const text = editor.value;
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    // Deshabilitar botón y mostrar loading
+    const saveButton = event.target;
+    const originalText = saveButton.innerHTML;
+    saveButton.disabled = true;
+    saveButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+    
+    fetch('/builder/cookies/save', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ text: text })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.status === 'ok' || !result.error) {
+            showNotification('Texto de cookies guardado correctamente', 'success');
+            if (cookiesEditorModal) {
+                cookiesEditorModal.hide();
+            }
+        } else {
+            showNotification(result.error || 'Error al guardar texto de cookies', 'danger');
+        }
+        saveButton.disabled = false;
+        saveButton.innerHTML = originalText;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error al guardar texto de cookies', 'danger');
         saveButton.disabled = false;
         saveButton.innerHTML = originalText;
     });

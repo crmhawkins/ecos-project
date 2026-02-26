@@ -628,6 +628,543 @@
                     user-select: none;
                 }
             `
+        },
+
+        // Visor PDF
+        pdfViewer: {
+            label: 'Visor PDF',
+            category: 'Preestilizados',
+            content: {
+                type: 'pdf-viewer-container',
+                classes: ['pdf-viewer-container'],
+                components: [
+                    {
+                        type: 'default',
+                        tagName: 'iframe',
+                        classes: ['pdf-viewer'],
+                        attributes: {
+                            frameborder: '0',
+                            allowfullscreen: 'true'
+                        }
+                    },
+                    {
+                        type: 'default',
+                        tagName: 'div',
+                        classes: ['pdf-viewer-placeholder'],
+                        components: [
+                            {
+                                type: 'default',
+                                tagName: 'i',
+                                classes: ['fas', 'fa-file-pdf']
+                            },
+                            {
+                                type: 'textnode',
+                                content: 'Configura la URL del PDF en las propiedades del componente'
+                            }
+                        ]
+                    }
+                ]
+            },
+            style: `
+                .pdf-viewer-container {
+                    position: relative;
+                    width: 100%;
+                    min-height: 600px;
+                    border: 2px dashed #e5e7eb;
+                    border-radius: 12px;
+                    background: #f8fafc;
+                    overflow: hidden;
+                }
+                .pdf-viewer {
+                    width: 100%;
+                    height: 600px;
+                    border: none;
+                    display: block;
+                }
+                .pdf-viewer-placeholder {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    text-align: center;
+                    color: #9ca3af;
+                    pointer-events: none;
+                }
+                .pdf-viewer-placeholder i {
+                    font-size: 48px;
+                    margin-bottom: 16px;
+                    display: block;
+                }
+                .pdf-viewer-placeholder p {
+                    margin: 0;
+                    font-size: 14px;
+                }
+            `,
+            attributes: {
+                'data-pdf-url': ''
+            }
+        },
+
+        // Banner de Cookies
+        cookieBanner: {
+            label: 'Banner de Cookies',
+            category: 'Preestilizados',
+            content: `
+                <div class="cookie-banner" id="cookieBanner">
+                    <div class="cookie-banner-content">
+                        <div class="cookie-banner-text">
+                            <h4>Política de Cookies</h4>
+                            <p>Utilizamos cookies para mejorar tu experiencia en nuestro sitio web. Al continuar navegando, aceptas nuestro uso de cookies.</p>
+                        </div>
+                        <div class="cookie-banner-actions">
+                            <button class="cookie-btn-accept">Aceptar</button>
+                            <button class="cookie-btn-reject">Rechazar</button>
+                            <a href="/politica-cookies" class="cookie-link">Más información</a>
+                        </div>
+                    </div>
+                </div>
+            `,
+            style: `
+                .cookie-banner {
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+                    color: #ffffff;
+                    padding: 20px;
+                    box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+                    z-index: 10000;
+                    display: none;
+                }
+                .cookie-banner.show {
+                    display: block;
+                }
+                .cookie-banner-content {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 20px;
+                    flex-wrap: wrap;
+                }
+                .cookie-banner-text {
+                    flex: 1;
+                    min-width: 300px;
+                }
+                .cookie-banner-text h4 {
+                    margin: 0 0 8px 0;
+                    font-size: 18px;
+                    font-weight: 700;
+                }
+                .cookie-banner-text p {
+                    margin: 0;
+                    font-size: 14px;
+                    opacity: 0.9;
+                }
+                .cookie-banner-actions {
+                    display: flex;
+                    gap: 12px;
+                    align-items: center;
+                    flex-wrap: wrap;
+                }
+                .cookie-btn-accept,
+                .cookie-btn-reject {
+                    padding: 10px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    font-size: 14px;
+                }
+                .cookie-btn-accept {
+                    background: linear-gradient(135deg, #D93690 0%, #8B5CF6 100%);
+                    color: #ffffff;
+                }
+                .cookie-btn-accept:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(217,54,144,0.4);
+                }
+                .cookie-btn-reject {
+                    background: transparent;
+                    color: #ffffff;
+                    border: 2px solid #ffffff;
+                }
+                .cookie-btn-reject:hover {
+                    background: rgba(255,255,255,0.1);
+                }
+                .cookie-link {
+                    color: #ffffff;
+                    text-decoration: underline;
+                    font-size: 14px;
+                    opacity: 0.8;
+                }
+                .cookie-link:hover {
+                    opacity: 1;
+                }
+                @media (max-width: 768px) {
+                    .cookie-banner-content {
+                        flex-direction: column;
+                        text-align: center;
+                    }
+                    .cookie-banner-actions {
+                        width: 100%;
+                        justify-content: center;
+                    }
+                }
+            `
+        },
+
+        // Componentes de formulario reutilizables
+        formFieldText: {
+            label: 'Campo Texto',
+            category: 'Formularios',
+            content: `
+                <div class="form-field" data-field-type="text" data-required="false">
+                    <label>Campo de texto <span class="required">*</span></label>
+                    <input type="text" name="field_text" placeholder="Escribe aquí...">
+                </div>
+            `,
+            style: `
+                .form-field {
+                    margin-bottom: 20px;
+                }
+                .form-field label {
+                    display: block;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    color: #374151;
+                    font-size: 0.95rem;
+                }
+                .form-field .required {
+                    color: #e53e3e;
+                }
+                .form-field input {
+                    width: 100%;
+                    border-radius: 10px;
+                    border: 2px solid #e5e7eb;
+                    padding: 12px 16px;
+                    font-size: 0.95rem;
+                    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+                }
+                .form-field input:focus {
+                    outline: none;
+                    border-color: #D93690;
+                    box-shadow: 0 0 0 3px rgba(217,54,144,0.15);
+                }
+            `
+        },
+        
+        formFieldEmail: {
+            label: 'Campo Email',
+            category: 'Formularios',
+            content: `
+                <div class="form-field" data-field-type="email" data-required="false">
+                    <label>Email <span class="required">*</span></label>
+                    <input type="email" name="field_email" placeholder="tu@email.com">
+                </div>
+            `,
+            style: `
+                .form-field {
+                    margin-bottom: 20px;
+                }
+                .form-field label {
+                    display: block;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    color: #374151;
+                    font-size: 0.95rem;
+                }
+                .form-field .required {
+                    color: #e53e3e;
+                }
+                .form-field input {
+                    width: 100%;
+                    border-radius: 10px;
+                    border: 2px solid #e5e7eb;
+                    padding: 12px 16px;
+                    font-size: 0.95rem;
+                    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+                }
+                .form-field input:focus {
+                    outline: none;
+                    border-color: #D93690;
+                    box-shadow: 0 0 0 3px rgba(217,54,144,0.15);
+                }
+            `
+        },
+        
+        formFieldTextarea: {
+            label: 'Campo Textarea',
+            category: 'Formularios',
+            content: `
+                <div class="form-field" data-field-type="textarea" data-required="false">
+                    <label>Mensaje <span class="required">*</span></label>
+                    <textarea name="field_message" rows="4" placeholder="Escribe tu mensaje..."></textarea>
+                </div>
+            `,
+            style: `
+                .form-field {
+                    margin-bottom: 20px;
+                }
+                .form-field label {
+                    display: block;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    color: #374151;
+                    font-size: 0.95rem;
+                }
+                .form-field .required {
+                    color: #e53e3e;
+                }
+                .form-field textarea {
+                    width: 100%;
+                    border-radius: 10px;
+                    border: 2px solid #e5e7eb;
+                    padding: 12px 16px;
+                    font-size: 0.95rem;
+                    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+                    resize: vertical;
+                }
+                .form-field textarea:focus {
+                    outline: none;
+                    border-color: #D93690;
+                    box-shadow: 0 0 0 3px rgba(217,54,144,0.15);
+                }
+            `
+        },
+        
+        formFieldSelect: {
+            label: 'Campo Select',
+            category: 'Formularios',
+            content: `
+                <div class="form-field" data-field-type="select" data-required="false">
+                    <label>Selecciona una opción <span class="required">*</span></label>
+                    <select name="field_select">
+                        <option value="">Selecciona...</option>
+                        <option value="opcion1">Opción 1</option>
+                        <option value="opcion2">Opción 2</option>
+                        <option value="opcion3">Opción 3</option>
+                    </select>
+                </div>
+            `,
+            style: `
+                .form-field {
+                    margin-bottom: 20px;
+                }
+                .form-field label {
+                    display: block;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    color: #374151;
+                    font-size: 0.95rem;
+                }
+                .form-field .required {
+                    color: #e53e3e;
+                }
+                .form-field select {
+                    width: 100%;
+                    border-radius: 10px;
+                    border: 2px solid #e5e7eb;
+                    padding: 12px 16px;
+                    font-size: 0.95rem;
+                    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+                    background: white;
+                }
+                .form-field select:focus {
+                    outline: none;
+                    border-color: #D93690;
+                    box-shadow: 0 0 0 3px rgba(217,54,144,0.15);
+                }
+            `
+        },
+        
+        formFieldCheckbox: {
+            label: 'Campo Checkbox',
+            category: 'Formularios',
+            content: `
+                <div class="form-field" data-field-type="checkbox" data-required="false">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" name="field_checkbox" value="1">
+                        <span>Acepto los términos y condiciones</span>
+                    </label>
+                </div>
+            `,
+            style: `
+                .form-field {
+                    margin-bottom: 20px;
+                }
+                .form-field input[type="checkbox"] {
+                    width: 18px;
+                    height: 18px;
+                    cursor: pointer;
+                }
+                .form-field label {
+                    font-size: 14px;
+                    color: #4a5568;
+                }
+            `
+        },
+        
+        formFieldFile: {
+            label: 'Campo Archivo',
+            category: 'Formularios',
+            content: `
+                <div class="form-field" data-field-type="file" data-required="false">
+                    <label>Subir archivo <span class="required">*</span></label>
+                    <input type="file" name="field_file" accept=".pdf,.doc,.docx,.jpg,.png">
+                    <small style="display: block; margin-top: 5px; color: #6b7280; font-size: 12px;">
+                        Formatos permitidos: PDF, DOC, DOCX, JPG, PNG
+                    </small>
+                </div>
+            `,
+            style: `
+                .form-field {
+                    margin-bottom: 20px;
+                }
+                .form-field label {
+                    display: block;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    color: #374151;
+                    font-size: 0.95rem;
+                }
+                .form-field .required {
+                    color: #e53e3e;
+                }
+                .form-field input[type="file"] {
+                    width: 100%;
+                    padding: 10px;
+                    border: 2px solid #e5e7eb;
+                    border-radius: 10px;
+                    font-size: 0.95rem;
+                }
+                .form-field input[type="file"]:focus {
+                    outline: none;
+                    border-color: #D93690;
+                    box-shadow: 0 0 0 3px rgba(217,54,144,0.15);
+                }
+            `
+        },
+
+        // Formulario Avanzado (configurable)
+        advancedForm: {
+            label: 'Formulario Avanzado',
+            category: 'Preestilizados',
+            content: `
+                <section class="advanced-form-section">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <form class="advanced-form" method="POST" action="/builder/form-submit" data-form-email="">
+                                    <div class="form-fields-container">
+                                        <!-- Los campos se añadirán aquí dinámicamente -->
+                                        <div class="form-field" data-field-type="text" data-required="true">
+                                            <label>Nombre <span class="required">*</span></label>
+                                            <input type="text" name="name" required>
+                                        </div>
+                                        <div class="form-field" data-field-type="email" data-required="true">
+                                            <label>Email <span class="required">*</span></label>
+                                            <input type="email" name="email" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-privacy-checkbox" data-required="true">
+                                        <input type="checkbox" name="privacy_policy" id="form-privacy" required>
+                                        <label for="form-privacy">Acepto la política de privacidad <span class="required">*</span></label>
+                                    </div>
+                                    <button type="submit" class="advanced-form-btn">Enviar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            `,
+            style: `
+                .advanced-form-section {
+                    padding: 80px 0;
+                    background: linear-gradient(135deg, #f8fafc 0%, #e5e7eb 100%);
+                }
+                .advanced-form {
+                    background: #ffffff;
+                    border-radius: 16px;
+                    padding: 40px;
+                    box-shadow: 0 10px 30px rgba(15,23,42,0.12);
+                    border: 1px solid #e5e7eb;
+                }
+                .form-fields-container {
+                    margin-bottom: 25px;
+                }
+                .form-field {
+                    margin-bottom: 20px;
+                }
+                .form-field label {
+                    display: block;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    color: #374151;
+                    font-size: 0.95rem;
+                }
+                .form-field .required {
+                    color: #e53e3e;
+                }
+                .form-field input,
+                .form-field textarea,
+                .form-field select {
+                    width: 100%;
+                    border-radius: 10px;
+                    border: 2px solid #e5e7eb;
+                    padding: 12px 16px;
+                    font-size: 0.95rem;
+                    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+                    font-family: inherit;
+                }
+                .form-field input:focus,
+                .form-field textarea:focus,
+                .form-field select:focus {
+                    outline: none;
+                    border-color: #D93690;
+                    box-shadow: 0 0 0 3px rgba(217,54,144,0.15);
+                }
+                .form-privacy-checkbox {
+                    margin-bottom: 25px;
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 10px;
+                }
+                .form-privacy-checkbox input[type="checkbox"] {
+                    margin-top: 4px;
+                    width: 18px;
+                    height: 18px;
+                    cursor: pointer;
+                }
+                .form-privacy-checkbox label {
+                    font-size: 14px;
+                    color: #4a5568;
+                    cursor: pointer;
+                }
+                .advanced-form-btn {
+                    background: linear-gradient(135deg, #D93690 0%, #8B5CF6 100%);
+                    color: #ffffff;
+                    border: none;
+                    border-radius: 999px;
+                    padding: 14px 32px;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    transition: transform 0.15s ease, box-shadow 0.15s ease;
+                    width: 100%;
+                }
+                .advanced-form-btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 18px rgba(217,54,144,0.35);
+                }
+            `,
+            attributes: {
+                'data-form-email': '',
+                'data-form-id': ''
+            }
         }
     };
 
@@ -689,6 +1226,88 @@
                     draggable: true,
                     droppable: true,
                     traits: []
+                }
+            }
+        });
+
+        // Configurar visor PDF con trait para URL
+        domc.addType('pdf-viewer-container', {
+            model: {
+                defaults: {
+                    tagName: 'div',
+                    classes: ['pdf-viewer-container'],
+                    traits: [
+                        {
+                            type: 'text',
+                            name: 'data-pdf-url',
+                            label: 'URL del PDF',
+                            placeholder: 'https://ejemplo.com/documento.pdf',
+                            changeProp: 1
+                        },
+                        {
+                            type: 'number',
+                            name: 'height',
+                            label: 'Altura (px)',
+                            default: 600,
+                            changeProp: 1
+                        }
+                    ]
+                },
+                init() {
+                    this.on('change:attributes:data-pdf-url', () => {
+                        const url = this.get('attributes')['data-pdf-url'];
+                        const view = this.view;
+                        if (view && view.el) {
+                            const iframe = view.el.querySelector('.pdf-viewer');
+                            const placeholder = view.el.querySelector('.pdf-viewer-placeholder');
+                            if (iframe && url) {
+                                iframe.src = url;
+                                if (placeholder) {
+                                    placeholder.style.display = 'none';
+                                }
+                            } else if (placeholder) {
+                                placeholder.style.display = 'block';
+                            }
+                        }
+                    });
+                    this.on('change:attributes:height', () => {
+                        const height = this.get('attributes').height || 600;
+                        const view = this.view;
+                        if (view && view.el) {
+                            const iframe = view.el.querySelector('.pdf-viewer');
+                            if (iframe) {
+                                iframe.style.height = height + 'px';
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        
+        // Configurar formulario avanzado con trait para email
+        domc.addType('advanced-form', {
+            model: {
+                defaults: {
+                    tagName: 'form',
+                    classes: ['advanced-form'],
+                    traits: [
+                        {
+                            type: 'text',
+                            name: 'data-form-email',
+                            label: 'Email de destino',
+                            placeholder: 'contacto@ejemplo.com',
+                            changeProp: 1
+                        }
+                    ]
+                },
+                init() {
+                    this.on('change:attributes:data-form-email', () => {
+                        const email = this.get('attributes')['data-form-email'];
+                        const view = this.view;
+                        if (view && view.el && email) {
+                            view.el.setAttribute('data-form-email', email);
+                        }
+                    });
                 }
             }
         });
@@ -875,13 +1494,20 @@
         Object.keys(customBlocks).forEach(key => {
             const block = customBlocks[key];
             
-            blockManager.add(key, {
+            const blockConfig = {
                 label: block.label,
                 category: block.category,
                 content: block.content,
                 media: '<i class="fas fa-cube"></i>',
                 activate: true,
-            });
+            };
+            
+            // Añadir atributos si existen
+            if (block.attributes) {
+                blockConfig.attributes = block.attributes;
+            }
+            
+            blockManager.add(key, blockConfig);
 
             // Añadir los estilos CSS al editor cuando se carga
             if (block.style) {

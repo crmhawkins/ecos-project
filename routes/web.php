@@ -72,12 +72,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/builder/load', [BuilderController::class, 'load'])->name('builder.load');
     Route::post('/builder/save', [BuilderController::class, 'save'])->name('builder.save');
     Route::post('/builder/upload', [BuilderController::class, 'upload']);
+    Route::get('/builder/assets', [BuilderController::class, 'listAssets'])->name('builder.assets');
     Route::post('/builder/create', [BuilderController::class, 'create'])->name('builder.create');
     Route::delete('/builder/delete', [BuilderController::class, 'delete'])->name('builder.delete');
     Route::get('/builder/seo/{view}', [BuilderController::class, 'seo'])->name('builder.seo');
     Route::post('/builder/seo/save', [BuilderController::class, 'saveSeo'])->name('builder.seo.save');
     Route::get('/builder/page-metadata', [BuilderController::class, 'getPageMetadata'])->name('builder.page-metadata');
     Route::post('/builder/page-metadata/save', [BuilderController::class, 'savePageMetadata'])->name('builder.page-metadata.save');
+    Route::get('/builder/cookies', [BuilderController::class, 'getCookiesText'])->name('builder.cookies.get');
+    Route::post('/builder/cookies/save', [BuilderController::class, 'saveCookiesText'])->name('builder.cookies.save');
+    Route::post('/builder/form-submit', [BuilderController::class, 'handleFormSubmit'])->name('builder.form.submit');
     Route::post('/builder/duplicate', [BuilderController::class, 'duplicate'])->name('builder.duplicate');
 
     // Rutas para gestión del menú
