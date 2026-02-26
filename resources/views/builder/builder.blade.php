@@ -1635,8 +1635,10 @@
         
         // Hacer editables todos los componentes de texto existentes
         const processedComponents = new Set(); // Para evitar procesar el mismo componente dos veces
+        let isProcessingComponents = false; // Flag para evitar procesamiento durante eventos
+        
         const makeTextEditable = (comp) => {
-            if (!comp) return;
+            if (!comp || isProcessingComponents) return;
             
             // Evitar procesar el mismo componente dos veces (previene recursión infinita)
             const compId = comp.cid || comp.getId();
@@ -1649,9 +1651,25 @@
             if (textElements.includes(tagName)) {
                 // Para H1, simplemente hacerlo editable sin cambiar su tipo
                 // Cambiar el tipo puede causar recursión infinita
-                comp.set('editable', true);
-                comp.set('selectable', true);
-                comp.set('hoverable', true);
+                // Usar setSilent si está disponible para evitar disparar eventos
+                try {
+                    if (comp.setSilent) {
+                        comp.setSilent('editable', true);
+                        comp.setSilent('selectable', true);
+                        comp.setSilent('hoverable', true);
+                    } else {
+                        // Si setSilent no está disponible, desactivar eventos temporalmente
+                        const wasSilent = comp.get('silent') || false;
+                        comp.set('silent', true);
+                        comp.set('editable', true);
+                        comp.set('selectable', true);
+                        comp.set('hoverable', true);
+                        comp.set('silent', wasSilent);
+                    }
+                } catch (e) {
+                    // Si falla, simplemente continuar sin modificar
+                    console.warn('Error al hacer componente editable:', e);
+                }
                 
                 // Procesar hijos recursivamente solo si no son del mismo tipo
                 const children = comp.components();
@@ -1667,8 +1685,14 @@
             }
         };
         
-        const allComponents = editor.getComponents();
-        allComponents.each(comp => makeTextEditable(comp));
+        // Procesar componentes de forma segura
+        isProcessingComponents = true;
+        try {
+            const allComponents = editor.getComponents();
+            allComponents.each(comp => makeTextEditable(comp));
+        } finally {
+            isProcessingComponents = false;
+        }
     });
     
     // Edición directa de texto en el canvas con mínimo impacto de performance
@@ -1745,50 +1769,98 @@
     });
     
     // También aplicar cuando se añaden nuevos componentes
+    const addingComponents = new Set(); // Para evitar recursión en component:add
     editor.on('component:add', (component) => {
-        if (!editor || !editor.Canvas) return;
-        const tagName = (component.get('tagName') || '').toLowerCase();
-        const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
+        if (!editor || !editor.Canvas || !component) return;
         
-        if (textElements.includes(tagName)) {
-            component.set('editable', true);
-            component.set('selectable', true);
-            component.set('hoverable', true);
+        // Evitar procesar el mismo componente dos veces (previene recursión infinita)
+        const compId = component.cid || component.getId();
+        if (addingComponents.has(compId)) {
+            return;
+        }
+        addingComponents.add(compId);
+        
+        try {
+            const tagName = (component.get('tagName') || '').toLowerCase();
+            const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
             
+            if (textElements.includes(tagName)) {
+                // Usar setSilent si está disponible para evitar disparar eventos
+                try {
+                    if (component.setSilent) {
+                        component.setSilent('editable', true);
+                        component.setSilent('selectable', true);
+                        component.setSilent('hoverable', true);
+                    } else {
+                        // Si setSilent no está disponible, desactivar eventos temporalmente
+                        const wasSilent = component.get('silent') || false;
+                        component.set('silent', true);
+                        component.set('editable', true);
+                        component.set('selectable', true);
+                        component.set('hoverable', true);
+                        component.set('silent', wasSilent);
+                    }
+                } catch (e) {
+                    console.warn('Error al hacer componente editable en component:add:', e);
+                }
+                
+                setTimeout(() => {
+                    if (!editor || !editor.Canvas) return;
+                    const frameDoc = editor.Canvas.getDocument();
+                    if (frameDoc) {
+                        const el = component.getEl();
+                        if (el) {
+                            el.setAttribute('contenteditable', 'true');
+                            el.style.cursor = 'text';
+                            el.style.userSelect = 'text';
+                            el.style.webkitUserSelect = 'text';
+                            el.style.outline = 'none';
+                        }
+                    }
+                }, 100);
+            }
+        } finally {
+            // Limpiar después de un delay para permitir actualizaciones futuras
             setTimeout(() => {
-                if (!editor || !editor.Canvas) return;
-                const frameDoc = editor.Canvas.getDocument();
-                if (frameDoc) {
+                addingComponents.delete(compId);
+            }, 1000);
+        }
+    });
+    
+    // Asegurar que los componentes se mantengan editables cuando se renderizan
+    const updatingComponents = new Set(); // Para evitar recursión en component:update
+    editor.on('component:update', (component) => {
+        if (!editor || !component) return;
+        
+        // Evitar procesar el mismo componente dos veces (previene recursión infinita)
+        const compId = component.cid || component.getId();
+        if (updatingComponents.has(compId)) {
+            return;
+        }
+        updatingComponents.add(compId);
+        
+        try {
+            const tagName = (component.get('tagName') || '').toLowerCase();
+            const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
+            
+            if (textElements.includes(tagName)) {
+                // No hacer set() aquí para evitar recursión, solo actualizar el DOM
+                setTimeout(() => {
+                    if (!editor) return;
                     const el = component.getEl();
                     if (el) {
                         el.setAttribute('contenteditable', 'true');
                         el.style.cursor = 'text';
                         el.style.userSelect = 'text';
                         el.style.webkitUserSelect = 'text';
-                        el.style.outline = 'none';
                     }
-                }
-            }, 100);
-        }
-    });
-    
-    // Asegurar que los componentes se mantengan editables cuando se renderizan
-    editor.on('component:update', (component) => {
-        if (!editor) return;
-        const tagName = (component.get('tagName') || '').toLowerCase();
-        const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
-        
-        if (textElements.includes(tagName)) {
+                }, 50);
+            }
+        } finally {
+            // Limpiar después de un delay para permitir actualizaciones futuras
             setTimeout(() => {
-                if (!editor) return;
-                const el = component.getEl();
-                if (el) {
-                    el.setAttribute('contenteditable', 'true');
-                    el.style.cursor = 'text';
-                    el.style.userSelect = 'text';
-                    el.style.webkitUserSelect = 'text';
-                }
-            }, 50);
+                updatingComponents.delete(compId);
+            }, 1000);
         }
     });
     
