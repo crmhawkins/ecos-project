@@ -2116,10 +2116,10 @@
 
         if (isOpen) {
             panel.classList.remove('show');
-            setTimeout(() => panel.style.display = 'none', 300); // esperar a que acabe la animación
+            setTimeout(() => { panel.style.display = 'none'; }, 300); // esperar a que acabe la animación
         } else {
             panel.style.display = 'block';
-            setTimeout(() => panel.classList.add('show'), 10); // pequeña pausa para activar transición
+            setTimeout(() => { panel.classList.add('show'); }, 10); // pequeña pausa para activar transición
         }
 
         const icon = document.getElementById('arrowIcon');

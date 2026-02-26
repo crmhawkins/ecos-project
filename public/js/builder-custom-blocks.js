@@ -1348,41 +1348,60 @@
                     defaults: {
                         tagName: 'div',
                         classes: ['form-field'],
-                        attributes: {
-                            'data-field-type': fieldType,
-                            'data-required': 'false'
-                        },
+                        attributes: (function() {
+                            // Calcular valores por defecto según el tipo
+                            let defaultLabel, defaultPlaceholder;
+                            
+                            if (type === 'text') {
+                                defaultLabel = 'Campo de texto';
+                                defaultPlaceholder = 'Escribe aquí...';
+                            } else if (type === 'email') {
+                                defaultLabel = 'Email';
+                                defaultPlaceholder = 'tu@email.com';
+                            } else if (type === 'textarea') {
+                                defaultLabel = 'Mensaje';
+                                defaultPlaceholder = 'Escribe tu mensaje...';
+                            } else if (type === 'select') {
+                                defaultLabel = 'Selecciona una opción';
+                                defaultPlaceholder = '';
+                            } else if (type === 'checkbox') {
+                                defaultLabel = 'Acepto los términos';
+                                defaultPlaceholder = '';
+                            } else {
+                                defaultLabel = 'Subir archivo';
+                                defaultPlaceholder = '';
+                            }
+                            
+                            return {
+                                'data-field-type': fieldType,
+                                'data-required': 'false',
+                                'field-label': defaultLabel,
+                                'field-placeholder': defaultPlaceholder,
+                                'field-name': 'field_' + type,
+                                'field-required': 'true'
+                            };
+                        })(),
                         traits: [
                             {
                                 type: 'text',
                                 name: 'field-label',
                                 label: 'Etiqueta (Label)',
                                 placeholder: 'Campo de texto',
-                                changeProp: 1,
-                                default: type === 'text' ? 'Campo de texto' : 
-                                        type === 'email' ? 'Email' : 
-                                        type === 'textarea' ? 'Mensaje' : 
-                                        type === 'select' ? 'Selecciona una opción' : 
-                                        type === 'checkbox' ? 'Acepto los términos' : 
-                                        'Subir archivo'
+                                changeProp: 1
                             },
                             {
                                 type: 'text',
                                 name: 'field-placeholder',
                                 label: 'Placeholder',
                                 placeholder: 'Escribe aquí...',
-                                changeProp: 1,
-                                default: type === 'text' ? 'Escribe aquí...' : 
-                                        type === 'email' ? 'tu@email.com' : 
-                                        type === 'textarea' ? 'Escribe tu mensaje...' : ''
+                                changeProp: 1
                             },
                             {
                                 type: 'text',
                                 name: 'field-name',
                                 label: 'Nombre del campo (name)',
                                 placeholder: 'field_text',
-                                changeProp: 1,
-                                default: `field_${type}`
+                                changeProp: 1
                             },
                             {
                                 type: 'checkbox',
@@ -1390,8 +1409,7 @@
                                 label: 'Campo obligatorio',
                                 valueTrue: 'true',
                                 valueFalse: 'false',
-                                changeProp: 1,
-                                default: true
+                                changeProp: 1
                             }
                         ],
                         selectable: true,
