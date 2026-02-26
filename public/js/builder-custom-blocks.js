@@ -1394,6 +1394,8 @@
                                 changeProp: 1
                             }
                         ],
+                        selectable: true,
+                        hoverable: true,
                         editable: false,
                         droppable: false
                     },
@@ -1738,6 +1740,15 @@
                             if (domc.getType(newType) && component.get('type') !== newType) {
                                 // Cambiar el tipo del componente
                                 component.set('type', newType);
+                                
+                                // Asegurar que sea seleccionable después de cambiar el tipo
+                                setTimeout(() => {
+                                    if (component && component.set) {
+                                        component.set('selectable', true);
+                                        component.set('hoverable', true);
+                                    }
+                                }, 50);
+                                
                                 return true;
                             }
                         }
@@ -1749,8 +1760,38 @@
                 if (!checkAndConvert()) {
                     // Si no funciona, intentar después de un delay (cuando el elemento esté renderizado)
                     setTimeout(() => {
-                        checkAndConvert();
+                        if (checkAndConvert()) {
+                            // Si se convirtió, asegurar que sea seleccionable
+                            setTimeout(() => {
+                                if (component && component.set) {
+                                    component.set('selectable', true);
+                                    component.set('hoverable', true);
+                                }
+                            }, 50);
+                        }
                     }, 200);
+                } else {
+                    // Si ya se convirtió, asegurar que sea seleccionable
+                    setTimeout(() => {
+                        if (component && component.set) {
+                            component.set('selectable', true);
+                            component.set('hoverable', true);
+                        }
+                    }, 50);
+                }
+            }
+        });
+
+        // Listener adicional para asegurar que los componentes form-field sean seleccionables
+        editor.on('component:selected', (component) => {
+            if (component) {
+                const el = component.getEl();
+                if (el && el.classList && el.classList.contains('form-field')) {
+                    // Asegurar que el componente sea seleccionable
+                    if (component.set) {
+                        component.set('selectable', true);
+                        component.set('hoverable', true);
+                    }
                 }
             }
         });
