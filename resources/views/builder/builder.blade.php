@@ -1622,7 +1622,9 @@
                                 hoverable: true,
                             }),
                             init() {
-                                this.set('editable', true);
+                                // NO hacer set('editable') aquí porque causa recursión infinita
+                                // Los componentes de texto ya son editables por defecto en GrapeJS
+                                // this.set('editable', true); // DESACTIVADO - causa recursión
                                 if (compType.model.prototype.init) {
                                     compType.model.prototype.init.call(this);
                                 }
@@ -1633,66 +1635,13 @@
             }
         });
         
-        // Hacer editables todos los componentes de texto existentes
-        const processedComponents = new Set(); // Para evitar procesar el mismo componente dos veces
-        let isProcessingComponents = false; // Flag para evitar procesamiento durante eventos
+        // NOTA: Desactivado el procesamiento automático de componentes editables
+        // porque causa recursión infinita. Los componentes de texto en GrapeJS
+        // ya son editables por defecto. Si necesitas hacer componentes editables,
+        // hazlo solo cuando se añaden nuevos componentes, no en el load inicial.
         
-        const makeTextEditable = (comp) => {
-            if (!comp || isProcessingComponents) return;
-            
-            // Evitar procesar el mismo componente dos veces (previene recursión infinita)
-            const compId = comp.cid || comp.getId();
-            if (processedComponents.has(compId)) {
-                return;
-            }
-            processedComponents.add(compId);
-            
-            const tagName = (comp.get('tagName') || '').toLowerCase();
-            if (textElements.includes(tagName)) {
-                // Para H1, simplemente hacerlo editable sin cambiar su tipo
-                // Cambiar el tipo puede causar recursión infinita
-                // Usar setSilent si está disponible para evitar disparar eventos
-                try {
-                    if (comp.setSilent) {
-                        comp.setSilent('editable', true);
-                        comp.setSilent('selectable', true);
-                        comp.setSilent('hoverable', true);
-                    } else {
-                        // Si setSilent no está disponible, desactivar eventos temporalmente
-                        const wasSilent = comp.get('silent') || false;
-                        comp.set('silent', true);
-                        comp.set('editable', true);
-                        comp.set('selectable', true);
-                        comp.set('hoverable', true);
-                        comp.set('silent', wasSilent);
-                    }
-                } catch (e) {
-                    // Si falla, simplemente continuar sin modificar
-                    console.warn('Error al hacer componente editable:', e);
-                }
-                
-                // Procesar hijos recursivamente solo si no son del mismo tipo
-                const children = comp.components();
-                if (children && children.length > 0) {
-                    children.each(child => makeTextEditable(child));
-                }
-            } else {
-                // Procesar hijos recursivamente
-                const children = comp.components();
-                if (children && children.length > 0) {
-                    children.each(child => makeTextEditable(child));
-                }
-            }
-        };
-        
-        // Procesar componentes de forma segura
-        isProcessingComponents = true;
-        try {
-            const allComponents = editor.getComponents();
-            allComponents.each(comp => makeTextEditable(comp));
-        } finally {
-            isProcessingComponents = false;
-        }
+        // La funcionalidad de hacer componentes editables se maneja en los listeners
+        // component:add y component:update que están más abajo
     });
     
     // Edición directa de texto en el canvas con mínimo impacto de performance
@@ -1785,24 +1734,9 @@
             const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
             
             if (textElements.includes(tagName)) {
-                // Usar setSilent si está disponible para evitar disparar eventos
-                try {
-                    if (component.setSilent) {
-                        component.setSilent('editable', true);
-                        component.setSilent('selectable', true);
-                        component.setSilent('hoverable', true);
-                    } else {
-                        // Si setSilent no está disponible, desactivar eventos temporalmente
-                        const wasSilent = component.get('silent') || false;
-                        component.set('silent', true);
-                        component.set('editable', true);
-                        component.set('selectable', true);
-                        component.set('hoverable', true);
-                        component.set('silent', wasSilent);
-                    }
-                } catch (e) {
-                    console.warn('Error al hacer componente editable en component:add:', e);
-                }
+                // NO hacer set() aquí para evitar recursión infinita
+                // Los componentes de texto ya son editables por defecto en GrapeJS
+                // Solo actualizar el DOM directamente
                 
                 setTimeout(() => {
                     if (!editor || !editor.Canvas) return;
@@ -1884,9 +1818,11 @@
             const tagName = (component.get('tagName') || '').toLowerCase();
             const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
             if (textElements.includes(tagName)) {
-                component.set('editable', true);
-                component.set('selectable', true);
-                component.set('hoverable', true);
+                // NO hacer set() aquí para evitar recursión infinita
+                // Los componentes de texto ya son editables por defecto en GrapeJS
+                // component.set('editable', true);
+                // component.set('selectable', true);
+                // component.set('hoverable', true);
                 
                 // SOLUCIÓN DEFINITIVA PARA H1: Forzar edición directa
                 setTimeout(() => {
