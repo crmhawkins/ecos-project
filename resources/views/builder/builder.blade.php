@@ -1634,43 +1634,26 @@
         });
         
         // Hacer editables todos los componentes de texto existentes
+        const processedComponents = new Set(); // Para evitar procesar el mismo componente dos veces
         const makeTextEditable = (comp) => {
             if (!comp) return;
             
+            // Evitar procesar el mismo componente dos veces (previene recursión infinita)
+            const compId = comp.cid || comp.getId();
+            if (processedComponents.has(compId)) {
+                return;
+            }
+            processedComponents.add(compId);
+            
             const tagName = (comp.get('tagName') || '').toLowerCase();
             if (textElements.includes(tagName)) {
-                // ESPECIALMENTE PARA H1: Convertir a tipo "text" si no lo es ya
-                if (tagName === 'h1' && comp.get('type') !== 'text') {
-                    // Obtener el contenido actual
-                    const content = comp.get('content') || '';
-                    const attributes = comp.getAttributes() || {};
-                    
-                    // Crear un nuevo componente de tipo "text" con tagName h1
-                    const parent = comp.parent();
-                    const index = parent ? parent.components().indexOf(comp) : -1;
-                    
-                    // Reemplazar el componente
-                    const newComp = editor.Components.addComponent({
-                        type: 'text',
-                        tagName: 'h1',
-                        content: content,
-                        attributes: attributes,
-                        editable: true,
-                    });
-                    
-                    if (parent && index >= 0) {
-                        parent.components().remove(comp);
-                        parent.components().add(newComp, { at: index });
-                    }
-                    
-                    return; // Ya procesado
-                }
-                
+                // Para H1, simplemente hacerlo editable sin cambiar su tipo
+                // Cambiar el tipo puede causar recursión infinita
                 comp.set('editable', true);
                 comp.set('selectable', true);
                 comp.set('hoverable', true);
                 
-                // Procesar hijos recursivamente
+                // Procesar hijos recursivamente solo si no son del mismo tipo
                 const children = comp.components();
                 if (children && children.length > 0) {
                     children.each(child => makeTextEditable(child));
