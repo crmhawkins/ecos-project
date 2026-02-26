@@ -1365,19 +1365,22 @@
                         let needsUpdate = false;
                         
                         if (!attrs['field-label']) {
-                            attrs['field-label'] = type === 'text' ? 'Campo de texto' : 
-                                                  type === 'email' ? 'Email' : 
-                                                  type === 'textarea' ? 'Mensaje' : 
-                                                  type === 'select' ? 'Selecciona una opción' : 
-                                                  type === 'checkbox' ? 'Acepto los términos' : 
-                                                  'Subir archivo';
+                            let defaultLabel = 'Campo de texto';
+                            if (type === 'email') defaultLabel = 'Email';
+                            else if (type === 'textarea') defaultLabel = 'Mensaje';
+                            else if (type === 'select') defaultLabel = 'Selecciona una opción';
+                            else if (type === 'checkbox') defaultLabel = 'Acepto los términos';
+                            else if (type === 'file') defaultLabel = 'Subir archivo';
+                            attrs['field-label'] = defaultLabel;
                             needsUpdate = true;
                         }
                         
                         if (!attrs['field-placeholder']) {
-                            attrs['field-placeholder'] = type === 'text' ? 'Escribe aquí...' : 
-                                                         type === 'email' ? 'tu@email.com' : 
-                                                         type === 'textarea' ? 'Escribe tu mensaje...' : '';
+                            let defaultPlaceholder = '';
+                            if (type === 'text') defaultPlaceholder = 'Escribe aquí...';
+                            else if (type === 'email') defaultPlaceholder = 'tu@email.com';
+                            else if (type === 'textarea') defaultPlaceholder = 'Escribe tu mensaje...';
+                            attrs['field-placeholder'] = defaultPlaceholder;
                             needsUpdate = true;
                         }
                         
@@ -1492,8 +1495,12 @@
                                 view.el.setAttribute('data-required', required ? 'true' : 'false');
                                 const labelEl = view.el.querySelector('label');
                                 if (labelEl) {
-                                    const label = attrs['field-label'] || labelEl.textContent.replace(/\s*\*\s*$/, '').trim();
-                                    labelEl.innerHTML = label + (required ? ' <span class="required">*</span>' : '');
+                                    let labelText = attrs['field-label'];
+                                    if (!labelText) {
+                                        labelText = labelEl.textContent.replace(/\s*\*\s*$/, '').trim();
+                                    }
+                                    const requiredSpan = required ? ' <span class="required">*</span>' : '';
+                                    labelEl.innerHTML = labelText + requiredSpan;
                                 }
                                 const input = view.el.querySelector('input, textarea, select');
                                 if (input) {
@@ -1552,7 +1559,7 @@
                         this.el.setAttribute('data-field-type', fieldType);
                         this.el.setAttribute('data-required', required ? 'true' : 'false');
                         this.el.className = 'form-field';
-                        this.el.innerHTML = `<label>${label}${requiredSpan}</label>${inputHTML}`;
+                        this.el.innerHTML = '<label>' + label + requiredSpan + '</label>' + inputHTML;
                     }
                 }
             }
