@@ -1312,6 +1312,199 @@
             }
         });
 
+        // Registrar componentes de campos de formulario con traits editables
+        const registerFormFieldComponent = (type, fieldType) => {
+            // Función para generar el HTML del campo según el tipo
+            const getFieldHTML = (attrs) => {
+                const label = attrs['field-label'] || 'Campo';
+                const placeholder = attrs['field-placeholder'] || '';
+                const name = attrs['field-name'] || `field_${type}`;
+                const required = attrs['field-required'] === 'true';
+                const requiredSpan = required ? ' <span class="required">*</span>' : '';
+                
+                let inputHTML = '';
+                if (fieldType === 'textarea') {
+                    inputHTML = `<textarea name="${name}" rows="4" placeholder="${placeholder}"></textarea>`;
+                } else if (fieldType === 'select') {
+                    inputHTML = `<select name="${name}">
+                        <option value="">Selecciona...</option>
+                        <option value="opcion1">Opción 1</option>
+                        <option value="opcion2">Opción 2</option>
+                    </select>`;
+                } else if (fieldType === 'checkbox') {
+                    inputHTML = `<input type="checkbox" name="${name}"${required ? ' required' : ''}>`;
+                } else if (fieldType === 'file') {
+                    inputHTML = `<input type="file" name="${name}"${required ? ' required' : ''}>`;
+                } else {
+                    const inputType = fieldType === 'email' ? 'email' : 'text';
+                    inputHTML = `<input type="${inputType}" name="${name}" placeholder="${placeholder}"${required ? ' required' : ''}>`;
+                }
+                
+                return `<label>${label}${requiredSpan}</label>${inputHTML}`;
+            };
+            
+            domc.addType(`form-field-${type}`, {
+                model: {
+                    defaults: {
+                        tagName: 'div',
+                        classes: ['form-field'],
+                        attributes: {
+                            'data-field-type': fieldType,
+                            'data-required': 'false',
+                            'field-label': type === 'text' ? 'Campo de texto' : 
+                                          type === 'email' ? 'Email' : 
+                                          type === 'textarea' ? 'Mensaje' : 
+                                          type === 'select' ? 'Selecciona una opción' : 
+                                          type === 'checkbox' ? 'Acepto los términos' : 
+                                          'Subir archivo',
+                            'field-placeholder': type === 'text' ? 'Escribe aquí...' : 
+                                               type === 'email' ? 'tu@email.com' : 
+                                               type === 'textarea' ? 'Escribe tu mensaje...' : '',
+                            'field-name': `field_${type}`,
+                            'field-required': 'true'
+                        },
+                        traits: [
+                            {
+                                type: 'text',
+                                name: 'field-label',
+                                label: 'Etiqueta (Label)',
+                                placeholder: 'Campo de texto',
+                                changeProp: 1
+                            },
+                            {
+                                type: 'text',
+                                name: 'field-placeholder',
+                                label: 'Placeholder',
+                                placeholder: 'Escribe aquí...',
+                                changeProp: 1
+                            },
+                            {
+                                type: 'text',
+                                name: 'field-name',
+                                label: 'Nombre del campo (name)',
+                                placeholder: 'field_text',
+                                changeProp: 1
+                            },
+                            {
+                                type: 'checkbox',
+                                name: 'field-required',
+                                label: 'Campo obligatorio',
+                                valueTrue: 'true',
+                                valueFalse: 'false',
+                                changeProp: 1
+                            }
+                        ],
+                        editable: false,
+                        droppable: false
+                    },
+                    init() {
+                        // Extraer valores iniciales del HTML si existen (solo si no están ya definidos)
+                        setTimeout(() => {
+                            const view = this.view;
+                            if (view && view.el) {
+                                const attrs = this.getAttributes() || {};
+                                let updated = false;
+                                
+                                const labelEl = view.el.querySelector('label');
+                                const input = view.el.querySelector('input, textarea, select');
+                                
+                                if (labelEl && !attrs['field-label']) {
+                                    const labelText = labelEl.textContent.replace(/\s*\*\s*$/, '').trim();
+                                    attrs['field-label'] = labelText;
+                                    updated = true;
+                                }
+                                
+                                if (input) {
+                                    if (!attrs['field-placeholder'] && input.getAttribute('placeholder')) {
+                                        attrs['field-placeholder'] = input.getAttribute('placeholder');
+                                        updated = true;
+                                    }
+                                    if (!attrs['field-name'] && input.getAttribute('name')) {
+                                        attrs['field-name'] = input.getAttribute('name');
+                                        updated = true;
+                                    }
+                                    if (!attrs['field-required']) {
+                                        const isRequired = input.hasAttribute('required') || 
+                                                          view.el.getAttribute('data-required') === 'true' ||
+                                                          (labelEl && labelEl.querySelector('.required') !== null);
+                                        attrs['field-required'] = isRequired ? 'true' : 'false';
+                                        updated = true;
+                                    }
+                                }
+                                
+                                if (updated) {
+                                    this.setAttributes(attrs);
+                                }
+                            }
+                        }, 100);
+                        
+                        // Listeners para actualizar cuando cambian los traits
+                        this.on('change:attributes:field-label change:attributes:field-placeholder change:attributes:field-name change:attributes:field-required', () => {
+                            const view = this.view;
+                            if (view && view.onRender) {
+                                view.onRender();
+                            }
+                        });
+                    }
+                }
+            },
+            view: {
+                onRender() {
+                    const model = this.model;
+                    const attrs = model.getAttributes() || {};
+                    const fieldType = attrs['data-field-type'] || type;
+                    
+                    // Generar HTML del campo
+                    const label = attrs['field-label'] || (type === 'text' ? 'Campo de texto' : 
+                                                          type === 'email' ? 'Email' : 
+                                                          type === 'textarea' ? 'Mensaje' : 
+                                                          type === 'select' ? 'Selecciona una opción' : 
+                                                          type === 'checkbox' ? 'Acepto los términos' : 
+                                                          'Subir archivo');
+                    const placeholder = attrs['field-placeholder'] || '';
+                    const name = attrs['field-name'] || `field_${type}`;
+                    const required = attrs['field-required'] === 'true';
+                    const requiredSpan = required ? ' <span class="required">*</span>' : '';
+                    
+                    let inputHTML = '';
+                    if (fieldType === 'textarea') {
+                        inputHTML = `<textarea name="${name}" rows="4" placeholder="${placeholder}"${required ? ' required' : ''}></textarea>`;
+                    } else if (fieldType === 'select') {
+                        inputHTML = `<select name="${name}"${required ? ' required' : ''}>
+                            <option value="">Selecciona...</option>
+                            <option value="opcion1">Opción 1</option>
+                            <option value="opcion2">Opción 2</option>
+                        </select>`;
+                    } else if (fieldType === 'checkbox') {
+                        inputHTML = `<input type="checkbox" name="${name}"${required ? ' required' : ''}>`;
+                    } else if (fieldType === 'file') {
+                        inputHTML = `<input type="file" name="${name}"${required ? ' required' : ''}>`;
+                    } else {
+                        const inputType = fieldType === 'email' ? 'email' : 'text';
+                        inputHTML = `<input type="${inputType}" name="${name}" placeholder="${placeholder}"${required ? ' required' : ''}>`;
+                    }
+                    
+                    // Actualizar el contenido del elemento
+                    if (this.el) {
+                        this.el.setAttribute('data-field-type', fieldType);
+                        this.el.setAttribute('data-required', required ? 'true' : 'false');
+                        this.el.className = 'form-field';
+                        this.el.innerHTML = `<label>${label}${requiredSpan}</label>${inputHTML}`;
+                    }
+                }
+            }
+            });
+        };
+
+        // Registrar todos los tipos de campos de formulario
+        registerFormFieldComponent('text', 'text');
+        registerFormFieldComponent('email', 'email');
+        registerFormFieldComponent('textarea', 'textarea');
+        registerFormFieldComponent('select', 'select');
+        registerFormFieldComponent('checkbox', 'checkbox');
+        registerFormFieldComponent('file', 'file');
+
+
         // Componente para fila de columnas configurable
         domc.addType('ecos-columns-row', {
             model: {
@@ -1530,8 +1723,36 @@
         });
         
         // Inyectar cuando se añade un componente (por si el canvas ya estaba cargado)
-        editor.on('component:add', () => {
+        editor.on('component:add', (component) => {
             setTimeout(injectAllBlockStyles, 100);
+            
+            // Convertir componentes de formulario al tipo registrado
+            if (component) {
+                // Función para verificar y convertir
+                const checkAndConvert = () => {
+                    const el = component.getEl();
+                    if (el && el.classList && el.classList.contains('form-field')) {
+                        const fieldType = el.getAttribute('data-field-type');
+                        if (fieldType) {
+                            const newType = `form-field-${fieldType}`;
+                            if (domc.getType(newType) && component.get('type') !== newType) {
+                                // Cambiar el tipo del componente
+                                component.set('type', newType);
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                };
+                
+                // Intentar inmediatamente
+                if (!checkAndConvert()) {
+                    // Si no funciona, intentar después de un delay (cuando el elemento esté renderizado)
+                    setTimeout(() => {
+                        checkAndConvert();
+                    }, 200);
+                }
+            }
         });
 
         // No es necesario un listener extra: el cambio se maneja en el propio modelo
