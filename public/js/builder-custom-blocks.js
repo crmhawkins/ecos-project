@@ -1319,39 +1319,10 @@
                     defaults: {
                         tagName: 'div',
                         classes: ['form-field'],
-                        attributes: (function() {
-                            // Calcular valores por defecto según el tipo
-                            let defaultLabel, defaultPlaceholder;
-                            
-                            if (type === 'text') {
-                                defaultLabel = 'Campo de texto';
-                                defaultPlaceholder = 'Escribe aquí...';
-                            } else if (type === 'email') {
-                                defaultLabel = 'Email';
-                                defaultPlaceholder = 'tu@email.com';
-                            } else if (type === 'textarea') {
-                                defaultLabel = 'Mensaje';
-                                defaultPlaceholder = 'Escribe tu mensaje...';
-                            } else if (type === 'select') {
-                                defaultLabel = 'Selecciona una opción';
-                                defaultPlaceholder = '';
-                            } else if (type === 'checkbox') {
-                                defaultLabel = 'Acepto los términos';
-                                defaultPlaceholder = '';
-                            } else {
-                                defaultLabel = 'Subir archivo';
-                                defaultPlaceholder = '';
-                            }
-                            
-                            return {
-                                'data-field-type': fieldType,
-                                'data-required': 'false',
-                                'field-label': defaultLabel,
-                                'field-placeholder': defaultPlaceholder,
-                                'field-name': 'field_' + type,
-                                'field-required': 'true'
-                            };
-                        })(),
+                        attributes: {
+                            'data-field-type': fieldType,
+                            'data-required': 'false'
+                        },
                         traits: [
                             {
                                 type: 'text',
@@ -1556,23 +1527,24 @@
                     const name = attrs['field-name'] || `field_${type}`;
                     const required = attrs['field-required'] === 'true';
                     const requiredSpan = required ? ' <span class="required">*</span>' : '';
+                    const requiredAttr = required ? ' required' : '';
                     
                     let inputHTML = '';
                     if (fieldType === 'textarea') {
-                        inputHTML = `<textarea name="${name}" rows="4" placeholder="${placeholder}"${required ? ' required' : ''}></textarea>`;
+                        inputHTML = '<textarea name="' + name + '" rows="4" placeholder="' + placeholder + '"' + requiredAttr + '></textarea>';
                     } else if (fieldType === 'select') {
-                        inputHTML = `<select name="${name}"${required ? ' required' : ''}>
-                            <option value="">Selecciona...</option>
-                            <option value="opcion1">Opción 1</option>
-                            <option value="opcion2">Opción 2</option>
-                        </select>`;
+                        inputHTML = '<select name="' + name + '"' + requiredAttr + '>' +
+                            '<option value="">Selecciona...</option>' +
+                            '<option value="opcion1">Opción 1</option>' +
+                            '<option value="opcion2">Opción 2</option>' +
+                            '</select>';
                     } else if (fieldType === 'checkbox') {
-                        inputHTML = `<input type="checkbox" name="${name}"${required ? ' required' : ''}>`;
+                        inputHTML = '<input type="checkbox" name="' + name + '"' + requiredAttr + '>';
                     } else if (fieldType === 'file') {
-                        inputHTML = `<input type="file" name="${name}"${required ? ' required' : ''}>`;
+                        inputHTML = '<input type="file" name="' + name + '"' + requiredAttr + '>';
                     } else {
                         const inputType = fieldType === 'email' ? 'email' : 'text';
-                        inputHTML = `<input type="${inputType}" name="${name}" placeholder="${placeholder}"${required ? ' required' : ''}>`;
+                        inputHTML = '<input type="' + inputType + '" name="' + name + '" placeholder="' + placeholder + '"' + requiredAttr + '>';
                     }
                     
                     // Actualizar el contenido del elemento
