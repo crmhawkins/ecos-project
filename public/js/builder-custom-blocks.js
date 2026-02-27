@@ -1318,7 +1318,8 @@
             const capturedType = type;
             const capturedFieldType = fieldTypeParam;
             
-            domc.addType(`form-field-${type}`, {
+            const componentType = 'form-field-' + type;
+            domc.addType(componentType, {
                 model: {
                     defaults: {
                         tagName: 'div',
@@ -1363,7 +1364,7 @@
                         editable: false,
                         droppable: false
                     },
-                    init() {
+                    init: function() {
                         // Inicializar valores por defecto si no existen
                         const attrs = this.getAttributes() || {};
                         let needsUpdate = false;
