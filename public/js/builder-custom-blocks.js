@@ -1429,9 +1429,13 @@
                                         updated = true;
                                     }
                                     
-                                    const isRequired = input.hasAttribute('required') || 
-                                                      view.el.getAttribute('data-required') === 'true' ||
-                                                      (labelEl && labelEl.querySelector('.required') !== null);
+                                    let isRequired = input.hasAttribute('required');
+                                    if (!isRequired) {
+                                        isRequired = view.el.getAttribute('data-required') === 'true';
+                                    }
+                                    if (!isRequired && labelEl) {
+                                        isRequired = labelEl.querySelector('.required') !== null;
+                                    }
                                     const requiredValue = isRequired ? 'true' : 'false';
                                     if (!currentAttrs['field-required'] || currentAttrs['field-required'] === '') {
                                         currentAttrs['field-required'] = requiredValue;
@@ -1458,7 +1462,8 @@
                                 const labelEl = view.el.querySelector('label');
                                 if (labelEl) {
                                     const required = attrs['field-required'] === 'true';
-                                    labelEl.innerHTML = label + (required ? ' <span class="required">*</span>' : '');
+                                    const requiredSpanText = required ? ' <span class="required">*</span>' : '';
+                                    labelEl.innerHTML = label + requiredSpanText;
                                 }
                             }
                         });
@@ -1492,7 +1497,8 @@
                             const required = attrs['field-required'] === 'true';
                             const view = this.view;
                             if (view && view.el) {
-                                view.el.setAttribute('data-required', required ? 'true' : 'false');
+                                const requiredValue = required ? 'true' : 'false';
+                                view.el.setAttribute('data-required', requiredValue);
                                 const labelEl = view.el.querySelector('label');
                                 if (labelEl) {
                                     let labelText = attrs['field-label'];
@@ -1557,7 +1563,8 @@
                     // Actualizar el contenido del elemento
                     if (this.el) {
                         this.el.setAttribute('data-field-type', fieldType);
-                        this.el.setAttribute('data-required', required ? 'true' : 'false');
+                        const requiredValue = required ? 'true' : 'false';
+                        this.el.setAttribute('data-required', requiredValue);
                         this.el.className = 'form-field';
                         this.el.innerHTML = '<label>' + label + requiredSpan + '</label>' + inputHTML;
                     }
