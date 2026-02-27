@@ -1313,14 +1313,18 @@
         });
 
         // Registrar componentes de campos de formulario con traits editables
-        const registerFormFieldComponent = (type, fieldType) => {
+        const registerFormFieldComponent = (type, fieldTypeParam) => {
+            // Capturar type y fieldType para usar en el closure
+            const capturedType = type;
+            const capturedFieldType = fieldTypeParam;
+            
             domc.addType(`form-field-${type}`, {
                 model: {
                     defaults: {
                         tagName: 'div',
                         classes: ['form-field'],
                         attributes: {
-                            'data-field-type': fieldType,
+                            'data-field-type': fieldTypeParam,
                             'data-required': 'false'
                         },
                         traits: [
@@ -1366,26 +1370,26 @@
                         
                         if (!attrs['field-label']) {
                             let defaultLabel = 'Campo de texto';
-                            if (type === 'email') defaultLabel = 'Email';
-                            else if (type === 'textarea') defaultLabel = 'Mensaje';
-                            else if (type === 'select') defaultLabel = 'Selecciona una opción';
-                            else if (type === 'checkbox') defaultLabel = 'Acepto los términos';
-                            else if (type === 'file') defaultLabel = 'Subir archivo';
+                            if (capturedType === 'email') defaultLabel = 'Email';
+                            else if (capturedType === 'textarea') defaultLabel = 'Mensaje';
+                            else if (capturedType === 'select') defaultLabel = 'Selecciona una opción';
+                            else if (capturedType === 'checkbox') defaultLabel = 'Acepto los términos';
+                            else if (capturedType === 'file') defaultLabel = 'Subir archivo';
                             attrs['field-label'] = defaultLabel;
                             needsUpdate = true;
                         }
                         
                         if (!attrs['field-placeholder']) {
                             let defaultPlaceholder = '';
-                            if (type === 'text') defaultPlaceholder = 'Escribe aquí...';
-                            else if (type === 'email') defaultPlaceholder = 'tu@email.com';
-                            else if (type === 'textarea') defaultPlaceholder = 'Escribe tu mensaje...';
+                            if (capturedType === 'text') defaultPlaceholder = 'Escribe aquí...';
+                            else if (capturedType === 'email') defaultPlaceholder = 'tu@email.com';
+                            else if (capturedType === 'textarea') defaultPlaceholder = 'Escribe tu mensaje...';
                             attrs['field-placeholder'] = defaultPlaceholder;
                             needsUpdate = true;
                         }
                         
                         if (!attrs['field-name']) {
-                            attrs['field-name'] = `field_${type}`;
+                            attrs['field-name'] = `field_${capturedType}`;
                             needsUpdate = true;
                         }
                         
@@ -1525,19 +1529,19 @@
                 onRender() {
                     const model = this.model;
                     const attrs = model.getAttributes() || {};
-                    const fieldType = attrs['data-field-type'] || type;
+                    const fieldType = attrs['data-field-type'] || capturedFieldType;
                     
                     // Generar HTML del campo
                     let defaultLabel = 'Campo de texto';
-                    if (type === 'email') defaultLabel = 'Email';
-                    else if (type === 'textarea') defaultLabel = 'Mensaje';
-                    else if (type === 'select') defaultLabel = 'Selecciona una opción';
-                    else if (type === 'checkbox') defaultLabel = 'Acepto los términos';
-                    else if (type === 'file') defaultLabel = 'Subir archivo';
+                    if (capturedType === 'email') defaultLabel = 'Email';
+                    else if (capturedType === 'textarea') defaultLabel = 'Mensaje';
+                    else if (capturedType === 'select') defaultLabel = 'Selecciona una opción';
+                    else if (capturedType === 'checkbox') defaultLabel = 'Acepto los términos';
+                    else if (capturedType === 'file') defaultLabel = 'Subir archivo';
                     
                     const label = attrs['field-label'] || defaultLabel;
                     const placeholder = attrs['field-placeholder'] || '';
-                    const name = attrs['field-name'] || `field_${type}`;
+                    const name = attrs['field-name'] || `field_${capturedType}`;
                     const required = attrs['field-required'] === 'true';
                     const requiredSpan = required ? ' <span class="required">*</span>' : '';
                     const requiredAttr = required ? ' required' : '';
