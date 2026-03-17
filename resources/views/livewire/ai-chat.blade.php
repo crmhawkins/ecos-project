@@ -78,10 +78,33 @@
                     @endif
                 </div>
 
-                <!-- Input del chat: form para controlar envío y vaciar input al instante -->
+                <!-- Input del chat: form para mostrar mensaje y "escribiendo" al instante -->
                 <div class="ai-chat-input" 
                      style="padding: 15px 20px; background: white; border-top: 1px solid #e2e8f0;">
-                    <form @submit.prevent="const el = $refs.msgInput; if (el && el.value.trim()) { $wire.set('newMessage', el.value); $wire.call('sendMessage'); el.value = ''; }"
+                    <form @submit.prevent="
+                        const el = $refs.msgInput;
+                        const text = el && el.value.trim();
+                        if (!text) return;
+                        const container = document.getElementById('chat-messages');
+                        if (container) {
+                            const now = new Date();
+                            const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+                            const userBubble = document.createElement('div');
+                            userBubble.className = 'ai-message user';
+                            userBubble.style.cssText = 'margin-bottom: 15px; display: flex; justify-content: flex-end;';
+                            userBubble.innerHTML = '<div style=\"max-width: 80%; padding: 12px 16px; border-radius: 18px; background: linear-gradient(135deg, #D93690 0%, #667eea 100%); color: white;\"><p style=\"margin: 0; font-size: 14px; line-height: 1.4;\">' + text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;') + '</p><small style=\"opacity: 0.7; font-size: 11px; margin-top: 5px; display: block;\">' + time + '</small></div>';
+                            container.appendChild(userBubble);
+                            const typingWrap = document.createElement('div');
+                            typingWrap.className = 'ai-message assistant ai-chat-typing-temp';
+                            typingWrap.style.cssText = 'margin-bottom: 15px; display: flex; justify-content: flex-start;';
+                            typingWrap.innerHTML = '<div style=\"max-width: 80%; padding: 12px 16px; border-radius: 18px; background: white; color: #333; box-shadow: 0 2px 10px rgba(0,0,0,0.1);\"><div style=\"display: flex; align-items: center; gap: 5px;\"><div class=\"typing-indicator\"><span></span><span></span><span></span></div><span style=\"font-size: 12px; color: #666;\">Escribiendo...</span></div></div>';
+                            container.appendChild(typingWrap);
+                            container.scrollTop = container.scrollHeight;
+                        }
+                        $wire.set('newMessage', text);
+                        $wire.call('sendMessage');
+                        el.value = '';
+                    "
                           x-data
                           style="display: flex; gap: 10px; align-items: center;">
                         <input type="text"
@@ -154,27 +177,6 @@
                 const messagesContainer = document.getElementById('chat-messages');
                 if (messagesContainer) {
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                }
-            });
-
-            // Limpiar el input al enviar: delegación para que funcione aunque el chat se abra después
-            function clearAiInput() {
-                var input = document.getElementById('ai-chat-input');
-                if (input) {
-                    input.value = '';
-                    input.dispatchEvent(new Event('input', { bubbles: true }));
-                }
-            }
-
-            document.addEventListener('click', function (e) {
-                if (e.target.closest('.ai-chat-send-btn')) {
-                    setTimeout(clearAiInput, 0);
-                }
-            });
-
-            document.addEventListener('keydown', function (e) {
-                if (e.target.id === 'ai-chat-input' && e.key === 'Enter') {
-                    setTimeout(clearAiInput, 0);
                 }
             });
         });
