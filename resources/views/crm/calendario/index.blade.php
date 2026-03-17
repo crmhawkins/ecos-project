@@ -786,14 +786,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const fullUrl = aulasParam.length ? url + '?' + aulasParam.map(function(id) { return 'aulas[]=' + encodeURIComponent(id); }).join('&') : url;
 
             fetch(fullUrl)
-                .then(function(response) { return response.json(); })
+                .then(function(response) {
+                    return response.json();
+                })
                 .then(function(data) {
-                    var list = Array.isArray(data) ? data : (data && data.data ? data.data : []);
+                    const list = Array.isArray(data) ? data : (data && data.data ? data.data : []);
                     successCallback(list);
                 })
                 .catch(function(error) {
                     console.error('Error loading events:', error);
-                    successCallback([]);
+                    if (typeof failureCallback === 'function') {
+                        failureCallback(error);
+                    }
                 });
         },
         eventClick: function(info) {
