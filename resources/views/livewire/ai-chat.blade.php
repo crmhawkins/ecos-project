@@ -83,7 +83,8 @@
                      style="padding: 15px 20px; background: white; border-top: 1px solid #e2e8f0;">
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <input type="text" 
-                               wire:model="newMessage" 
+                               id="ai-chat-input"
+                               wire:model.defer="newMessage" 
                                wire:keydown.enter="sendMessage"
                                placeholder="Escribe tu mensaje..."
                                style="flex: 1; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 25px; outline: none; font-size: 14px;"
@@ -148,12 +149,38 @@
 
     <script>
         document.addEventListener('livewire:load', function () {
+            // Scroll al último mensaje cuando Livewire lo indique
             Livewire.on('scrollToBottom', () => {
                 const messagesContainer = document.getElementById('chat-messages');
                 if (messagesContainer) {
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 }
             });
+
+            // Limpiar el input inmediatamente al enviar (antes de que responda el servidor)
+            const input = document.getElementById('ai-chat-input');
+            const sendButton = input ? input.parentElement.querySelector('button[wire\\:click="sendMessage"]') : null;
+
+            const clearInput = () => {
+                if (input) {
+                    // Pequeño delay para dejar que Livewire lea el valor
+                    setTimeout(() => { input.value = ''; }, 10);
+                }
+            };
+
+            if (input) {
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        clearInput();
+                    }
+                });
+            }
+
+            if (sendButton) {
+                sendButton.addEventListener('click', function () {
+                    clearInput();
+                });
+            }
         });
     </script>
 </div>
