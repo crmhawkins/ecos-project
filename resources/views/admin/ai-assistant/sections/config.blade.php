@@ -70,9 +70,25 @@
                             <label for="ai_model" style="font-weight: 600; color: #2d3748; margin-bottom: 8px; display: block; font-size: 0.95rem;">Modelo de IA</label>
                             <select id="ai_model" name="ai_model" required
                                     style="border: 2px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; font-size: 0.95rem; transition: all 0.3s ease; background: white; width: 100%;">
-                                <option value="gpt-3.5-turbo" {{ $config->ai_model == 'gpt-3.5-turbo' ? 'selected' : '' }}>GPT-3.5 Turbo</option>
-                                <option value="gpt-4" {{ $config->ai_model == 'gpt-4' ? 'selected' : '' }}>GPT-4</option>
+                                @if(!empty($useHawkinsAi) && count($availableModels ?? []) > 0)
+                                    <option value="">-- Selecciona modelo (Hawkins) --</option>
+                                    @foreach($availableModels as $modelId)
+                                        @php $id = is_string($modelId) ? $modelId : ($modelId['id'] ?? $modelId['name'] ?? ''); $label = is_string($modelId) ? $modelId : ($modelId['name'] ?? $modelId['id'] ?? $id); @endphp
+                                        <option value="{{ $id }}" {{ $config->ai_model == $id ? 'selected' : '' }}>{{ $label }}</option>
+                                    @endforeach
+                                @else
+                                    <option value="gpt-3.5-turbo" {{ $config->ai_model == 'gpt-3.5-turbo' ? 'selected' : '' }}>GPT-3.5 Turbo</option>
+                                    <option value="gpt-4" {{ $config->ai_model == 'gpt-4' ? 'selected' : '' }}>GPT-4</option>
+                                    @if(!empty($useHawkinsAi))
+                                        <option value="gpt-oss:120b-cloud" {{ $config->ai_model == 'gpt-oss:120b-cloud' ? 'selected' : '' }}>Hawkins (gpt-oss:120b-cloud)</option>
+                                    @endif
+                                @endif
                             </select>
+                            @if(!empty($useHawkinsAi))
+                                <small style="color: #6b7280; font-size: 0.85rem; margin-top: 4px; display: block;">Conectado a IA Hawkins. Modelos cargados desde /chat/models.</small>
+                            @else
+                                <small style="color: #6b7280; font-size: 0.85rem; margin-top: 4px; display: block;">IA Hawkins configurada en <code>config/services.php</code>.</small>
+                            @endif
                         </div>
                         <div class="col-md-6" style="margin-bottom: 16px;">
                             <label for="temperature" style="font-weight: 600; color: #2d3748; margin-bottom: 8px; display: block; font-size: 0.95rem;">Temperatura (0-2)</label>

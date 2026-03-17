@@ -837,5 +837,6 @@ Route::prefix('crm')->group(function () {
 Route::prefix('api/ai-assistant')->group(function () {
     Route::post('/send-message', [AiAssistantController::class, 'sendMessage'])->name('ai.send-message');
     Route::get('/config', [AiAssistantController::class, 'getConfig'])->name('ai.config');
+    Route::get('/models', [AiAssistantController::class, 'getModels'])->name('ai.models');
     Route::get('/history', [AiAssistantController::class, 'getHistory'])->name('ai.history');
 });

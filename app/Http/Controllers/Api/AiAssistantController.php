@@ -43,7 +43,7 @@ class AiAssistantController extends Controller
 
             return response()->json([
                 'success' => true,
-                'response' => $result['response'],
+                'response' => $result['message'],
                 'links' => $result['links'],
                 'config' => $result['config']
             ]);
@@ -73,6 +73,18 @@ class AiAssistantController extends Controller
                 'show_courses' => $config->show_courses,
                 'show_contact_info' => $config->show_contact_info
             ]
+        ]);
+    }
+
+    /**
+     * Listar modelos disponibles (IA Hawkins)
+     */
+    public function getModels(): JsonResponse
+    {
+        $models = $this->aiService->getAvailableModels();
+        return response()->json([
+            'success' => true,
+            'models' => $models,
         ]);
     }
 

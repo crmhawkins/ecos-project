@@ -13,11 +13,21 @@ class AiAssistantService
 {
     protected $config;
     protected $apiKey;
+    /** @var bool */
+    protected $useHawkinsAi;
+    /** @var string */
+    protected $hawkinsBaseUrl;
+    /** @var string */
+    protected $hawkinsApiKey;
 
     public function __construct()
     {
         $this->config = AiAssistantConfig::getActiveConfig();
         $this->apiKey = config('services.openai.api_key', env('OPENAI_API_KEY'));
+        $hawkins = config('services.hawkins_ai', []);
+        $this->hawkinsBaseUrl = rtrim($hawkins['base_url'] ?? '', '/');
+        $this->hawkinsApiKey = $hawkins['api_key'] ?? '';
+        $this->useHawkinsAi = $this->hawkinsBaseUrl !== '' && $this->hawkinsApiKey !== '';
     }
 
     /**
@@ -41,8 +51,10 @@ class AiAssistantService
             // Preparar mensajes para la API
             $messages = $this->prepareMessages($systemPrompt, $conversationHistory, $userMessage);
             
-            // Llamar a la API de OpenAI
-            $response = $this->callOpenAI($messages);
+            // Llamar a la IA: Hawkins (local) si está configurada, si no OpenAI
+            $response = $this->useHawkinsAi
+                ? $this->callHawkinsAI($messages)
+                : $this->callOpenAI($messages);
             
             // Guardar conversación
             $this->saveConversation($sessionId, $userMessage, $response, $pageUrl);
@@ -191,15 +203,68 @@ class AiAssistantService
     }
 
     /**
+     * Llamar a la API Hawkins (IA local)
+     * POST /chat/chat con {"prompt":"", "modelo":""}, header x-api-key
+     */
+    protected function callHawkinsAI(array $messages): string
+    {
+        $prompt = $this->buildPromptForHawkins($messages);
+        $url = $this->hawkinsBaseUrl . '/chat/chat';
+
+        $response = Http::withHeaders([
+            'x-api-key' => $this->hawkinsApiKey,
+            'Content-Type' => 'application/json',
+        ])->timeout(120)->post($url, [
+            'prompt' => $prompt,
+            'modelo' => $this->config->ai_model ?: 'gpt-oss:120b-cloud',
+        ]);
+
+        if (!$response->successful()) {
+            Log::error('Hawkins AI request failed', ['status' => $response->status(), 'body' => $response->body()]);
+            throw new \Exception('Error al conectar con la IA: ' . $response->body());
+        }
+
+        $data = $response->json();
+        if (empty($data['success']) || empty($data['respuesta'])) {
+            $fallback = $data['metadata']['message']['content'] ?? null;
+            if ($fallback) {
+                return $fallback;
+            }
+            throw new \Exception('La IA no devolvió una respuesta válida.');
+        }
+
+        return (string) $data['respuesta'];
+    }
+
+    /**
+     * Construir un único prompt para Hawkins a partir de mensajes (system + historial + user)
+     */
+    protected function buildPromptForHawkins(array $messages): string
+    {
+        $parts = [];
+        foreach ($messages as $m) {
+            $role = $m['role'] ?? '';
+            $content = $m['content'] ?? '';
+            if ($role === 'system') {
+                $parts[] = "Instrucciones del sistema:\n" . $content;
+            } elseif ($role === 'user') {
+                $parts[] = "Usuario: " . $content;
+            } elseif ($role === 'assistant') {
+                $parts[] = "Asistente: " . $content;
+            }
+        }
+        return implode("\n\n", $parts);
+    }
+
+    /**
      * Llamar a la API de OpenAI
      */
     protected function callOpenAI($messages)
     {
         if (empty($this->apiKey)) {
-            // Si no hay API key configurada, devolver un mensaje claro pero sin lanzar excepción
-            Log::warning('AiAssistantService: falta OPENAI_API_KEY o services.openai.api_key');
+            Log::warning('AiAssistantService: falta OPENAI_API_KEY y/o Hawkins AI no configurada');
             return 'Por ahora el asistente no tiene conexión con el modelo de IA. '
-                .'Informa a la academia de que falta configurar la clave de OpenAI para activar las respuestas automáticas.';
+                . 'Configura la IA local Hawkins (HAWKINS_AI_BASE_URL y HAWKINS_AI_API_KEY) o la clave de OpenAI para activar las respuestas automáticas.';
         }
 
         $response = Http::withHeaders([
@@ -211,13 +276,57 @@ class AiAssistantService
             'temperature' => (float) $this->config->temperature,
             'max_tokens' => (int) $this->config->max_tokens,
         ]);
-        
+
         if ($response->successful()) {
             $data = $response->json();
             return $data['choices'][0]['message']['content'] ?? 'Lo siento, no pude generar una respuesta.';
         }
-        
+
         throw new \Exception('Error en la API de OpenAI: ' . $response->body());
+    }
+
+    /**
+     * Listar modelos disponibles en la API Hawkins (GET /chat/models)
+     */
+    public function getAvailableModels(): array
+    {
+        if (!$this->useHawkinsAi) {
+            return [];
+        }
+        $url = $this->hawkinsBaseUrl . '/chat/models';
+        try {
+            $response = Http::withHeaders([
+                'x-api-key' => $this->hawkinsApiKey,
+                'Accept' => 'application/json',
+            ])->timeout(10)->get($url);
+
+            if (!$response->successful()) {
+                Log::warning('Hawkins AI models request failed', ['status' => $response->status()]);
+                return [];
+            }
+
+            $data = $response->json();
+            if (is_array($data) && isset($data['models']) && is_array($data['models'])) {
+                return array_values($data['models']);
+            }
+            if (is_array($data) && isset($data['data']) && is_array($data['data'])) {
+                $list = [];
+                foreach ($data['data'] as $item) {
+                    $list[] = is_string($item) ? $item : ($item['id'] ?? $item['name'] ?? (string) $item);
+                }
+                return $list;
+            }
+            if (is_array($data) && array_is_list($data)) {
+                $list = [];
+                foreach ($data as $item) {
+                    $list[] = is_string($item) ? $item : ($item['id'] ?? $item['name'] ?? (string) $item);
+                }
+                return $list;
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Hawkins AI getAvailableModels error: ' . $e->getMessage());
+        }
+        return [];
     }
 
     /**

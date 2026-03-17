@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    /*
+    | IA Hawkins (URL pública y token fijos)
+    */
+    'hawkins_ai' => [
+        'base_url' => 'https://aiapi.hawkins.es',
+        'api_key' => 'OllamaAPI_2024_K8mN9pQ2rS5tU7vW3xY6zA1bC4eF8hJ0lM',
+    ],
+
 ];

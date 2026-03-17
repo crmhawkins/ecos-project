@@ -7,6 +7,7 @@ use App\Models\AiAssistantConfig;
 use App\Models\AiPrompt;
 use App\Models\AiLink;
 use App\Models\AiConversation;
+use App\Services\AiAssistantService;
 use Illuminate\Http\Request;
 
 class AiAssistantController extends Controller
@@ -23,10 +24,12 @@ class AiAssistantController extends Controller
     /**
      * Mostrar sección de configuración general
      */
-    public function config()
+    public function config(AiAssistantService $aiService)
     {
         $config = AiAssistantConfig::getActiveConfig();
-        return view('admin.ai-assistant.config', compact('config'));
+        $availableModels = $aiService->getAvailableModels();
+        $useHawkinsAi = !empty(config('services.hawkins_ai.base_url')) && !empty(config('services.hawkins_ai.api_key'));
+        return view('admin.ai-assistant.config', compact('config', 'availableModels', 'useHawkinsAi'));
     }
 
     /**
