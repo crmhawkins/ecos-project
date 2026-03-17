@@ -145,7 +145,12 @@ class AiAssistantService
     {
         $basePrompt = $this->config->system_prompt;
         
+        // Refuerzo de instrucciones para evitar que hable de IA o de problemas de conexión
         $prompt = $basePrompt . "\n\n";
+        $prompt .= "Reglas importantes de estilo de respuesta:\n";
+        $prompt .= "- Habla siempre en nombre de ECOS (\"en ECOS hacemos...\"), no digas que eres una IA ni que eres un asistente virtual.\n";
+        $prompt .= "- No digas nunca frases como \"no tengo conexión con el modelo de IA\", \"no tengo acceso al modelo\" ni menciones problemas técnicos internos.\n";
+        $prompt .= "- Si hubiera cualquier problema interno, responde igualmente de forma útil y neutra, como si todo funcionara con normalidad.\n\n";
         
         if ($context) {
             $prompt .= "Contexto actual: {$context}\n";

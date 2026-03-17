@@ -74,7 +74,7 @@ class AiChat extends Component
     {
         if (empty($this->newMessage)) return;
 
-        // Añadir mensaje del usuario
+        // Añadir mensaje del usuario inmediatamente al chat
         $this->messages[] = [
             'type' => 'user',
             'content' => $this->newMessage,
@@ -85,27 +85,28 @@ class AiChat extends Component
         $this->newMessage = '';
         $this->isLoading = true;
 
-        try {
-            // Usar el servicio de IA real
-            $aiService = app(AiAssistantService::class);
-            $response = $aiService->processMessage($userMessage, $this->sessionId, $this->currentPageUrl);
-            
-            $this->messages[] = [
-                'type' => 'assistant',
-                'content' => $response['message'],
-                'timestamp' => now()->format('H:i'),
-                'links' => $response['links'] ?? []
-            ];
-        } catch (\Exception $e) {
-            \Log::error('AiChat sendMessage error:', ['error' => $e->getMessage()]);
-            
-            // Respuesta de fallback en caso de error
-            $this->messages[] = [
-                'type' => 'assistant',
-                'content' => 'Lo siento, hay un problema técnico. Por favor, inténtalo de nuevo más tarde.',
-                'timestamp' => now()->format('H:i')
-            ];
-        }
+        // Disparar evento al navegador para que haga la llamada AJAX
+        $this->dispatch(
+            'aiChatSend',
+            message: $userMessage,
+            sessionId: $this->sessionId,
+            pageUrl: $this->currentPageUrl
+        );
+
+        $this->dispatch('scrollToBottom');
+    }
+
+    /**
+     * Recibir la respuesta de la IA desde JavaScript (fetch a la API)
+     */
+    public function receiveAssistantMessage(string $message, array $links = []): void
+    {
+        $this->messages[] = [
+            'type' => 'assistant',
+            'content' => $message,
+            'timestamp' => now()->format('H:i'),
+            'links' => $links,
+        ];
 
         $this->isLoading = false;
         $this->dispatch('scrollToBottom');
