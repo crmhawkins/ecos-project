@@ -28,6 +28,14 @@ class AiAssistantService
         $this->hawkinsBaseUrl = rtrim($hawkins['base_url'] ?? '', '/');
         $this->hawkinsApiKey = $hawkins['api_key'] ?? '';
         $this->useHawkinsAi = $this->hawkinsBaseUrl !== '' && $this->hawkinsApiKey !== '';
+        if ($this->useHawkinsAi) {
+            Log::channel('single')->debug('AiAssistant: usando Hawkins AI', ['base_url' => $this->hawkinsBaseUrl]);
+        } else {
+            Log::channel('single')->warning('AiAssistant: Hawkins no configurada (base_url o api_key vacío). Se usará OpenAI o mensaje de fallo.', [
+                'base_url_set' => $this->hawkinsBaseUrl !== '',
+                'api_key_set' => $this->hawkinsApiKey !== '',
+            ]);
+        }
     }
 
     /**
@@ -210,30 +218,44 @@ class AiAssistantService
     {
         $prompt = $this->buildPromptForHawkins($messages);
         $url = $this->hawkinsBaseUrl . '/chat/chat';
+        $modelo = $this->config->ai_model ?: 'gpt-oss:120b-cloud';
+        $mensajeAmigable = 'Lo siento, no he podido conectar con el asistente en este momento. Por favor, inténtalo de nuevo más tarde.';
 
-        $response = Http::withHeaders([
-            'x-api-key' => $this->hawkinsApiKey,
-            'Content-Type' => 'application/json',
-        ])->timeout(120)->post($url, [
-            'prompt' => $prompt,
-            'modelo' => $this->config->ai_model ?: 'gpt-oss:120b-cloud',
-        ]);
+        try {
+            $response = Http::withHeaders([
+                'x-api-key' => $this->hawkinsApiKey,
+                'Content-Type' => 'application/json',
+            ])->timeout(120)->post($url, [
+                'prompt' => $prompt,
+                'modelo' => $modelo,
+            ]);
 
-        if (!$response->successful()) {
-            Log::error('Hawkins AI request failed', ['status' => $response->status(), 'body' => $response->body()]);
-            throw new \Exception('Error al conectar con la IA: ' . $response->body());
-        }
+            if (!$response->successful()) {
+                Log::error('Hawkins AI falló: HTTP ' . $response->status() . '. URL: ' . $url . '. Respuesta: ' . $response->body());
+                return $mensajeAmigable;
+            }
 
-        $data = $response->json();
-        if (empty($data['success']) || empty($data['respuesta'])) {
+            $data = $response->json();
+            if (!empty($data['respuesta'])) {
+                return (string) $data['respuesta'];
+            }
             $fallback = $data['metadata']['message']['content'] ?? null;
             if ($fallback) {
-                return $fallback;
+                return (string) $fallback;
             }
-            throw new \Exception('La IA no devolvió una respuesta válida.');
+            if (!empty($data['success'])) {
+                Log::warning('Hawkins AI: success=true pero sin campo respuesta ni metadata.message.content');
+                return $mensajeAmigable;
+            }
+            Log::warning('Hawkins AI: respuesta sin contenido válido', ['keys' => $data ? array_keys($data) : [], 'body' => $response->body()]);
+            return $mensajeAmigable;
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::error('Hawkins AI falló: no se pudo conectar (timeout o red). ' . $e->getMessage());
+            return $mensajeAmigable;
+        } catch (\Throwable $e) {
+            Log::error('Hawkins AI falló: excepción. ' . $e->getMessage(), ['exception' => get_class($e)]);
+            return $mensajeAmigable;
         }
-
-        return (string) $data['respuesta'];
     }
 
     /**
@@ -257,14 +279,13 @@ class AiAssistantService
     }
 
     /**
-     * Llamar a la API de OpenAI
+     * Llamar a la API de OpenAI (solo si no se usa Hawkins)
      */
     protected function callOpenAI($messages)
     {
         if (empty($this->apiKey)) {
-            Log::warning('AiAssistantService: falta OPENAI_API_KEY y/o Hawkins AI no configurada');
-            return 'Por ahora el asistente no tiene conexión con el modelo de IA. '
-                . 'Configura la IA local Hawkins (HAWKINS_AI_BASE_URL y HAWKINS_AI_API_KEY) o la clave de OpenAI para activar las respuestas automáticas.';
+            Log::warning('AiAssistantService: OpenAI sin clave y Hawkins no disponible');
+            return 'Lo siento, no he podido conectar con el asistente en este momento. Por favor, inténtalo de nuevo más tarde.';
         }
 
         $response = Http::withHeaders([
@@ -282,7 +303,8 @@ class AiAssistantService
             return $data['choices'][0]['message']['content'] ?? 'Lo siento, no pude generar una respuesta.';
         }
 
-        throw new \Exception('Error en la API de OpenAI: ' . $response->body());
+        Log::error('OpenAI API error: ' . $response->body());
+        return 'Lo siento, no he podido conectar con el asistente en este momento. Por favor, inténtalo de nuevo más tarde.';
     }
 
     /**
