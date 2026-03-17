@@ -102,87 +102,53 @@
             </div>
         @endif
     @endif
-
-    <style>
-        /* Separación de botones flotantes: Asistente IA (arriba) y WhatsApp (abajo) */
-        .ai-chat-button:hover {
-            transform: scale(1.1);
-        }
-        
-        .typing-indicator {
-            display: flex;
-            gap: 3px;
-        }
-        
-        .typing-indicator span {
-            width: 6px;
-            height: 6px;
-            background: #D93690;
-            border-radius: 50%;
-            animation: typing 1.4s infinite ease-in-out;
-        }
-        
-        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-        
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
-            40% { transform: scale(1); opacity: 1; }
-        }
-        
-        .ai-chat-button:hover {
-            transform: scale(1.1);
-        }
-        
-        .ai-chat-messages::-webkit-scrollbar {
-            width: 4px;
-        }
-        
-        .ai-chat-messages::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        
-        .ai-chat-messages::-webkit-scrollbar-thumb {
-            background: #D93690;
-            border-radius: 2px;
-        }
-    </style>
-
-    <script>
-        window.aiChatSubmit = function (wire, inputEl) {
-            var el = inputEl && inputEl.value !== undefined ? inputEl : (inputEl && inputEl.$el ? inputEl.$el : null);
-            if (!el) return;
-            var text = (el.value || '').trim();
-            if (!text) return;
-            var container = document.getElementById('chat-messages');
-            if (container) {
-                var now = new Date();
-                var time = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-                var esc = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-                var userBubble = document.createElement('div');
-                userBubble.className = 'ai-message user';
-                userBubble.style.cssText = 'margin-bottom: 15px; display: flex; justify-content: flex-end;';
-                userBubble.innerHTML = '<div style="max-width: 80%; padding: 12px 16px; border-radius: 18px; background: linear-gradient(135deg, #D93690 0%, #667eea 100%); color: white;"><p style="margin: 0; font-size: 14px; line-height: 1.4;">' + esc + '</p><small style="opacity: 0.7; font-size: 11px; margin-top: 5px; display: block;">' + time + '</small></div>';
-                container.appendChild(userBubble);
-                var typingWrap = document.createElement('div');
-                typingWrap.className = 'ai-message assistant ai-chat-typing-temp';
-                typingWrap.style.cssText = 'margin-bottom: 15px; display: flex; justify-content: flex-start;';
-                typingWrap.innerHTML = '<div style="max-width: 80%; padding: 12px 16px; border-radius: 18px; background: white; color: #333; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"><div style="display: flex; align-items: center; gap: 5px;"><div class="typing-indicator"><span></span><span></span><span></span></div><span style="font-size: 12px; color: #666;">Escribiendo...</span></div></div>';
-                container.appendChild(typingWrap);
-                container.scrollTop = container.scrollHeight;
-            }
-            wire.set('newMessage', text);
-            wire.call('sendMessage');
-            el.value = '';
-        };
-
-        document.addEventListener('livewire:load', function () {
-            Livewire.on('scrollToBottom', () => {
-                const messagesContainer = document.getElementById('chat-messages');
-                if (messagesContainer) {
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                }
-            });
-        });
-    </script>
 </div>
+@push('styles')
+<style>
+    .ai-chat-button:hover { transform: scale(1.1); }
+    .typing-indicator { display: flex; gap: 3px; }
+    .typing-indicator span { width: 6px; height: 6px; background: #D93690; border-radius: 50%; animation: typing 1.4s infinite ease-in-out; }
+    .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes typing { 0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
+    .ai-chat-messages::-webkit-scrollbar { width: 4px; }
+    .ai-chat-messages::-webkit-scrollbar-track { background: #f1f1f1; }
+    .ai-chat-messages::-webkit-scrollbar-thumb { background: #D93690; border-radius: 2px; }
+</style>
+@endpush
+@push('scripts')
+<script>
+window.aiChatSubmit = function (wire, inputEl) {
+    var el = inputEl && inputEl.value !== undefined ? inputEl : (inputEl && inputEl.$el ? inputEl.$el : null);
+    if (!el) return;
+    var text = (el.value || '').trim();
+    if (!text) return;
+    var container = document.getElementById('chat-messages');
+    if (container) {
+        var now = new Date();
+        var time = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        var esc = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        var userBubble = document.createElement('div');
+        userBubble.className = 'ai-message user';
+        userBubble.style.cssText = 'margin-bottom: 15px; display: flex; justify-content: flex-end;';
+        userBubble.innerHTML = '<div style="max-width: 80%; padding: 12px 16px; border-radius: 18px; background: linear-gradient(135deg, #D93690 0%, #667eea 100%); color: white;"><p style="margin: 0; font-size: 14px; line-height: 1.4;">' + esc + '</p><small style="opacity: 0.7; font-size: 11px; margin-top: 5px; display: block;">' + time + '</small></div>';
+        container.appendChild(userBubble);
+        var typingWrap = document.createElement('div');
+        typingWrap.className = 'ai-message assistant ai-chat-typing-temp';
+        typingWrap.style.cssText = 'margin-bottom: 15px; display: flex; justify-content: flex-start;';
+        typingWrap.innerHTML = '<div style="max-width: 80%; padding: 12px 16px; border-radius: 18px; background: white; color: #333; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"><div style="display: flex; align-items: center; gap: 5px;"><div class="typing-indicator"><span></span><span></span><span></span></div><span style="font-size: 12px; color: #666;">Escribiendo...</span></div></div>';
+        container.appendChild(typingWrap);
+        container.scrollTop = container.scrollHeight;
+    }
+    wire.set('newMessage', text);
+    wire.call('sendMessage');
+    el.value = '';
+};
+document.addEventListener('livewire:load', function () {
+    Livewire.on('scrollToBottom', function () {
+        var messagesContainer = document.getElementById('chat-messages');
+        if (messagesContainer) messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    });
+});
+</script>
+@endpush

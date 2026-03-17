@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     @livewireStyles
     @yield('css')
+    @stack('styles')
 
 </head>
 <body>
@@ -67,6 +68,7 @@
 <script src="{{ asset('assets/js/scripts.js') }}"></script>
 <script src="{{ asset('assets/js/jquery.mixitup.js') }}"></script>
 @yield('scripts')
+@stack('scripts')
 
 </body>
 </html>
