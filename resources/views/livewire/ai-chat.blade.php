@@ -78,27 +78,26 @@
                     @endif
                 </div>
 
-                <!-- Input del chat -->
+                <!-- Input del chat: form para controlar envío y vaciar input al instante -->
                 <div class="ai-chat-input" 
                      style="padding: 15px 20px; background: white; border-top: 1px solid #e2e8f0;">
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <input type="text" 
-                               id="ai-chat-input"
-                               wire:model.defer="newMessage" 
-                               wire:keydown.enter="sendMessage"
+                    <form @submit.prevent="const el = $refs.msgInput; if (el && el.value.trim()) { $wire.set('newMessage', el.value); $wire.call('sendMessage'); el.value = ''; }"
+                          x-data
+                          style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text"
+                               x-ref="msgInput"
+                               wire:model.defer="newMessage"
                                placeholder="Escribe tu mensaje..."
                                style="flex: 1; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 25px; outline: none; font-size: 14px;"
-                               onfocus="this.style.borderColor='#D93690'" 
+                               onfocus="this.style.borderColor='#D93690'"
                                onblur="this.style.borderColor='#e2e8f0'">
-                        <button type="button"
-                                class="ai-chat-send-btn"
-                                wire:click="sendMessage" 
+                        <button type="submit"
                                 style="width: 40px; height: 40px; background: linear-gradient(135deg, #D93690 0%, #667eea 100%); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;"
-                                onmouseover="this.style.transform='scale(1.1)'" 
+                                onmouseover="this.style.transform='scale(1.1)'"
                                 onmouseout="this.style.transform='scale(1)'">
                             <i class="fas fa-paper-plane"></i>
                         </button>
-                    </div>
+                    </form>
                 </div>
             </div>
         @endif
