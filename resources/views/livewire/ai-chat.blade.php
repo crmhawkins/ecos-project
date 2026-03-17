@@ -90,7 +90,9 @@
                                style="flex: 1; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 25px; outline: none; font-size: 14px;"
                                onfocus="this.style.borderColor='#D93690'" 
                                onblur="this.style.borderColor='#e2e8f0'">
-                        <button wire:click="sendMessage" 
+                        <button type="button"
+                                class="ai-chat-send-btn"
+                                wire:click="sendMessage" 
                                 style="width: 40px; height: 40px; background: linear-gradient(135deg, #D93690 0%, #667eea 100%); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;"
                                 onmouseover="this.style.transform='scale(1.1)'" 
                                 onmouseout="this.style.transform='scale(1)'">
@@ -149,7 +151,6 @@
 
     <script>
         document.addEventListener('livewire:load', function () {
-            // Scroll al último mensaje cuando Livewire lo indique
             Livewire.on('scrollToBottom', () => {
                 const messagesContainer = document.getElementById('chat-messages');
                 if (messagesContainer) {
@@ -157,30 +158,26 @@
                 }
             });
 
-            // Limpiar el input inmediatamente al enviar (antes de que responda el servidor)
-            const input = document.getElementById('ai-chat-input');
-            const sendButton = input ? input.parentElement.querySelector('button[wire\\:click="sendMessage"]') : null;
-
-            const clearInput = () => {
+            // Limpiar el input al enviar: delegación para que funcione aunque el chat se abra después
+            function clearAiInput() {
+                var input = document.getElementById('ai-chat-input');
                 if (input) {
-                    // Pequeño delay para dejar que Livewire lea el valor
-                    setTimeout(() => { input.value = ''; }, 10);
+                    input.value = '';
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
                 }
-            };
-
-            if (input) {
-                input.addEventListener('keydown', function (e) {
-                    if (e.key === 'Enter') {
-                        clearInput();
-                    }
-                });
             }
 
-            if (sendButton) {
-                sendButton.addEventListener('click', function () {
-                    clearInput();
-                });
-            }
+            document.addEventListener('click', function (e) {
+                if (e.target.closest('.ai-chat-send-btn')) {
+                    setTimeout(clearAiInput, 0);
+                }
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.target.id === 'ai-chat-input' && e.key === 'Enter') {
+                    setTimeout(clearAiInput, 0);
+                }
+            });
         });
     </script>
 </div>
