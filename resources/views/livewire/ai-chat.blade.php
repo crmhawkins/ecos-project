@@ -148,60 +148,10 @@
 
     <script>
         document.addEventListener('livewire:load', function () {
-            const livewireComponent = @this;
-
             Livewire.on('scrollToBottom', () => {
                 const messagesContainer = document.getElementById('chat-messages');
                 if (messagesContainer) {
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                }
-            });
-
-            // Escuchar el evento que dispara Livewire al enviar un mensaje
-            Livewire.on('aiChatSend', (payload) => {
-                try {
-                    const url = '{{ route('ai.send-message') }}';
-                    const tokenMeta = document.querySelector('meta[name="csrf-token"]');
-                    const csrf = tokenMeta ? tokenMeta.getAttribute('content') : null;
-
-                    // Mostrar indicador de escritura (isLoading ya está a true en Livewire)
-                    fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            ...(csrf ? { 'X-CSRF-TOKEN': csrf } : {}),
-                            'Accept': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            message: payload.message,
-                            session_id: payload.sessionId,
-                            page_url: payload.pageUrl,
-                        }),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data && data.success) {
-                            livewireComponent.call('receiveAssistantMessage', data.response, data.links || []);
-                        } else {
-                            const msg = data && data.message
-                                ? data.message
-                                : 'Lo siento, no he podido conectar con el asistente en este momento. Por favor, inténtalo de nuevo más tarde.';
-                            livewireComponent.call('receiveAssistantMessage', msg, []);
-                        }
-                    })
-                    .catch(() => {
-                        livewireComponent.call(
-                            'receiveAssistantMessage',
-                            'Lo siento, no he podido conectar con el asistente en este momento. Por favor, inténtalo de nuevo más tarde.',
-                            []
-                        );
-                    });
-                } catch (e) {
-                    livewireComponent.call(
-                        'receiveAssistantMessage',
-                        'Lo siento, no he podido conectar con el asistente en este momento. Por favor, inténtalo de nuevo más tarde.',
-                        []
-                    );
                 }
             });
         });
