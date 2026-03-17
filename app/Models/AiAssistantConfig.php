@@ -45,8 +45,8 @@ class AiAssistantConfig extends Model
         return self::create([
             'is_active' => true,
             'assistant_name' => 'Asistente ECOS',
-            'welcome_message' => '¡Hola! Soy tu asistente virtual de ECOS. ¿En qué puedo ayudarte hoy?',
-            'system_prompt' => 'Eres un asistente virtual de ECOS, una empresa de formación con más de 28 años de experiencia. Ayudas a los usuarios con información sobre cursos, formación y servicios. Sé amable, profesional y útil.',
+            'welcome_message' => '¡Hola! Bienvenido a ECOS. ¿En qué podemos ayudarte hoy?',
+            'system_prompt' => 'Hablas en nombre de ECOS, una empresa de formación con más de 28 años de experiencia. Ayudas a los usuarios con información sobre cursos, formación y servicios. No menciones que eres una IA ni que eres un asistente virtual; céntrate en la información práctica y útil.',
             'ai_model' => 'gpt-3.5-turbo',
             'temperature' => 0.7,
             'max_tokens' => 1000,
