@@ -481,14 +481,14 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Hacer clickeable toda la caja del equipamiento
+    // Hacer clickeable toda la caja del equipamiento (icono y zona vacía). No tocar si es checkbox o label (el label ya asocia con for="id")
     const equipmentItems = document.querySelectorAll('.equipment-item');
     equipmentItems.forEach(item => {
         item.addEventListener('click', function(e) {
-            if (e.target.type !== 'checkbox') {
-                const checkbox = this.querySelector('input[type="checkbox"]');
-                checkbox.checked = !checkbox.checked;
-            }
+            if (e.target.type === 'checkbox') return;
+            if (e.target.tagName === 'LABEL') return;
+            const checkbox = this.querySelector('input[type="checkbox"]');
+            if (checkbox) checkbox.checked = !checkbox.checked;
         });
     });
 
