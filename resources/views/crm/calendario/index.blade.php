@@ -780,15 +780,20 @@ document.addEventListener('DOMContentLoaded', function() {
         events: function(fetchInfo, successCallback, failureCallback) {
             const year = fetchInfo.start.getFullYear();
             const month = fetchInfo.start.getMonth() + 1;
-            
-            fetch(`{{ route('calendario.api', ['year' => ':year', 'month' => ':month']) }}`.replace(':year', year).replace(':month', month))
-                .then(response => response.json())
-                .then(data => {
-                    successCallback(data);
+            const url = `{{ route('calendario.api', ['year' => ':year', 'month' => ':month']) }}`.replace(':year', year).replace(':month', month);
+            const params = new URLSearchParams(window.location.search);
+            const aulasParam = params.getAll('aulas[]');
+            const fullUrl = aulasParam.length ? url + '?' + aulasParam.map(function(id) { return 'aulas[]=' + encodeURIComponent(id); }).join('&') : url;
+
+            fetch(fullUrl)
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    var list = Array.isArray(data) ? data : (data && data.data ? data.data : []);
+                    successCallback(list);
                 })
-                .catch(error => {
+                .catch(function(error) {
                     console.error('Error loading events:', error);
-                    failureCallback(error);
+                    successCallback([]);
                 });
         },
         eventClick: function(info) {

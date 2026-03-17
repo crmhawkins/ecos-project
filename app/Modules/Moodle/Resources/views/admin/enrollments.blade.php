@@ -416,19 +416,15 @@
             });
         });
 
-        // Enable enroll button when a user is selected
+        // Enable enroll button when a user is selected (solo quitar hidden duplicados, no los radios)
         $(document).on('change', '.user-select', function() {
             $('#enrollBtn').prop('disabled', false);
-            
-            // Add hidden input with selected user ID
-            $('input[name="user_id"]').remove(); // Remove any existing hidden input
+            $('input[type="hidden"][name="user_id"]').remove();
             $('<input>').attr({
                 type: 'hidden',
                 name: 'user_id',
                 value: $(this).val()
             }).appendTo('form[action*="enroll"]');
-            
-            console.log('Usuario seleccionado:', $(this).val());
         });
 
         // Also trigger search when pressing Enter in the search field

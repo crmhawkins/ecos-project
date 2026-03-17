@@ -50,6 +50,7 @@ use App\Http\Controllers\Product\ProductsCategoriesController;
 use App\Http\Controllers\Product\ProductsController;
 use App\Http\Controllers\Cursos\CursosController;
 use App\Http\Controllers\Cursos\CursosCategoriesController;
+use App\Http\Controllers\Dominios\DominiosController;
 use App\Http\Controllers\Productividad\ProductividadController;
 use App\Http\Controllers\Settings\UserSettingsController;
 use App\Http\Controllers\Statistics\StatisticsController;
@@ -270,6 +271,13 @@ Route::prefix('crm')->group(function () {
         Route::post('/products-categories/update/{id}', [ProductsCategoriesController::class, 'update'])->name('productosCategoria.update');
         Route::post('/products-categories/destroy', [ProductsCategoriesController::class, 'destroy'])->name('productosCategoria.delete');
 
+        // Dominios
+        Route::get('/dominios', [DominiosController::class, 'index'])->name('dominios.index');
+        Route::get('/dominios/create', [DominiosController::class, 'create'])->name('dominios.create');
+        Route::post('/dominios/store', [DominiosController::class, 'store'])->name('dominios.store');
+        Route::get('/dominios/edit/{id}', [DominiosController::class, 'edit'])->name('dominios.edit');
+        Route::post('/dominios/update/{id}', [DominiosController::class, 'update'])->name('dominios.update');
+
         // Cursos (CURSOS)
         Route::get('/cursos', [CursosController::class, 'index'])->name('cursos.index');
         Route::get('/cursos/create', [CursosController::class, 'create'])->name('cursos.create');
@@ -378,7 +386,7 @@ Route::prefix('crm')->group(function () {
         //Holidays(Vacaciones Admin)
         Route::get('/holidays/index', [AdminHolidaysController::class, 'index'])->name('holiday.admin.index');
         Route::get('/holidays/admin-create', [AdminHolidaysController::class, 'create'])->name('holiday.admin.create');
-        Route::get('/holidays/store', [AdminHolidaysController::class, 'store'])->name('holiday.admin.store');
+        Route::post('/holidays/store', [AdminHolidaysController::class, 'store'])->name('holiday.admin.store');
         Route::get('/holidays/destroy', [AdminHolidaysController::class, 'destroy'])->name('holiday.admin.destroy');
         Route::get('/holidays/admin-edit/{id}', [AdminHolidaysController::class, 'edit'])->name('holiday.admin.edit');
         Route::post('/holidays/admin-update', [AdminHolidaysController::class, 'update'])->name('holiday.admin.update');
@@ -573,8 +581,6 @@ Route::prefix('crm')->group(function () {
         Route::post('/nominas/store', [NominasController::class, 'store'])->name('nominas.store');
         Route::post('/nominas/update/{id}', [NominasController::class, 'update'])->name('nominas.update');
         Route::post('/nominas/destroy', [NominasController::class, 'destroy'])->name('nominas.delete');
-
-        Route::get('/nominas', [NominasController::class, 'index'])->name('nominas.index');
 
         //Departamentos
         Route::get('/departament', [DepartamentController::class, 'index'])->name('departamento.index');

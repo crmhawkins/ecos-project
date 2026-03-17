@@ -331,8 +331,8 @@
     <div class="course-header">
         <div class="course-header-content">
             <div>
-                @if($curso->imagen)
-                    <img src="{{ asset('storage/' . $curso->imagen) }}" alt="{{ $curso->titulo }}" class="course-image">
+                @if($curso->image)
+                    <img src="{{ $curso->image }}" alt="{{ $curso->name }}" class="course-image">
                 @else
                     <div class="course-image-placeholder">
                         <i class="fas fa-book"></i>
@@ -340,7 +340,7 @@
                 @endif
             </div>
             <div class="course-info">
-                <h1>{{ $curso->titulo }}</h1>
+                <h1>{{ $curso->name }}</h1>
                 <div class="subtitle">{{ $curso->categoria->nombre ?? 'Sin categoría' }}</div>
                 <div class="course-actions">
                     <a href="{{ route('cursos.edit', $curso->id) }}" class="btn">
@@ -366,7 +366,7 @@
                 <div class="info-card-body">
                     <div class="info-row">
                         <span class="info-label">Título</span>
-                        <span class="info-value">{{ $curso->titulo }}</span>
+                        <span class="info-value">{{ $curso->name }}</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Categoría</span>

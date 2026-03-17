@@ -589,7 +589,8 @@
     <script src="{{ asset('vendor/grapesjs/grapesjs-plugin-toolbox.min.js') }}"></script>
     <script src="{{ asset('vendor/grapesjs/grapesjs-component-code-editor.min.js') }}"></script>
     
-    <script src="{{ asset('js/builder-custom-blocks.js') }}"></script>
+    {{-- Plugin custom-blocks deshabilitado temporalmente --}}
+    {{-- <script src="{{ asset('js/builder-custom-blocks.js') }}"></script> --}}
     <script>
     let editor;
     
@@ -688,8 +689,8 @@
             // Construir lista de plugins dinámicamente basada en disponibilidad
             const pluginsToLoad = [
                 'gjs-blocks-basic',
-                'grapesjs-preset-webpage',
-                'custom-blocks'
+                'grapesjs-preset-webpage'
+                // 'custom-blocks' - Deshabilitado temporalmente
             ];
             
             // Añadir plugins solo si están disponibles
@@ -707,7 +708,7 @@
                 pluginsOpts: {
                     'gjs-blocks-basic': {},
                     'grapesjs-preset-webpage': {},
-                    'custom-blocks': {},
+                    // 'custom-blocks': {}, - Deshabilitado temporalmente
                     'grapesjs-tabs': {},
                     'grapesjs-user-blocks': {
                         blockLabel: 'Nombre',
@@ -1146,46 +1147,45 @@
             run(ed) {
                 const selected = ed.getSelected();
                 if (!selected) {
-                    showNotification('Selecciona primero un elemento de texto para editar.', 'info');
+                    showNotification('Selecciona primero un elemento en el canvas (texto, título o bloque) y vuelve a pulsar Editar texto.', 'info');
                     return;
                 }
                 
                 const tagName = (selected.get('tagName') || '').toLowerCase();
-                const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
+                const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label', 'div'];
                 
                 if (!textElements.includes(tagName)) {
-                    showNotification('Este elemento no es un elemento de texto editable.', 'warning');
+                    showNotification('Este elemento no es un elemento de texto editable. Prueba con un párrafo, título o bloque de texto.', 'warning');
                     return;
                 }
                 
-                // Usar el Rich Text Editor de GrapesJS si está disponible
-                if (ed.RichTextEditor) {
-                    const rte = ed.RichTextEditor;
-                    if (rte.isActive()) {
-                        rte.stop();
-                    } else {
-                        rte.enable(selected);
-                    }
-                } else {
-                    // Fallback: hacer editable directamente
-                    const el = selected.getEl();
-                    if (el) {
-                        el.setAttribute('contenteditable', 'true');
-                        el.style.cursor = 'text';
-                        el.style.userSelect = 'text';
-                        el.focus();
-                        
-                        const frameWin = ed.Canvas.getWindow();
-                        const frameDoc = ed.Canvas.getDocument();
-                        if (frameWin.getSelection) {
-                            const selection = frameWin.getSelection();
-                            const range = frameDoc.createRange();
-                            range.selectNodeContents(el);
-                            selection.removeAllRanges();
-                            selection.addRange(range);
-                        }
-                    }
+                const el = selected.getEl();
+                if (!el) {
+                    showNotification('Elemento aún no listo. Haz clic de nuevo en el botón Editar texto.', 'info');
+                    return;
                 }
+                
+                // Fallback directo: contenteditable (siempre ejecuta una acción visible)
+                el.setAttribute('contenteditable', 'true');
+                el.style.cursor = 'text';
+                el.style.userSelect = 'text';
+                el.style.outline = '2px solid rgba(0,123,255,0.5)';
+                el.style.outlineOffset = '2px';
+                el.focus();
+                
+                const frameWin = ed.Canvas.getWindow();
+                const frameDoc = ed.Canvas.getDocument();
+                if (frameWin && frameWin.getSelection && frameDoc) {
+                    try {
+                        const selection = frameWin.getSelection();
+                        const range = frameDoc.createRange();
+                        range.selectNodeContents(el);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    } catch (err) {}
+                }
+                
+                showNotification('Modo edición: escribe en el elemento seleccionado. Al terminar, haz clic fuera para aplicar.', 'success');
             }
         });
         
@@ -1588,6 +1588,204 @@
         .catch(error => {
             console.warn('Error al cargar imágenes existentes:', error);
         });
+        
+        // Registrar componente PDF Viewer
+        const domc = editor.DomComponents;
+        domc.addType('pdf-viewer-container', {
+            model: {
+                defaults: {
+                    tagName: 'div',
+                    classes: ['pdf-viewer-container'],
+                    traits: [
+                        {
+                            type: 'text',
+                            name: 'data-pdf-url',
+                            label: 'URL del PDF',
+                            placeholder: 'https://ejemplo.com/documento.pdf',
+                            changeProp: 1
+                        },
+                        {
+                            type: 'number',
+                            name: 'height',
+                            label: 'Altura (px)',
+                            default: 600,
+                            changeProp: 1
+                        }
+                    ]
+                },
+                init: function() {
+                    this.on('change:attributes:data-pdf-url', () => {
+                        const url = this.get('attributes')['data-pdf-url'];
+                        const view = this.view;
+                        if (view && view.el) {
+                            const iframe = view.el.querySelector('.pdf-viewer');
+                            const placeholder = view.el.querySelector('.pdf-viewer-placeholder');
+                            if (iframe && url) {
+                                iframe.src = url;
+                                if (placeholder) {
+                                    placeholder.style.display = 'none';
+                                }
+                            } else if (placeholder) {
+                                placeholder.style.display = 'block';
+                            }
+                        }
+                    });
+                    this.on('change:attributes:height', () => {
+                        const height = this.get('attributes').height || 600;
+                        const view = this.view;
+                        if (view && view.el) {
+                            const iframe = view.el.querySelector('.pdf-viewer');
+                            if (iframe) {
+                                iframe.style.height = height + 'px';
+                            }
+                        }
+                    });
+                }
+            },
+            view: {
+                onRender: function() {
+                    const model = this.model;
+                    const attrs = model.getAttributes() || {};
+                    const url = attrs['data-pdf-url'] || '';
+                    const height = attrs.height || 600;
+                    
+                    if (this.el) {
+                        this.el.className = 'pdf-viewer-container';
+                        this.el.innerHTML = `
+                            <iframe class="pdf-viewer" src="${url}" frameborder="0" allowfullscreen="true" style="width: 100%; height: ${height}px; border: none; display: ${url ? 'block' : 'none'};"></iframe>
+                            <div class="pdf-viewer-placeholder" style="display: ${url ? 'none' : 'block'}; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #9ca3af; pointer-events: none;">
+                                <i class="fas fa-file-pdf" style="font-size: 48px; margin-bottom: 16px; display: block;"></i>
+                                <p style="margin: 0; font-size: 14px;">Configura la URL del PDF en las propiedades del componente</p>
+                            </div>
+                        `;
+                    }
+                }
+            }
+        });
+        
+        // Añadir bloque PDF Viewer al BlockManager
+        const blockManager = editor.BlockManager;
+        blockManager.add('pdf-viewer', {
+            label: 'Visor PDF',
+            category: 'Preestilizados',
+            content: {
+                type: 'pdf-viewer-container',
+                classes: ['pdf-viewer-container'],
+                components: [
+                    {
+                        type: 'default',
+                        tagName: 'iframe',
+                        classes: ['pdf-viewer'],
+                        attributes: {
+                            frameborder: '0',
+                            allowfullscreen: 'true'
+                        }
+                    },
+                    {
+                        type: 'default',
+                        tagName: 'div',
+                        classes: ['pdf-viewer-placeholder'],
+                        components: [
+                            {
+                                type: 'default',
+                                tagName: 'i',
+                                classes: ['fas', 'fa-file-pdf']
+                            },
+                            {
+                                type: 'textnode',
+                                content: 'Configura la URL del PDF en las propiedades del componente'
+                            }
+                        ]
+                    }
+                ]
+            },
+            attributes: {
+                'data-pdf-url': ''
+            }
+        });
+        
+        // Añadir estilos CSS para el visor PDF
+        editor.Css.add(`
+            .pdf-viewer-container {
+                position: relative;
+                width: 100%;
+                min-height: 600px;
+                border: 2px dashed #e5e7eb;
+                border-radius: 12px;
+                background: #f8fafc;
+                overflow: hidden;
+            }
+            .pdf-viewer {
+                width: 100%;
+                height: 600px;
+                border: none;
+                display: block;
+            }
+            .pdf-viewer-placeholder {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+                color: #9ca3af;
+                pointer-events: none;
+            }
+            .pdf-viewer-placeholder i {
+                font-size: 48px;
+                margin-bottom: 16px;
+                display: block;
+            }
+            .pdf-viewer-placeholder p {
+                margin: 0;
+                font-size: 14px;
+            }
+        `);
+        
+        // Inyectar estilos en el canvas también
+        const canvas = editor.Canvas;
+        const canvasDoc = canvas.getDocument();
+        const canvasHead = canvasDoc.head;
+        let pdfStyleTag = canvasHead.querySelector('style[data-pdf-viewer-css]');
+        if (!pdfStyleTag) {
+            pdfStyleTag = canvasDoc.createElement('style');
+            pdfStyleTag.setAttribute('data-pdf-viewer-css', 'true');
+            canvasHead.appendChild(pdfStyleTag);
+        }
+        pdfStyleTag.textContent = `
+            .pdf-viewer-container {
+                position: relative;
+                width: 100%;
+                min-height: 600px;
+                border: 2px dashed #e5e7eb;
+                border-radius: 12px;
+                background: #f8fafc;
+                overflow: hidden;
+            }
+            .pdf-viewer {
+                width: 100%;
+                height: 600px;
+                border: none;
+                display: block;
+            }
+            .pdf-viewer-placeholder {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+                color: #9ca3af;
+                pointer-events: none;
+            }
+            .pdf-viewer-placeholder i {
+                font-size: 48px;
+                margin-bottom: 16px;
+                display: block;
+            }
+            .pdf-viewer-placeholder p {
+                margin: 0;
+                font-size: 14px;
+            }
+        `;
     });
     
     // Configurar componentes de texto para que sean editables (versión segura sin recursión)

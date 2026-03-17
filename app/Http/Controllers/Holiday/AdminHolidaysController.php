@@ -43,8 +43,7 @@ class AdminHolidaysController extends Controller
      */
     public function edit(Holidays $holiday, Request $request)
     {
-        $holidays = Holidays::where('admin_user_id', 'admin_user_id')->get();
-        return view('crm.admin.admin_holidays.edit', compact('holidays', 'request'));
+        return view('crm.admin.admin_holidays.edit', compact('holiday', 'request'));
     }
 
     /**
@@ -54,8 +53,10 @@ class AdminHolidaysController extends Controller
      * @param  Holidays  $holiday
      *
      */
-    public function update(Request $request, Holidays $holiday)
+    public function update(Request $request)
     {
+        $holiday = Holidays::findOrFail($request->input('holiday'));
+
         // Validación
         $request->validate([
             'quantity' => 'required|between:0,99.99',
@@ -88,7 +89,7 @@ class AdminHolidaysController extends Controller
         }
 
         // Respuesta
-        return redirect()->route('admin_holiday.edit',$holiday->id)->with('toast', [
+        return redirect()->route('holiday.admin.edit', $holiday->id)->with('toast', [
             'icon' => 'success',
             'mensaje' => 'Nuevo registro actualizado correctamente'
           ]

@@ -314,62 +314,62 @@
                     <label>Equipamiento Disponible</label>
                     <div class="equipment-selector">
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="proyector" value="proyector" 
-                                   {{ in_array('proyector', old('equipamiento', [])) ? 'checked' : '' }}>
+                            <input type="checkbox" name="equipment[]" id="proyector" value="proyector" 
+                                   {{ in_array('proyector', old('equipment', [])) ? 'checked' : '' }}>
                             <i class="fas fa-video"></i>
                             <label for="proyector">Proyector</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="pizarra_digital" value="pizarra_digital" 
-                                   {{ in_array('pizarra_digital', old('equipamiento', [])) ? 'checked' : '' }}>
+                            <input type="checkbox" name="equipment[]" id="pizarra_digital" value="pizarra_digital" 
+                                   {{ in_array('pizarra_digital', old('equipment', [])) ? 'checked' : '' }}>
                             <i class="fas fa-chalkboard"></i>
                             <label for="pizarra_digital">Pizarra Digital</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="ordenadores" value="ordenadores" 
-                                   {{ in_array('ordenadores', old('equipamiento', [])) ? 'checked' : '' }}>
+                            <input type="checkbox" name="equipment[]" id="ordenadores" value="ordenadores" 
+                                   {{ in_array('ordenadores', old('equipment', [])) ? 'checked' : '' }}>
                             <i class="fas fa-desktop"></i>
                             <label for="ordenadores">Ordenadores</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="wifi" value="wifi" 
-                                   {{ in_array('wifi', old('equipamiento', [])) ? 'checked' : '' }}>
+                            <input type="checkbox" name="equipment[]" id="wifi" value="wifi" 
+                                   {{ in_array('wifi', old('equipment', [])) ? 'checked' : '' }}>
                             <i class="fas fa-wifi"></i>
                             <label for="wifi">WiFi</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="aire_acondicionado" value="aire_acondicionado" 
-                                   {{ in_array('aire_acondicionado', old('equipamiento', [])) ? 'checked' : '' }}>
+                            <input type="checkbox" name="equipment[]" id="aire_acondicionado" value="aire_acondicionado" 
+                                   {{ in_array('aire_acondicionado', old('equipment', [])) ? 'checked' : '' }}>
                             <i class="fas fa-snowflake"></i>
                             <label for="aire_acondicionado">Aire Acondicionado</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="sistema_audio" value="sistema_audio" 
-                                   {{ in_array('sistema_audio', old('equipamiento', [])) ? 'checked' : '' }}>
+                            <input type="checkbox" name="equipment[]" id="sistema_audio" value="sistema_audio" 
+                                   {{ in_array('sistema_audio', old('equipment', [])) ? 'checked' : '' }}>
                             <i class="fas fa-volume-up"></i>
                             <label for="sistema_audio">Sistema de Audio</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="microfono" value="microfono" 
-                                   {{ in_array('microfono', old('equipamiento', [])) ? 'checked' : '' }}>
+                            <input type="checkbox" name="equipment[]" id="microfono" value="microfono" 
+                                   {{ in_array('microfono', old('equipment', [])) ? 'checked' : '' }}>
                             <i class="fas fa-microphone"></i>
                             <label for="microfono">Micrófono</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="camara" value="camara" 
-                                   {{ in_array('camara', old('equipamiento', [])) ? 'checked' : '' }}>
+                            <input type="checkbox" name="equipment[]" id="camara" value="camara" 
+                                   {{ in_array('camara', old('equipment', [])) ? 'checked' : '' }}>
                             <i class="fas fa-camera"></i>
                             <label for="camara">Cámara</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="impresora" value="impresora" 
-                                   {{ in_array('impresora', old('equipamiento', [])) ? 'checked' : '' }}>
+                            <input type="checkbox" name="equipment[]" id="impresora" value="impresora" 
+                                   {{ in_array('impresora', old('equipment', [])) ? 'checked' : '' }}>
                             <i class="fas fa-print"></i>
                             <label for="impresora">Impresora</label>
                         </div>
                         <div class="equipment-item">
-                            <input type="checkbox" name="equipamiento[]" id="scanner" value="scanner" 
-                                   {{ in_array('scanner', old('equipamiento', [])) ? 'checked' : '' }}>
+                            <input type="checkbox" name="equipment[]" id="scanner" value="scanner" 
+                                   {{ in_array('scanner', old('equipment', [])) ? 'checked' : '' }}>
                             <i class="fas fa-scanner"></i>
                             <label for="scanner">Escáner</label>
                         </div>

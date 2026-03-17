@@ -72,8 +72,9 @@ class CursosController extends Controller
             $data['published'] = 0;
         }
 
-        if($request->hasFile('image')){
-            $imagen = $request->file('image')->store('public/products');
+        if ($request->hasFile('image') || $request->hasFile('imagen')) {
+            $file = $request->file('image') ?? $request->file('imagen');
+            $imagen = $file->store('public/products');
             $data['image'] = Storage::url($imagen);
         }
 
@@ -128,8 +129,9 @@ class CursosController extends Controller
             $data['published'] = 0;
         }
 
-        if($request->hasFile('image')){
-            $imagen = $request->file('image')->store('public/products');
+        if ($request->hasFile('image') || $request->hasFile('imagen')) {
+            $file = $request->file('image') ?? $request->file('imagen');
+            $imagen = $file->store('public/products');
             $data['image'] = Storage::url($imagen);
         }
         $petitionCreado = $servicio->update($data);

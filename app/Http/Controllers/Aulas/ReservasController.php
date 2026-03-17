@@ -39,14 +39,17 @@ class ReservasController extends Controller
         return view('crm.calendario.index', compact('aulas', 'selectedAulas'));
     }
 
-    public function getReservasCalendario($year, $month)
+    public function getReservasCalendario(Request $request, $year, $month)
     {
         $startDate = \Carbon\Carbon::create($year, $month, 1)->startOfMonth();
         $endDate = $startDate->copy()->endOfMonth();
 
-        $reservas = Reservas::with(['aula'])
-            ->whereBetween('fecha_inicio', [$startDate, $endDate])
-            ->get();
+        $query = Reservas::with(['aula'])->whereBetween('fecha_inicio', [$startDate, $endDate]);
+        $aulas = $request->get('aulas', []);
+        if (!empty($aulas)) {
+            $query->whereIn('aula_id', (array) $aulas);
+        }
+        $reservas = $query->get();
 
         $eventos = $reservas->map(function ($reserva) {
             $fechaInicio = \Carbon\Carbon::parse($reserva->fecha_inicio);
@@ -68,7 +71,7 @@ class ReservasController extends Controller
                     'descripcion' => $reserva->descripcion,
                     'solicitante' => $reserva->solicitante,
                     'email_contacto' => $reserva->email_contacto,
-                    'aula' => $reserva->aula ? $reserva->aula->nombre : 'Sin aula',
+                    'aula' => $reserva->aula ? $reserva->aula->name : 'Sin aula',
                     'estado' => $reserva->estado,
                     'prioridad' => $reserva->prioridad,
                     'numero_asistentes' => $reserva->numero_asistentes,

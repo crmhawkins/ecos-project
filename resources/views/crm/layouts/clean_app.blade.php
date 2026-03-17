@@ -231,6 +231,15 @@
             display: flex;
             align-items: center;
             position: relative;
+            padding: 8px 12px;
+            margin: -8px -12px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .navbar-user:hover {
+            background: rgba(217, 54, 144, 0.06);
         }
         
         .user-menu {
@@ -245,10 +254,11 @@
             min-width: 180px;
             display: none;
             z-index: 1001;
-            margin-top: 8px;
+            margin-top: 4px;
         }
         
-        .navbar-user:hover .user-menu {
+        .navbar-user:hover .user-menu,
+        .navbar-user.user-menu-open .user-menu {
             display: block;
         }
         
@@ -462,13 +472,13 @@
                 </div>
             </div>
             
-            <!-- User Menu -->
-            <div class="navbar-user">
+            <!-- User Menu (click + hover para mejor usabilidad) -->
+            <div class="navbar-user" id="userMenuTrigger" onclick="document.getElementById('userMenuTrigger').classList.toggle('user-menu-open');" role="button" aria-haspopup="true" aria-expanded="false">
                 <img src="{{ Auth::user()->avatar ?? asset('assets/images/faces/1.jpg') }}" alt="Avatar" class="user-avatar">
                 <span style="font-weight: 500; margin-right: 8px;">{{ Auth::user()->name }}</span>
                 <i class="fas fa-chevron-down" style="font-size: 12px;"></i>
                 
-                <div class="user-menu">
+                <div class="user-menu" onclick="event.stopPropagation();">
                     <a href="{{ route('user.profile') }}" class="dropdown-item">
                         <i class="fas fa-user"></i>
                         Mi Perfil
@@ -576,6 +586,9 @@
                             menu.style.display = 'none';
                         }, 300);
                     });
+                }
+                if (!e.target.closest('.navbar-user')) {
+                    document.getElementById('userMenuTrigger')?.classList.remove('user-menu-open');
                 }
             });
         });

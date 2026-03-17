@@ -55,17 +55,16 @@ class CursosCategoriesController extends Controller
         }
         $categoriaCreada = Category::create($data);
 
-        if($categoriaCreada){
-            return redirect()->route('productosCategoria.edit', $categoriaCreada->id)->with('toast', [
-                    'icon' => 'success',
-                    'mensaje' => 'El categoria creada con exito'
-            ]);
-        }else{
-            return redirect()->back()->with('toast', [
-                'icon' => 'error',
-                'mensaje' => 'Error en la creacion de la categoria'
+        if ($categoriaCreada) {
+            return redirect()->route('cursosCategoria.edit', $categoriaCreada->id)->with('toast', [
+                'icon' => 'success',
+                'mensaje' => 'La categoría se creó correctamente'
             ]);
         }
+        return redirect()->back()->with('toast', [
+            'icon' => 'error',
+            'mensaje' => 'Error al crear la categoría'
+        ]);
 
     }
 
@@ -76,7 +75,7 @@ class CursosCategoriesController extends Controller
                 'icon' => 'error',
                 'mensaje' => 'La categoria no existe'
             ]);
-            return redirect()->route('productosCategoria.index');
+            return redirect()->route('cursosCategoria.index');
         }
         return view('crm.cursos-categories.edit', compact('categoria'));
     }
@@ -98,27 +97,27 @@ class CursosCategoriesController extends Controller
 
         $categoriaCreada = $categoria->update($data);
 
-        return redirect()->route('productosCategoria.index')->with('toast', [
-                'icon' => 'success',
-                'mensaje' => 'El servicio actualizado con exito'
+        return redirect()->route('cursosCategoria.index')->with('toast', [
+            'icon' => 'success',
+            'mensaje' => 'La categoría se actualizó correctamente'
         ]);
     }
 
     public function destroy(Request $request) {
-        $servicio = Category::find($request->id);
+        $categoria = Category::find($request->id);
 
-        if (!$servicio) {
+        if (!$categoria) {
             return response()->json([
                 'error' => true,
-                'mensaje' => "Error en el servidor, intentelo mas tarde."
+                'mensaje' => 'Error en el servidor, inténtelo más tarde.'
             ]);
         }
 
-        $servicio->delete();
+        $categoria->delete();
 
         return response()->json([
             'error' => false,
-            'mensaje' => 'La categoria de servicio fue borrada correctamente'
+            'mensaje' => 'La categoría se eliminó correctamente'
         ]);
     }
 

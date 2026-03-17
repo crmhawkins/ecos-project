@@ -103,7 +103,7 @@ class BlogController extends Controller
         $validated['author_id'] = Auth::id();
 
         // Si se marca como publicado, establecer fecha de publicación
-        if ($validated['published'] && !$validated['published_at']) {
+        if (!empty($validated['published']) && empty($validated['published_at'] ?? null)) {
             $validated['published_at'] = now();
         }
 
@@ -192,7 +192,7 @@ class BlogController extends Controller
         }
 
         // Si se marca como publicado por primera vez, establecer fecha de publicación
-        if ($validated['published'] && !$blogPost->published && !$validated['published_at']) {
+        if (!empty($validated['published']) && !$blogPost->published && empty($validated['published_at'] ?? null)) {
             $validated['published_at'] = now();
         }
 
@@ -232,7 +232,7 @@ class BlogController extends Controller
     {
         $blogPost->update([
             'published' => !$blogPost->published,
-            'published_at' => !$blogPost->published ? now() : $blogPost->published_at
+            'published_at' => !$blogPost->published ? now() : ($blogPost->published_at ?? $blogPost->updated_at)
         ]);
 
         $status = $blogPost->published ? 'publicado' : 'despublicado';

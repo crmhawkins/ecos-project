@@ -1527,7 +1527,7 @@
                 }
             },
             view: {
-                onRender() {
+                onRender: function() {
                     const model = this.model;
                     const attrs = model.getAttributes() || {};
                     const fieldType = attrs['data-field-type'] || capturedFieldType;

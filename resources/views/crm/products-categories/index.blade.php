@@ -28,13 +28,11 @@
                     </nav>
                 </div>
             </div>
-            {{-- <div class="row mt-3">
+            <div class="row mt-3">
                 <div class="col-12 col-md-4 order-md-1 order-last">
-                    @if($servicios->count() >= 0)
-                        <a href="{{route('campania.create')}}" class="btn btn-primary"><i class="fa-solid fa-plus me-2 mx-auto"></i>  Crear categoria de servicio</a>
-                    @endif
+                    <a href="{{ route('productosCategoria.create') }}" class="btn btn-primary"><i class="fa-solid fa-plus me-2 mx-auto"></i> Crear categoría de producto</a>
                 </div>
-            </div> --}}
+            </div>
         </div>
 
         <section class="section pt-4">

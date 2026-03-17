@@ -40,9 +40,10 @@ class Cursos extends Model
         'published' => 'boolean',
         'inactive' => 'boolean',
         'certificado' => 'boolean',
-    ];
-    protected $dates = [
-        'created_at', 'updated_at', 'deleted_at','inicio'
+        'inicio' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function category()
