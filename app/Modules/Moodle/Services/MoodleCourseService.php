@@ -128,31 +128,36 @@ class MoodleCourseService
                 }
             }
 
-            // Prepare course data for Moodle API
+            // Prepare course data for Moodle API (omitir parámetros opcionales vacíos que la API rechaza)
             $course = [
                 'fullname' => $courseData['fullname'],
                 'shortname' => $courseData['shortname'],
                 'categoryid' => $courseData['categoryid'],
                 'idnumber' => $courseData['idnumber'] ?? '',
                 'summary' => $courseData['summary'] ?? '',
-                'summaryformat' => $courseData['summaryformat'] ?? 1,
+                'summaryformat' => (int) ($courseData['summaryformat'] ?? 1),
                 'format' => $courseData['format'] ?? 'topics',
-                'showgrades' => $courseData['showgrades'] ?? 1,
-                'newsitems' => $courseData['newsitems'] ?? 5,
+                'showgrades' => (int) ($courseData['showgrades'] ?? 1),
+                'newsitems' => (int) ($courseData['newsitems'] ?? 5),
                 'startdate' => $courseData['startdate'] ?? time(),
-                'enddate' => $courseData['enddate'] ?? 0,
-                'numsections' => $courseData['numsections'] ?? 10,
-                'maxbytes' => $courseData['maxbytes'] ?? 0,
-                'showreports' => $courseData['showreports'] ?? 0,
-                'visible' => $courseData['visible'] ?? 1,
-                'groupmode' => $courseData['groupmode'] ?? 0,
-                'groupmodeforce' => $courseData['groupmodeforce'] ?? 0,
-                'defaultgroupingid' => $courseData['defaultgroupingid'] ?? 0,
-                'enablecompletion' => $courseData['enablecompletion'] ?? 1,
-                'completionnotify' => $courseData['completionnotify'] ?? 0,
-                'lang' => !empty($courseData['lang']) ? $courseData['lang'] : null,
-                'forcetheme' => $courseData['forcetheme'] ?? '',
+                'enddate' => (int) ($courseData['enddate'] ?? 0),
+                'numsections' => (int) ($courseData['numsections'] ?? 10),
+                'maxbytes' => (int) ($courseData['maxbytes'] ?? 0),
+                'showreports' => (int) ($courseData['showreports'] ?? 0),
+                'visible' => (int) ($courseData['visible'] ?? 1),
+                'groupmode' => (int) ($courseData['groupmode'] ?? 0),
+                'groupmodeforce' => (int) ($courseData['groupmodeforce'] ?? 0),
+                'defaultgroupingid' => (int) ($courseData['defaultgroupingid'] ?? 0),
+                'enablecompletion' => (int) ($courseData['enablecompletion'] ?? 1),
+                'completionnotify' => (int) ($courseData['completionnotify'] ?? 0),
             ];
+            if (!empty($courseData['lang'])) {
+                $course['lang'] = $courseData['lang'];
+            }
+            // Solo enviar forcetheme si tiene un valor válido (la API rechaza string vacío)
+            if (!empty($courseData['forcetheme'])) {
+                $course['forcetheme'] = $courseData['forcetheme'];
+            }
 
             // Call Moodle API to create course
             $response = $this->apiService->call('core_course_create_courses', [
