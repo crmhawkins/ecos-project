@@ -757,6 +757,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');
     let currentDate = new Date();
+    let lastEvents = [];
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
@@ -791,7 +792,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(function(data) {
                     const list = Array.isArray(data) ? data : (data && data.data ? data.data : []);
-                    successCallback(list);
+                    // Si la respuesta viene vacía pero ya teníamos eventos, mantenemos los anteriores
+                    if (list.length > 0) {
+                        lastEvents = list;
+                        successCallback(list);
+                    } else if (lastEvents.length > 0) {
+                        successCallback(lastEvents);
+                    } else {
+                        successCallback([]);
+                    }
                 })
                 .catch(function(error) {
                     console.error('Error loading events:', error);
