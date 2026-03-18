@@ -651,6 +651,43 @@
         
         return { available, missing };
     }
+
+    /** Storage Laravel + persistencia de bloques de usuario (localStorage). Debe ejecutarse ANTES que grapesjs-user-blocks. */
+    function ecosLaravelStorageFirst(editor) {
+        var USER_BLOCKS_KEY = 'gjs_ecos_userblocks_v1';
+        editor.StorageManager.add('laravel', {
+            async load(options) {
+                var userBlocks = {};
+                try {
+                    userBlocks = JSON.parse(localStorage.getItem(USER_BLOCKS_KEY) || '{}');
+                } catch (e) {}
+                return { userBlocks: userBlocks };
+            },
+            async store(data, options) {
+                if (data && data.userBlocks && typeof data.userBlocks === 'object') {
+                    try {
+                        localStorage.setItem(USER_BLOCKS_KEY, JSON.stringify(data.userBlocks));
+                    } catch (err) {}
+                }
+                var view = '{{ urlencode($currentView) }}';
+                var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                var html = editor.getHtml();
+                var css = editor.getCss();
+                var cc = (typeof customCss !== 'undefined' && customCss) ? customCss : '';
+                var res = await fetch('/builder/save?view=' + encodeURIComponent(view), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ html: html, css: css, custom_css: cc }),
+                });
+                if (!res.ok) throw new Error('Error al guardar');
+                return await res.json();
+            }
+        });
+    }
     
     // Función para inicializar el editor
     function initializeEditor() {
@@ -688,6 +725,7 @@
             
             // Construir lista de plugins dinámicamente basada en disponibilidad
             const pluginsToLoad = [
+                ecosLaravelStorageFirst,
                 'gjs-blocks-basic',
                 'grapesjs-preset-webpage'
                 // 'custom-blocks' - Deshabilitado temporalmente
@@ -835,6 +873,43 @@
                 }
             }
         }
+    });
+
+    editor.on('load', function () {
+        var cmd = editor.Commands.get('blocks-editor');
+        if (!cmd || typeof cmd.run !== 'function') return;
+        var origRun = cmd.run.bind(cmd);
+        editor.Commands.add('blocks-editor', {
+            run: function (ed) {
+                var key = 'gjs_ecos_userblocks_v1';
+                var parsed = {};
+                try {
+                    parsed = JSON.parse(localStorage.getItem(key) || '{}');
+                } catch (e) {}
+                var count = Object.keys(parsed).reduce(function (n, cat) {
+                    var b = parsed[cat];
+                    return n + (b && typeof b === 'object' ? Object.keys(b).length : 0);
+                }, 0);
+                if (count === 0) {
+                    ed.Modal.open({
+                        title: 'Mis bloques personalizados',
+                        content: '<div style="padding:20px;max-width:480px;line-height:1.55;font-size:14px;color:#333;">' +
+                            '<p><strong>Aún no tienes bloques guardados.</strong></p>' +
+                            '<p>Para crear uno reutilizable:</p>' +
+                            '<ol style="margin:8px 0;padding-left:1.25em;">' +
+                            '<li>Selecciona un componente en el canvas (sección, texto, tarjeta…).</li>' +
+                            '<li>En la barra flotante del componente, pulsa el icono de <strong>guardar</strong> (bloque/carpeta).</li>' +
+                            '<li>Indica nombre y categoría y confirma.</li>' +
+                            '</ol>' +
+                            '<p style="color:#6c757d;font-size:13px;margin:0;">Los bloques se guardan en este navegador y aparecerán en el panel <em>Bloques</em>.</p>' +
+                            '</div>',
+                        width: '520px'
+                    });
+                    return;
+                }
+                origRun(ed);
+            }
+        });
     });
     
     // Función para añadir CSS al canvas de GrapesJS
@@ -2220,44 +2295,6 @@
                     assetManager.close();
                 }
             });
-        }
-    });
-    // REGISTRO DEL STORAGE PERSONALIZADO
-    editor.StorageManager.add('laravel', {
-        async load(options) {
-            // No cargar nada porque usamos fromElement: true
-            // El contenido ya está en el DOM
-            // Retornar null para indicar que no hay datos que cargar
-            return null;
-        },
-        async store(data, options) {
-            const view = '{{ urlencode($currentView) }}';
-            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            const html = editor.getHtml();
-            const css = editor.getCss();
-            
-            // Combinar CSS del editor con CSS personalizado
-            const finalCss = customCss ? `${css}\n\n/* CSS Personalizado */\n${customCss}` : css;
-            
-            const res = await fetch(`/builder/save?view=${encodeURIComponent(view)}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': token,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({
-                    html: html,
-                    css: css,
-                    custom_css: customCss
-                }),
-            });
-            
-            if (!res.ok) {
-                throw new Error('Error al guardar');
-            }
-            
-            return await res.json();
         }
     });
         } catch (error) {
