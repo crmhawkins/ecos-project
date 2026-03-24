@@ -731,12 +731,8 @@
                 // 'custom-blocks' - Deshabilitado temporalmente
             ];
             
-            // Añadir plugins solo si están disponibles
-            if (window['grapesjs-tabs']) pluginsToLoad.push('grapesjs-tabs');
-            if (window['grapesjs-user-blocks']) pluginsToLoad.push('grapesjs-user-blocks');
-            if (window['grapesjs-templates']) pluginsToLoad.push('grapesjs-templates');
-            if (window['grapesjs-plugin-toolbox']) pluginsToLoad.push('grapesjs-plugin-toolbox');
-            if (window['grapesjs-component-code-editor']) pluginsToLoad.push('grapesjs-component-code-editor');
+            // Plugins opcionales desactivados por estabilidad (rompían init en algunos entornos).
+            // Si se quieren reactivar, hacerlo uno a uno y validar compatibilidad con la versión de GrapesJS.
             
             editor = grapesjs.init({
                 container: '#gjs',
@@ -2302,8 +2298,41 @@
         } catch (error) {
             console.error('Error al inicializar GrapesJS:', error);
             const container = document.getElementById('gjs');
+            // Fallback de seguridad: inicialización mínima para evitar pantalla en blanco.
+            if (container && !window.__gjsFallbackTried) {
+                window.__gjsFallbackTried = true;
+                try {
+                    const fallbackHtml = cleanHtmlForGrapesJS(container.innerHTML || '');
+                    container.innerHTML = fallbackHtml;
+
+                    editor = grapesjs.init({
+                        container: '#gjs',
+                        fromElement: false,
+                        components: fallbackHtml,
+                        autoload: false,
+                        plugins: [ecosLaravelStorageFirst, 'gjs-blocks-basic'],
+                        storageManager: {
+                            type: 'laravel',
+                            autoload: false,
+                            autosave: false
+                        },
+                        canvas: {
+                            styles: [
+                                '{{ asset("assets/bootstrap/css/bootstrap.min.css") }}',
+                                '{{ asset("assets/css/style.css") }}'
+                            ],
+                        },
+                    });
+
+                    console.warn('Builder iniciado en modo fallback estable');
+                    return;
+                } catch (fallbackError) {
+                    console.error('Fallback GrapesJS también falló:', fallbackError);
+                }
+            }
+
             if (container) {
-                container.innerHTML = '<div style="padding: 20px; color: red; background: #fff; border-radius: 8px; margin: 20px;"><h3>Error al cargar el editor</h3><p>' + error.message + '</p><p>Por favor, recarga la página.</p></div>';
+                container.innerHTML = '<div style="padding: 20px; color: red; background: #fff; border-radius: 8px; margin: 20px;"><h3>Error al cargar el editor</h3><p>' + error.message + '</p><p>Se intentó recuperación automática y también falló. Recarga la página.</p></div>';
             }
         }
     } // Cierre de initializeEditor
