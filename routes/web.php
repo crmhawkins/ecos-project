@@ -82,7 +82,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/builder/page-metadata/save', [BuilderController::class, 'savePageMetadata'])->name('builder.page-metadata.save');
     Route::get('/builder/cookies', [BuilderController::class, 'getCookiesText'])->name('builder.cookies.get');
     Route::post('/builder/cookies/save', [BuilderController::class, 'saveCookiesText'])->name('builder.cookies.save');
-    Route::post('/builder/form-submit', [BuilderController::class, 'handleFormSubmit'])->name('builder.form.submit');
     Route::post('/builder/duplicate', [BuilderController::class, 'duplicate'])->name('builder.duplicate');
 
     // Rutas para gestión del menú
@@ -93,6 +92,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/builder/menu/reorder', [MenuController::class, 'reorder'])->name('builder.menu.reorder');
     Route::get('/builder/menu/pages', [MenuController::class, 'getAvailablePages'])->name('builder.menu.pages');
 });
+
+// Envío de formularios del builder desde páginas públicas
+Route::post('/builder/form-submit', [BuilderController::class, 'handleFormSubmit'])->name('builder.form.submit');
 
 
 

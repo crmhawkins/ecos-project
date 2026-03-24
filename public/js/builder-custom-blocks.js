@@ -1058,7 +1058,9 @@
                     <div class="container">
                         <div class="row justify-content-center">
                             <div class="col-lg-8">
-                                <form class="advanced-form" method="POST" action="/builder/form-submit" data-form-email="">
+                                <form class="advanced-form" method="POST" action="/builder/form-submit" enctype="multipart/form-data" data-form-email="">
+                                    <input type="hidden" name="form_email" value="">
+                                    <input type="hidden" name="form_id" value="">
                                     <div class="form-fields-container">
                                         <!-- Los campos se añadirán aquí dinámicamente -->
                                         <div class="form-field" data-field-type="text" data-required="true">
@@ -1290,6 +1292,11 @@
                 defaults: {
                     tagName: 'form',
                     classes: ['advanced-form'],
+                    attributes: {
+                        method: 'POST',
+                        action: '/builder/form-submit',
+                        enctype: 'multipart/form-data'
+                    },
                     traits: [
                         {
                             type: 'text',
@@ -1301,13 +1308,45 @@
                     ]
                 },
                 init() {
+                    const syncHiddenFields = () => {
+                        const attrs = this.get('attributes') || {};
+                        const email = attrs['data-form-email'] || '';
+                        const formId = attrs['data-form-id'] || '';
+                        const view = this.view;
+                        if (view && view.el) {
+                            const hiddenEmail = view.el.querySelector('input[name="form_email"]');
+                            if (hiddenEmail) hiddenEmail.value = email;
+                            const hiddenFormId = view.el.querySelector('input[name="form_id"]');
+                            if (hiddenFormId) hiddenFormId.value = formId;
+                        }
+                    };
+
                     this.on('change:attributes:data-form-email', () => {
                         const email = this.get('attributes')['data-form-email'];
                         const view = this.view;
-                        if (view && view.el && email) {
-                            view.el.setAttribute('data-form-email', email);
+                        if (view && view.el) {
+                            if (email) {
+                                view.el.setAttribute('data-form-email', email);
+                            }
+                            const hiddenEmail = view.el.querySelector('input[name="form_email"]');
+                            if (hiddenEmail) {
+                                hiddenEmail.value = email || '';
+                            }
                         }
                     });
+                    this.on('change:attributes:data-form-id', () => {
+                        const formId = this.get('attributes')['data-form-id'] || '';
+                        const view = this.view;
+                        if (view && view.el) {
+                            const hiddenFormId = view.el.querySelector('input[name="form_id"]');
+                            if (hiddenFormId) {
+                                hiddenFormId.value = formId;
+                            }
+                        }
+                    });
+
+                    // Sincronizar al cargar componente
+                    setTimeout(syncHiddenFields, 0);
                 }
             }
         });

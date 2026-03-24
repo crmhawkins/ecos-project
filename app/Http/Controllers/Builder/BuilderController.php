@@ -676,7 +676,11 @@ class BuilderController extends Controller
         
         foreach ($formData as $key => $value) {
             $label = ucfirst(str_replace('_', ' ', $key));
-            $message .= "{$label}: {$value}\n";
+            if (is_array($value)) {
+                $message .= "{$label}: " . implode(', ', $value) . "\n";
+            } else {
+                $message .= "{$label}: {$value}\n";
+            }
         }
         
         $message .= "\n" . str_repeat('=', 50) . "\n";
@@ -684,9 +688,32 @@ class BuilderController extends Controller
         
         // Enviar email
         try {
-            Mail::raw($message, function ($mail) use ($data) {
+            $files = $request->allFiles();
+            Mail::raw($message, function ($mail) use ($data, $files) {
                 $mail->to($data['form_email'])
                     ->subject('Nuevo formulario enviado desde el sitio web');
+
+                // Adjuntar archivos enviados en el formulario (si existen)
+                foreach ($files as $file) {
+                    if (is_array($file)) {
+                        foreach ($file as $nestedFile) {
+                            if ($nestedFile && method_exists($nestedFile, 'isValid') && $nestedFile->isValid()) {
+                                $mail->attach($nestedFile->getRealPath(), [
+                                    'as' => $nestedFile->getClientOriginalName(),
+                                    'mime' => $nestedFile->getMimeType(),
+                                ]);
+                            }
+                        }
+                        continue;
+                    }
+
+                    if ($file && method_exists($file, 'isValid') && $file->isValid()) {
+                        $mail->attach($file->getRealPath(), [
+                            'as' => $file->getClientOriginalName(),
+                            'mime' => $file->getMimeType(),
+                        ]);
+                    }
+                }
             });
             
             return response()->json([

@@ -12,7 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     {{-- CodeMirror para editor de CSS --}}
     <link rel="stylesheet" href="{{ asset('vendor/codemirror/codemirror.min.css') }}">
     <link rel="stylesheet" href="{{ asset('vendor/codemirror/monokai.min.css') }}">
@@ -21,7 +21,7 @@
     <style>
         body, html { margin: 0; padding: 0; height: 100%; }
         #gjs { height: 100% !important; }
-        
+
         /* Animación de spin para iconos de carga */
         .spin {
             animation: spin 1s linear infinite;
@@ -30,7 +30,7 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-        
+
         /* Estilos para drag & drop del menú */
         .menu-item-draggable {
             transition: background-color 0.2s;
@@ -41,7 +41,7 @@
         .menu-item-draggable.dragging {
             opacity: 0.5;
         }
-        
+
         /* Estilos para CodeMirror */
         .CodeMirror {
             border: 1px solid #ddd;
@@ -154,7 +154,7 @@
                 </form>
             </div>
         </div>
-        
+
         {{-- Botón de guardar y estado --}}
         <div class="row g-3 mt-2">
             <div class="col-12">
@@ -209,7 +209,7 @@
                         <div id="duplicateError" class="text-danger mt-2" style="display: none;"></div>
                     </div>
                     <div class="alert alert-info mb-0">
-                        <i class="bi bi-info-circle"></i> 
+                        <i class="bi bi-info-circle"></i>
                         <strong>Vista origen:</strong> <span id="duplicateSourceView">{{ str_replace('webacademia/pages/', '', $currentView) }}</span>
                     </div>
                 </div>
@@ -280,12 +280,12 @@
                                 <h6 id="menuFormTitle">Nuevo Item</h6>
                                 <form id="menuItemForm" onsubmit="saveMenuItem(event)">
                                     <input type="hidden" id="menuItemId" name="id">
-                                    
+
                                     <div class="mb-3">
                                         <label for="menuItemLabel" class="form-label">Etiqueta *</label>
                                         <input type="text" class="form-control" id="menuItemLabel" name="label" required>
                                     </div>
-                                    
+
                                     <div class="mb-3">
                                         <label for="menuItemUrl" class="form-label">URL *</label>
                                         <div class="input-group">
@@ -295,13 +295,13 @@
                                             </button>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="mb-3">
                                         <label for="menuItemIcon" class="form-label">Icono (opcional)</label>
                                         <input type="text" class="form-control" id="menuItemIcon" name="icon" placeholder="ej: fas fa-home">
                                         <small class="form-text text-muted">Clase de Font Awesome o Bootstrap Icons</small>
                                     </div>
-                                    
+
                                     <div class="mb-3">
                                         <label for="menuItemTarget" class="form-label">Abrir en</label>
                                         <select class="form-select" id="menuItemTarget" name="target">
@@ -309,12 +309,12 @@
                                             <option value="_blank">Nueva ventana</option>
                                         </select>
                                     </div>
-                                    
+
                                     <div class="mb-3 form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="menuItemActive" name="active" checked>
                                         <label class="form-check-label" for="menuItemActive">Activo</label>
                                     </div>
-                                    
+
                                     <div class="d-grid gap-2">
                                         <button type="submit" class="btn btn-primary">
                                             <i class="bi bi-save"></i> Guardar
@@ -370,8 +370,8 @@
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> 
-                        <strong>Nota:</strong> Este CSS se añadirá además del CSS generado por el editor. 
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Nota:</strong> Este CSS se añadirá además del CSS generado por el editor.
                         Úsalo para estilos personalizados que no se pueden aplicar desde el editor visual.
                     </div>
                     <div class="mb-3">
@@ -380,7 +380,7 @@
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
                         <small class="text-muted">
-                            <i class="bi bi-lightbulb"></i> 
+                            <i class="bi bi-lightbulb"></i>
                             Tip: Usa selectores específicos para evitar conflictos con los estilos del editor.
                         </small>
                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCustomCss()">
@@ -410,42 +410,42 @@
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> 
+                        <i class="bi bi-info-circle"></i>
                         <strong>Nota:</strong> Configura la URL amigable y los metadatos SEO para mejorar el posicionamiento de la página.
                     </div>
                     <form id="pageMetadataForm">
                         <input type="hidden" id="metadataView" name="view" value="{{ str_replace('webacademia/pages/', '', $currentView) }}">
-                        
+
                         <div class="mb-3">
                             <label for="metadataSlug" class="form-label">URL Amigable (Slug) *</label>
                             <div class="input-group">
                                 <span class="input-group-text">{{ url('/web/') }}</span>
-                                <input type="text" class="form-control" id="metadataSlug" name="slug" 
-                                       pattern="[a-z0-9-]+" 
+                                <input type="text" class="form-control" id="metadataSlug" name="slug"
+                                       pattern="[a-z0-9-]+"
                                        placeholder="ej: nueva-pagina"
                                        required>
                             </div>
                             <small class="form-text text-muted">Solo letras minúsculas, números y guiones. La URL será: {{ url('/web/') }}<span id="slugPreview"></span></small>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="metadataTitle" class="form-label">Título SEO (máx. 60 caracteres)</label>
                             <input type="text" class="form-control" id="metadataTitle" name="title" maxlength="60">
                             <small class="form-text text-muted"><span id="titleCount">0</span>/60 caracteres</small>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="metadataDescription" class="form-label">Descripción SEO (máx. 160 caracteres)</label>
                             <textarea class="form-control" id="metadataDescription" name="description" rows="3" maxlength="160"></textarea>
                             <small class="form-text text-muted"><span id="descriptionCount">0</span>/160 caracteres</small>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="metadataKeywords" class="form-label">Palabras clave (opcional)</label>
-                            <input type="text" class="form-control" id="metadataKeywords" name="keywords" 
+                            <input type="text" class="form-control" id="metadataKeywords" name="keywords"
                                    placeholder="palabra1, palabra2, palabra3">
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -465,7 +465,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="metadataOgDescription" class="form-label">Descripción Open Graph</label>
                             <textarea class="form-control" id="metadataOgDescription" name="og_description" rows="2" maxlength="160"></textarea>
@@ -494,7 +494,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> 
+                        <i class="bi bi-info-circle"></i>
                         <strong>Nota:</strong> Edita el texto que aparecerá en el banner de cookies. Este texto debe cumplir con la normativa de protección de datos.
                     </div>
                     <div class="mb-3">
@@ -581,16 +581,15 @@
     <script src="{{ asset('vendor/grapesjs/grapes.min.js') }}"></script>
     <script src="{{ asset('vendor/grapesjs/grapesjs-blocks-basic.min.js') }}"></script>
     <script src="{{ asset('vendor/grapesjs/grapesjs-preset-webpage.min.js') }}"></script>
-    
+
     {{-- Cargar plugins adicionales de GrapeJS desde archivos locales --}}
     <script src="{{ asset('vendor/grapesjs/grapesjs-tabs.min.js') }}"></script>
     <script src="{{ asset('vendor/grapesjs/grapesjs-user-blocks.min.js') }}"></script>
     <script src="{{ asset('vendor/grapesjs/grapesjs-templates.min.js') }}"></script>
     <script src="{{ asset('vendor/grapesjs/grapesjs-plugin-toolbox.min.js') }}"></script>
     <script src="{{ asset('vendor/grapesjs/grapesjs-component-code-editor.min.js') }}"></script>
-    
-    {{-- Plugin custom-blocks deshabilitado temporalmente --}}
-    {{-- <script src="{{ asset('js/builder-custom-blocks.js') }}"></script> --}}
+
+    <script src="{{ asset('js/builder-custom-blocks.js') }}"></script>
     <script>
     let editor;
     const FORCE_DISABLE_USER_BLOCKS = true;
@@ -598,17 +597,17 @@
     if (FORCE_DISABLE_USER_BLOCKS && !window.__gjsExcludedPlugins.includes('grapesjs-user-blocks')) {
         window.__gjsExcludedPlugins.push('grapesjs-user-blocks');
     }
-    
+
     // Función para limpiar HTML antes de que GrapesJS lo procese
     function cleanHtmlForGrapesJS(html) {
         // Limpiar atributos SVG problemáticos en URLs de data:image/svg
         // Esto previene el error InvalidCharacterError con atributos mal formados
         html = html.replace(/background:\s*url\(['"]?data:image\/svg\+xml[^'"]*['"]?\)/gi, '');
-        
+
         // Crear un elemento temporal para parsear el HTML
         const temp = document.createElement('div');
         temp.innerHTML = html;
-        
+
         // Remover atributos data-wow-* que pueden causar problemas
         const allElements = temp.querySelectorAll('*');
         allElements.forEach(el => {
@@ -627,10 +626,10 @@
                 }
             });
         });
-        
+
         return temp.innerHTML;
     }
-    
+
     // Función para verificar que los plugins estén disponibles
     function checkPluginsAvailable() {
         const requiredPlugins = {
@@ -642,10 +641,10 @@
         if (!FORCE_DISABLE_USER_BLOCKS) {
             requiredPlugins['grapesjs-user-blocks'] = window['grapesjs-user-blocks'];
         }
-        
+
         const available = [];
         const missing = [];
-        
+
         for (const [name, plugin] of Object.entries(requiredPlugins)) {
             if (plugin) {
                 available.push(name);
@@ -655,7 +654,7 @@
                 console.warn(`⚠ Plugin ${name} no disponible`);
             }
         }
-        
+
         return { available, missing };
     }
 
@@ -695,7 +694,7 @@
             }
         });
     }
-    
+
     // Función para inicializar el editor
     function initializeEditor() {
         try {
@@ -705,18 +704,18 @@
                 console.error('Contenedor #gjs no encontrado');
                 return;
             }
-            
+
             // Verificar plugins disponibles
             const { available, missing } = checkPluginsAvailable();
             if (missing.length > 0) {
                 console.warn('Algunos plugins no están disponibles:', missing);
                 console.log('Plugins disponibles:', available);
             }
-            
+
             // Limpiar el HTML antes de que GrapesJS lo procese
             const originalHtml = container.innerHTML;
             let cleanedHtml = cleanHtmlForGrapesJS(originalHtml);
-            
+
             // FORZAR que los h1 con data-gjs-editable sean tratados como texto editable
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = cleanedHtml;
@@ -729,15 +728,15 @@
             });
             cleanedHtml = tempDiv.innerHTML;
             container.innerHTML = cleanedHtml;
-            
+
             // Construir lista de plugins dinámicamente basada en disponibilidad
             const pluginsToLoad = [
                 ecosLaravelStorageFirst,
                 'gjs-blocks-basic',
                 'grapesjs-preset-webpage'
-                // 'custom-blocks' - Deshabilitado temporalmente
             ];
-            
+            if (window.customBlocksPlugin) pluginsToLoad.push('custom-blocks');
+
             // Añadir plugins opcionales si están disponibles y no están excluidos por errores runtime.
             const excluded = window.__gjsExcludedPlugins || [];
             if (window['grapesjs-tabs'] && !excluded.includes('grapesjs-tabs')) pluginsToLoad.push('grapesjs-tabs');
@@ -745,7 +744,7 @@
             if (window['grapesjs-templates'] && !excluded.includes('grapesjs-templates')) pluginsToLoad.push('grapesjs-templates');
             if (window['grapesjs-plugin-toolbox'] && !excluded.includes('grapesjs-plugin-toolbox')) pluginsToLoad.push('grapesjs-plugin-toolbox');
             if (window['grapesjs-component-code-editor'] && !excluded.includes('grapesjs-component-code-editor')) pluginsToLoad.push('grapesjs-component-code-editor');
-            
+
             editor = grapesjs.init({
                 container: '#gjs',
                 // Evita errores de carga en ciertas combinaciones de plugins/páginas.
@@ -765,7 +764,7 @@
                 pluginsOpts: {
                     'gjs-blocks-basic': {},
                     'grapesjs-preset-webpage': {},
-                    // 'custom-blocks': {}, - Deshabilitado temporalmente
+                    'custom-blocks': {},
                     'grapesjs-tabs': {},
                     'grapesjs-user-blocks': {
                         blockLabel: 'Nombre',
@@ -960,11 +959,11 @@
             }
         });
     });
-    
+
     // Función para añadir CSS al canvas de GrapesJS
     function addCssToCanvas(cssText) {
         if (!cssText || !editor) return;
-        
+
         // Si el CSS contiene "CSS generado por el editor", extraer solo el CSS del editor
         // para añadirlo a GrapesJS, y el resto (CSS personalizado) inyectarlo directamente
         if (cssText.includes('CSS generado por el editor')) {
@@ -976,7 +975,7 @@
                 editor.Css.add(editorCss);
                 console.log('CSS del editor añadido a GrapesJS:', editorCss.length, 'caracteres');
             }
-            
+
             // Extraer el CSS personalizado si existe
             const customMatch = cssText.match(/\/\*\s*CSS Personalizado\s*\*\/(.*?)$/s);
             if (customMatch && customMatch[1]) {
@@ -989,12 +988,12 @@
             editor.Css.add(cssText);
             console.log('CSS añadido a GrapesJS:', cssText.length, 'caracteres');
         }
-        
+
         // Añadir TODO el CSS directamente al canvas iframe para que se renderice
         const canvas = editor.Canvas;
         const canvasDoc = canvas.getDocument();
         const canvasHead = canvasDoc.head;
-        
+
         // Verificar si ya existe un style tag para CSS completo
         let styleTag = canvasHead.querySelector('style[data-full-css]');
         if (!styleTag) {
@@ -1002,22 +1001,22 @@
             styleTag.setAttribute('data-full-css', 'true');
             canvasHead.appendChild(styleTag);
         }
-        
+
         // Añadir TODO el CSS al style tag para que se renderice
         styleTag.textContent = cssText;
-        
+
         console.log('CSS completo inyectado en el canvas:', cssText.substring(0, 50) + '...');
     }
-    
+
     // Función para encontrar la imagen dentro de un contenedor
     function findImageInComponent(component) {
         if (!component) return null;
-        
+
         // Si el componente es una imagen, devolverlo
         if (component.get('type') === 'image' || component.get('tagName') === 'img') {
             return component;
         }
-        
+
         // Buscar imagen dentro del componente
         const components = component.components();
         if (components && components.length > 0) {
@@ -1031,19 +1030,19 @@
                 if (nestedImg) return nestedImg;
             }
         }
-        
+
         return null;
     }
-    
+
     // Asegurar que los estilos de los bloques personalizados se añadan
     editor.on('load', () => {
         // Los estilos ya se añaden automáticamente por el plugin
         console.log('Editor cargado con bloques personalizados');
-        
+
         // Añadir propiedades personalizadas al Style Manager
         const styleManager = editor.StyleManager;
         const sector = styleManager.getSector('dimension');
-        
+
         if (sector) {
             // Añadir object-fit después de height
             const objectFitProp = sector.addProperty({
@@ -1060,17 +1059,17 @@
                 ],
                 changeProp: 1,
             }, { at: sector.getProperties().length });
-            
+
             // Listener para cuando se cambia object-fit
             objectFitProp.on('change', function() {
                 setTimeout(() => {
                     const component = editor.getSelected();
                     if (!component) return;
-                    
+
                     // Buscar imagen dentro del componente si es un contenedor
                     const imgComponent = findImageInComponent(component);
                     const targetComponent = imgComponent || component;
-                    
+
                     // Solo aplicar a elementos img
                     if (targetComponent && (targetComponent.get('type') === 'image' || targetComponent.get('tagName') === 'img')) {
                         const objectFit = targetComponent.getStyle('object-fit');
@@ -1078,14 +1077,14 @@
                             // Asegurar que tiene width y height para que cover funcione
                             const currentWidth = targetComponent.getStyle('width');
                             const currentHeight = targetComponent.getStyle('height');
-                            
+
                             if (!currentWidth || currentWidth === 'auto') {
                                 targetComponent.addStyle({ width: '100%' });
                             }
                             if (!currentHeight || currentHeight === 'auto') {
                                 targetComponent.addStyle({ height: '100%' });
                             }
-                            
+
                             // Forzar actualización del componente
                             targetComponent.view.render();
                         }
@@ -1095,7 +1094,7 @@
                         if (imgComponent) {
                             editor.select(imgComponent);
                             // Aplicar object-fit: cover a la imagen
-                            imgComponent.addStyle({ 
+                            imgComponent.addStyle({
                                 'object-fit': 'cover',
                                 'width': '100%',
                                 'height': '100%'
@@ -1105,7 +1104,7 @@
                     }
                 }, 100);
             });
-            
+
             // Añadir object-position después de object-fit
             sector.addProperty({
                 name: 'object-position',
@@ -1127,7 +1126,7 @@
                 changeProp: 1,
             }, { at: sector.getProperties().length });
         }
-        
+
         // También añadir a la sección de decoraciones como alternativa
         const decorSector = styleManager.getSector('decorations');
         if (decorSector) {
@@ -1274,21 +1273,21 @@
                     showNotification('Selecciona primero un elemento en el canvas (texto, título o bloque) y vuelve a pulsar Editar texto.', 'info');
                     return;
                 }
-                
+
                 const tagName = (selected.get('tagName') || '').toLowerCase();
                 const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label', 'div'];
-                
+
                 if (!textElements.includes(tagName)) {
                     showNotification('Este elemento no es un elemento de texto editable. Prueba con un párrafo, título o bloque de texto.', 'warning');
                     return;
                 }
-                
+
                 const el = selected.getEl();
                 if (!el) {
                     showNotification('Elemento aún no listo. Haz clic de nuevo en el botón Editar texto.', 'info');
                     return;
                 }
-                
+
                 // Fallback directo: contenteditable (siempre ejecuta una acción visible)
                 el.setAttribute('contenteditable', 'true');
                 el.style.cursor = 'text';
@@ -1296,7 +1295,7 @@
                 el.style.outline = '2px solid rgba(0,123,255,0.5)';
                 el.style.outlineOffset = '2px';
                 el.focus();
-                
+
                 const frameWin = ed.Canvas.getWindow();
                 const frameDoc = ed.Canvas.getDocument();
                 if (frameWin && frameWin.getSelection && frameDoc) {
@@ -1308,11 +1307,11 @@
                         selection.addRange(range);
                     } catch (err) {}
                 }
-                
+
                 showNotification('Modo edición: escribe en el elemento seleccionado. Al terminar, haz clic fuera para aplicar.', 'success');
             }
         });
-        
+
         // Añadir botón para editar texto en la barra de herramientas
         editor.Panels.addButton('options', {
             id: 'edit-text-btn',
@@ -1320,7 +1319,7 @@
             command: 'edit-text',
             attributes: { title: 'Editar texto' }
         });
-        
+
         // ================================
         // COMANDO ESPECÍFICO PARA EDITAR H1 - SOLUCIÓN SIN RICH TEXT EDITOR
         // ================================
@@ -1329,7 +1328,7 @@
                 // Buscar todos los h1 en el editor
                 const allComponents = ed.getComponents();
                 let h1Component = null;
-                
+
                 const findH1 = (comp) => {
                     if (comp.get('tagName') === 'h1') {
                         h1Component = comp;
@@ -1340,17 +1339,17 @@
                         children.each(child => findH1(child));
                     }
                 };
-                
+
                 allComponents.each(comp => findH1(comp));
-                
+
                 if (!h1Component) {
                     showNotification('No se encontró ningún título h1 para editar', 'warning');
                     return;
                 }
-                
+
                 // Seleccionar el h1
                 ed.select(h1Component);
-                
+
                 // SOLUCIÓN DIRECTA: Hacer editable sin Rich Text Editor
                 setTimeout(() => {
                     const el = h1Component.getEl();
@@ -1358,7 +1357,7 @@
                         showNotification('No se pudo encontrar el elemento h1', 'error');
                         return;
                     }
-                    
+
                     // Forzar contenteditable directamente
                     el.setAttribute('contenteditable', 'true');
                     el.style.cursor = 'text';
@@ -1366,7 +1365,7 @@
                     el.style.webkitUserSelect = 'text';
                     el.style.outline = '2px solid #007bff';
                     el.style.outlineOffset = '2px';
-                    
+
                     // Enfocar y seleccionar todo el texto
                     el.focus();
                     const frameWin = ed.Canvas.getWindow();
@@ -1378,31 +1377,31 @@
                         selection.removeAllRanges();
                         selection.addRange(range);
                     }
-                    
+
                     // Guardar cambios - función mejorada
                     const saveChanges = function() {
                         if (!ed || typeof ed.getComponent !== 'function') return;
                         const comp = ed.getComponent(this);
                         if (!comp) return;
-                        
+
                         // Obtener el contenido actual
                         const newContent = this.innerHTML || this.textContent || '';
-                        
+
                         // Actualizar el componente
                         comp.set('content', newContent);
-                        
+
                         // Forzar actualización visual
                         if (comp.view) {
                             comp.view.render();
                         }
-                        
+
                         // Actualizar el modelo completo
                         comp.set('components', newContent);
-                        
+
                         // Disparar eventos para que GrapesJS sepa que hubo cambios
                         ed.trigger('component:update', comp);
                         ed.trigger('update');
-                        
+
                         // IMPORTANTE: Marcar como cambiado para que se habilite el botón de guardar
                         if (typeof markAsChanged === 'function') {
                             markAsChanged();
@@ -1420,7 +1419,7 @@
                                 saveStatus.innerHTML = '<i class="bi bi-exclamation-circle"></i> Cambios sin guardar';
                             }
                         }
-                        
+
                         // Abrir el panel superior automáticamente si está cerrado
                         const panel = document.getElementById('builderPanel');
                         const toggle = document.getElementById('builderToggle');
@@ -1432,14 +1431,14 @@
                                 icon.classList.add('bi-chevron-up');
                             }
                         }
-                        
+
                         this.style.outline = 'none';
                         console.log('Cambios guardados en h1:', newContent);
                     };
-                    
+
                     // Guardar en blur (cada vez, no solo una vez)
                     el.addEventListener('blur', saveChanges);
-                    
+
                     // Guardar también en input para cambios en tiempo real
                     el.addEventListener('input', function() {
                         // Guardar después de un pequeño delay para no saturar
@@ -1455,7 +1454,7 @@
                             }
                         }, 300);
                     });
-                    
+
                     // Guardar cuando se presiona Enter
                     el.addEventListener('keydown', function(e) {
                         if (e.key === 'Enter' && !e.shiftKey) {
@@ -1463,12 +1462,12 @@
                             saveChanges.call(this);
                         }
                     });
-                    
+
                     showNotification('Título editable. Escribe directamente para cambiar el texto.', 'success');
                 }, 100);
             }
         });
-        
+
         // Añadir botón visible para editar el título h1
         editor.Panels.addButton('options', {
             id: 'edit-h1-title-btn',
@@ -1477,11 +1476,11 @@
             attributes: { title: 'Editar título principal (h1)' },
             active: false
         });
-        
+
         // ================================
         // ELIMINAR COMANDO DUPLICADO - Ya está definido arriba
         // ================================
-        
+
         // Añadir botón visible para editar el título h1
         editor.Panels.addButton('options', {
             id: 'edit-h1-title-btn',
@@ -1490,7 +1489,7 @@
             attributes: { title: 'Editar título principal (h1)' },
             active: false
         });
-        
+
         // ================================
         // BOTÓN DE GUARDAR VISIBLE EN LA BARRA DE HERRAMIENTAS
         // ================================
@@ -1507,7 +1506,7 @@
                         icon.classList.add('bi-chevron-up');
                     }
                 }
-                
+
                 // Ejecutar el guardado
                 if (typeof confirmSave === 'function') {
                     confirmSave();
@@ -1516,7 +1515,7 @@
                 }
             }
         });
-        
+
         // Añadir botón de guardar visible en la barra de opciones de GrapesJS
         editor.Panels.addButton('options', {
             id: 'save-changes-btn',
@@ -1525,7 +1524,7 @@
             attributes: { title: 'Guardar cambios (Ctrl+S)' },
             active: false
         });
-        
+
         // ================================
         // Editor de atributos como JSON (modal)
         // ================================
@@ -1602,7 +1601,7 @@
             command: 'clone-clean',
             attributes: { title: 'Duplicar bloque (sin solapar)' },
         });
-        
+
         // Añadir CSS inicial del archivo si existe
         @if(!empty($initialCss))
             const initialCss = @json($initialCss);
@@ -1616,7 +1615,7 @@
                         customCss = customMatch[1].trim();
                         console.log('CSS personalizado extraído:', customCss.length, 'caracteres');
                     }
-                    
+
                     // Inyectar TODO el CSS (del editor + personalizado) en el canvas
                     addCssToCanvas(initialCss);
                     console.log('CSS completo cargado desde el archivo:', initialCss.length, 'caracteres');
@@ -1628,7 +1627,7 @@
                 }
             }
         @endif
-        
+
         // Cargar CSS personalizado si existe (desde el método load)
         let view = '{{ str_replace("webacademia/pages/", "", $currentView) }}';
         fetch(`/builder/load?view=${encodeURIComponent(view)}`)
@@ -1653,7 +1652,7 @@
                 console.error('Error al cargar CSS personalizado:', error);
             });
     });
-    
+
     // También añadir CSS cuando el canvas se renderiza
     editor.on('canvas:frame:load', () => {
         @if(!empty($initialCss))
@@ -1669,14 +1668,14 @@
         // Buscar imagen dentro del componente si es un contenedor
         const imgComponent = findImageInComponent(component);
         const targetComponent = imgComponent || component;
-        
+
         // Aplicar object-fit: cover automáticamente si la imagen tiene width y height
         if (targetComponent && (targetComponent.get('type') === 'image' || targetComponent.get('tagName') === 'img')) {
             const objectFit = targetComponent.getStyle('object-fit');
             if (objectFit === 'cover') {
                 const width = targetComponent.getStyle('width');
                 const height = targetComponent.getStyle('height');
-                
+
                 // Si tiene object-fit: cover pero no tiene dimensiones, añadirlas
                 if (!width || width === 'auto') {
                     targetComponent.addStyle({ width: '100%' });
@@ -1688,7 +1687,7 @@
             }
         }
     });
-    
+
     // Cargar imágenes existentes al iniciar el editor
     editor.on('load', () => {
         // Cargar imágenes existentes en el assetManager
@@ -1712,7 +1711,7 @@
         .catch(error => {
             console.warn('Error al cargar imágenes existentes:', error);
         });
-        
+
         // Registrar componente PDF Viewer
         const domc = editor.DomComponents;
         domc.addType('pdf-viewer-container', {
@@ -1772,7 +1771,7 @@
                     const attrs = model.getAttributes() || {};
                     const url = attrs['data-pdf-url'] || '';
                     const height = attrs.height || 600;
-                    
+
                     if (this.el) {
                         this.el.className = 'pdf-viewer-container';
                         this.el.innerHTML = `
@@ -1786,7 +1785,7 @@
                 }
             }
         });
-        
+
         // Añadir bloque PDF Viewer al BlockManager
         const blockManager = editor.BlockManager;
         blockManager.add('pdf-viewer', {
@@ -1827,7 +1826,7 @@
                 'data-pdf-url': ''
             }
         });
-        
+
         // Añadir estilos CSS para el visor PDF
         editor.Css.add(`
             .pdf-viewer-container {
@@ -1864,7 +1863,7 @@
                 font-size: 14px;
             }
         `);
-        
+
         // Inyectar estilos en el canvas también
         const canvas = editor.Canvas;
         const canvasDoc = canvas.getDocument();
@@ -1911,15 +1910,15 @@
             }
         `;
     });
-    
+
     // Configurar componentes de texto para que sean editables (versión segura sin recursión)
     let componentTypesExtended = false; // Flag para extender tipos solo una vez
     editor.on('load', () => {
         if (componentTypesExtended) return; // Ya se extendieron, no hacerlo de nuevo
         componentTypesExtended = true;
-        
+
         const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
-        
+
         // Extender tipos de componentes de forma segura
         textElements.forEach(tagName => {
             try {
@@ -1960,7 +1959,7 @@
             }
         });
     });
-    
+
     // Edición directa de texto en el canvas con mínimo impacto de performance
     editor.on('canvas:frame:load', () => {
         if (!editor || !editor.Canvas) return;
@@ -2033,23 +2032,23 @@
             subtree: true
         });
     });
-    
+
     // También aplicar cuando se añaden nuevos componentes
     const addingComponents = new Set(); // Para evitar recursión en component:add
     editor.on('component:add', (component) => {
         if (!editor || !editor.Canvas || !component) return;
-        
+
         // Evitar procesar el mismo componente dos veces (previene recursión infinita)
         const compId = component.cid || component.getId();
         if (addingComponents.has(compId)) {
             return;
         }
         addingComponents.add(compId);
-        
+
         try {
             const tagName = (component.get('tagName') || '').toLowerCase();
             const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
-            
+
             if (textElements.includes(tagName)) {
                 // Hacer componente editable usando setSilent para evitar recursión
                 try {
@@ -2070,7 +2069,7 @@
                 } catch (e) {
                     console.warn('Error al hacer componente editable:', e);
                 }
-                
+
                 // También actualizar el DOM directamente
                 setTimeout(() => {
                     if (!editor || !editor.Canvas) return;
@@ -2094,23 +2093,23 @@
             }, 1000);
         }
     });
-    
+
     // Asegurar que los componentes se mantengan editables cuando se renderizan
     const updatingComponents = new Set(); // Para evitar recursión en component:update
     editor.on('component:update', (component) => {
         if (!editor || !component) return;
-        
+
         // Evitar procesar el mismo componente dos veces (previene recursión infinita)
         const compId = component.cid || component.getId();
         if (updatingComponents.has(compId)) {
             return;
         }
         updatingComponents.add(compId);
-        
+
         try {
             const tagName = (component.get('tagName') || '').toLowerCase();
             const textElements = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'a', 'li', 'td', 'th', 'label'];
-            
+
             if (textElements.includes(tagName)) {
                 // No hacer set() aquí para evitar recursión, solo actualizar el DOM
                 setTimeout(() => {
@@ -2131,7 +2130,7 @@
             }, 1000);
         }
     });
-    
+
     // Listener para cuando se selecciona un componente
     editor.on('component:selected', (component) => {
         if (!editor || !editor.Canvas) return;
@@ -2146,7 +2145,7 @@
                 }
             }
         }
-        
+
         // Asegurar que los elementos de texto seleccionados sean editables
         if (component) {
             const tagName = (component.get('tagName') || '').toLowerCase();
@@ -2157,7 +2156,7 @@
                 // component.set('editable', true);
                 // component.set('selectable', true);
                 // component.set('hoverable', true);
-                
+
                 // SOLUCIÓN DEFINITIVA PARA H1: Forzar edición directa
                 setTimeout(() => {
                     if (!editor || !editor.Canvas) return;
@@ -2174,7 +2173,7 @@
                             el.style.webkitUserSelect = 'text';
                             el.style.pointerEvents = 'auto';
                             el.style.outline = 'none';
-                            
+
                             // Hacer que los hijos también sean editables
                             const children = el.querySelectorAll('*');
                             children.forEach(child => {
@@ -2182,7 +2181,7 @@
                                 child.style.cursor = 'text';
                                 child.style.userSelect = 'text';
                             });
-                            
+
                             // Permitir edición con un solo clic
                             el.addEventListener('click', function(e) {
                                 e.stopPropagation();
@@ -2190,7 +2189,7 @@
                                     this.focus();
                                 }, 50);
                             }, true);
-                            
+
                             // Guardar cambios en tiempo real mientras se escribe
                             el.addEventListener('input', function() {
                                 if (!editor || typeof editor.getComponent !== 'function') return;
@@ -2205,7 +2204,7 @@
                                     markAsChanged(); // Marcar que hay cambios sin guardar
                                 }
                             });
-                            
+
                             // Guardar cambios al perder el foco
                             el.addEventListener('blur', function() {
                                 if (!editor || typeof editor.getComponent !== 'function') return;
@@ -2220,7 +2219,7 @@
                                     markAsChanged(); // Marcar que hay cambios sin guardar
                                 }
                             });
-                            
+
                             // Guardar cambios al presionar Enter
                             el.addEventListener('keydown', function(e) {
                                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -2239,29 +2238,29 @@
                                     }
                                 }
                             });
-                            
+
                             return; // Salir temprano para h1
                         }
-                        
+
                         // Para otros elementos, verificar si tiene hijos
                         const hasChildren = el.children.length > 0 || (el.textContent && el.textContent.trim() && el.innerHTML !== el.textContent);
-                        
+
                         if (hasChildren) {
                             // Para elementos con hijos, usar Rich Text Editor
                             component.set('editable', true);
                             component.set('selectable', true);
                             component.set('hoverable', true);
-                            
+
                             el.setAttribute('contenteditable', 'true');
                             el.style.cursor = 'text';
                             el.style.userSelect = 'text';
                             el.style.webkitUserSelect = 'text';
-                            
+
                             // Habilitar Rich Text Editor cuando se hace doble clic
                             el.addEventListener('dblclick', function(e) {
                                 e.stopPropagation();
                                 e.preventDefault();
-                                
+
                                 if (editor.RichTextEditor) {
                                     const rte = editor.RichTextEditor;
                                     if (!rte.isActive()) {
@@ -2284,26 +2283,26 @@
                             // Para elementos sin hijos, edición directa
                             if (el._gjsTextEditBound) return;
                             el._gjsTextEditBound = true;
-                            
+
                             el.setAttribute('contenteditable', 'true');
                             el.style.cursor = 'text';
                             el.style.userSelect = 'text';
                             el.style.webkitUserSelect = 'text';
                             el.style.outline = 'none';
                             el.style.pointerEvents = 'auto';
-                            
+
                             el.addEventListener('mousedown', function(e) {
                                 e.stopPropagation();
                                 e.stopImmediatePropagation();
                             }, true);
-                            
+
                             el.addEventListener('click', function(e) {
                                 e.stopPropagation();
                                 setTimeout(() => {
                                     this.focus();
                                 }, 50);
                             }, true);
-                            
+
                             el.addEventListener('blur', function() {
                                 if (!editor || typeof editor.getComponent !== 'function') return;
                                 const comp = editor.getComponent(this);
@@ -2319,7 +2318,7 @@
                 }, 100);
             }
         }
-        
+
         if (component && (component.get('type') === 'video' || component.get('type') === 'image')) {
             const assetManager = editor.AssetManager;
 
@@ -2395,7 +2394,7 @@
             }
         }
     } // Cierre de initializeEditor
-    
+
     // Función para esperar a que los plugins estén disponibles
     function waitForPlugins(callback, maxAttempts = 50, attempt = 0) {
         const requiredPlugins = [
@@ -2407,11 +2406,11 @@
         if (!FORCE_DISABLE_USER_BLOCKS) {
             requiredPlugins.push('grapesjs-user-blocks');
         }
-        
+
         const allAvailable = requiredPlugins.every(name => {
             return window[name] !== undefined;
         });
-        
+
         if (allAvailable || attempt >= maxAttempts) {
             if (allAvailable) {
                 console.log('✓ Todos los plugins están disponibles');
@@ -2423,7 +2422,7 @@
             setTimeout(() => waitForPlugins(callback, maxAttempts, attempt + 1), 100);
         }
     }
-    
+
     // Capturar errores async de plugins (incluyendo getFrames) y forzar fallback estable.
     window.addEventListener('unhandledrejection', function (event) {
         try {
@@ -2519,25 +2518,25 @@ setTimeout(function() {
     if (modalElement) {
         saveModal = new bootstrap.Modal(modalElement);
     }
-    
+
     // Detectar cambios en el editor
     if (typeof editor !== 'undefined') {
         editor.on('update', function() {
             markAsChanged();
         });
-        
+
         editor.on('component:add', function() {
             markAsChanged();
         });
-        
+
         editor.on('component:remove', function() {
             markAsChanged();
         });
-        
+
         editor.on('component:update', function() {
             markAsChanged();
         });
-        
+
         editor.on('style:custom', function() {
             markAsChanged();
         });
@@ -2548,13 +2547,13 @@ function markAsChanged() {
     hasUnsavedChanges = true;
     const saveButton = document.getElementById('saveButton');
     const saveStatus = document.getElementById('saveStatus');
-    
+
     if (saveButton) {
         saveButton.disabled = false;
         saveButton.classList.remove('btn-primary');
         saveButton.classList.add('btn-warning');
     }
-    
+
     if (saveStatus) {
         saveStatus.className = 'badge bg-warning';
         saveStatus.innerHTML = '<i class="bi bi-exclamation-circle"></i> Cambios sin guardar';
@@ -2566,7 +2565,7 @@ function markAsSaved() {
     const saveButton = document.getElementById('saveButton');
     const saveStatus = document.getElementById('saveStatus');
     const lastSaveTime = document.getElementById('lastSaveTime');
-    
+
     if (saveButton) {
         // Restaurar el texto original del botón
         saveButton.innerHTML = '<i class="bi bi-save"></i> Guardar Cambios';
@@ -2574,17 +2573,17 @@ function markAsSaved() {
         saveButton.classList.remove('btn-warning');
         saveButton.classList.add('btn-primary');
     }
-    
+
     if (saveStatus) {
         saveStatus.className = 'badge bg-success';
         saveStatus.innerHTML = '<i class="bi bi-check-circle"></i> Guardado';
     }
-    
+
     if (lastSaveTime) {
         const now = new Date();
         lastSaveTime.textContent = `Último guardado: ${now.toLocaleTimeString('es-ES')}`;
     }
-    
+
     // Resetear después de 3 segundos
     setTimeout(() => {
         if (saveStatus) {
@@ -2598,7 +2597,7 @@ function confirmSave() {
     if (!hasUnsavedChanges) {
         return;
     }
-    
+
     // Mostrar modal de confirmación
     if (saveModal) {
         saveModal.show();
@@ -2621,28 +2620,28 @@ function executeSave() {
         }
         return;
     }
-    
+
     const saveButton = document.getElementById('saveButton');
     if (!saveButton) {
         console.error('Botón de guardar no encontrado');
         return;
     }
-    
+
     const originalText = saveButton.innerHTML;
-    
+
     // Deshabilitar botón y mostrar loading
     saveButton.disabled = true;
     saveButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
-    
+
     // Cerrar modal inmediatamente
     if (saveModal) {
         saveModal.hide();
     }
-    
+
     // Extraer solo el nombre del archivo de la vista actual
     let view = '{{ str_replace("webacademia/pages/", "", $currentView) }}';
     const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-    
+
     if (!token) {
         console.error('Token CSRF no encontrado');
         saveButton.disabled = false;
@@ -2650,7 +2649,7 @@ function executeSave() {
         alert('Error: Token de seguridad no encontrado. Por favor, recarga la página.');
         return;
     }
-    
+
     // Forzar actualización de todos los componentes antes de obtener el HTML
     // Esto asegura que los cambios en contenteditable se reflejen en el modelo
     const allComponents = editor.getComponents();
@@ -2688,11 +2687,11 @@ function executeSave() {
         }
     };
     allComponents.each(comp => updateComponentContent(comp));
-    
+
     // Ahora obtener el HTML actualizado
     const html = editor.getHtml();
     const css = editor.getCss();
-    
+
     // DEBUG: Verificar que el h1 esté en el HTML
     console.log('HTML a guardar (primeros 500 caracteres):', html.substring(0, 500));
     const h1Match = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
@@ -2701,14 +2700,14 @@ function executeSave() {
     } else {
         console.warn('⚠️ No se encontró h1 en el HTML a guardar');
     }
-    
+
     // Combinar CSS del editor con CSS personalizado
     const finalCss = customCss ? `${css}\n\n/* CSS Personalizado */\n${customCss}` : css;
-    
+
     // Crear un AbortController para timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
-    
+
     // Codificar solo una vez
     fetch(`/builder/save?view=${encodeURIComponent(view)}`, {
         method: 'POST',
@@ -2726,14 +2725,14 @@ function executeSave() {
     })
     .then(async response => {
         clearTimeout(timeoutId);
-        
+
         // Log para debugging
         console.log('Respuesta del servidor:', response.status, response.statusText);
-        
+
         // Leer el contenido de la respuesta primero
         const responseText = await response.text();
         console.log('Respuesta del servidor (texto):', responseText.substring(0, 200));
-        
+
         if (!response.ok) {
             try {
                 const data = JSON.parse(responseText);
@@ -2743,7 +2742,7 @@ function executeSave() {
                 throw new Error(`Error HTTP: ${response.status} - ${responseText.substring(0, 100)}`);
             }
         }
-        
+
         // Intentar parsear como JSON
         try {
             return JSON.parse(responseText);
@@ -2755,7 +2754,7 @@ function executeSave() {
     })
     .then(data => {
         console.log('Datos recibidos del servidor:', data);
-        
+
         if (data && (data.status === 'ok' || (data.error === undefined && data.status !== 'error'))) {
             // Éxito - restaurar botón inmediatamente
             const saveButton = document.getElementById('saveButton');
@@ -2765,13 +2764,13 @@ function executeSave() {
                 saveButton.classList.remove('btn-warning');
                 saveButton.classList.add('btn-primary');
             }
-            
+
             // Marcar como guardado
             markAsSaved();
-            
+
             // Mostrar notificación de éxito
             showNotification('Cambios guardados correctamente', 'success');
-            
+
             console.log('Guardado completado exitosamente');
         } else {
             // Error en la respuesta
@@ -2782,14 +2781,14 @@ function executeSave() {
     .catch(error => {
         clearTimeout(timeoutId);
         console.error('Error al guardar:', error);
-        
+
         let errorMessage = 'Error al guardar los cambios. ';
         if (error.name === 'AbortError') {
             errorMessage += 'La operación tardó demasiado. Por favor, verifica tu conexión e inténtalo de nuevo.';
         } else {
             errorMessage += error.message || 'Por favor, inténtalo de nuevo.';
         }
-        
+
         alert(errorMessage);
         saveButton.disabled = false;
         saveButton.innerHTML = originalText;
@@ -2805,18 +2804,18 @@ function resetSaveState() {
         saveButton.classList.remove('btn-warning');
         saveButton.classList.add('btn-primary');
     }
-    
+
     const saveStatus = document.getElementById('saveStatus');
     if (saveStatus) {
         saveStatus.className = 'badge bg-secondary';
         saveStatus.innerHTML = '<i class="bi bi-check-circle"></i> Sin cambios';
     }
-    
+
     // Cerrar modal si está abierto
     if (saveModal) {
         saveModal.hide();
     }
-    
+
     hasUnsavedChanges = true;
     markAsChanged();
     console.log('Estado de guardado reseteado');
@@ -2832,7 +2831,7 @@ function showNotification(message, type = 'info') {
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
     document.body.appendChild(notification);
-    
+
     // Auto-remover después de 3 segundos
     setTimeout(() => {
         notification.remove();
@@ -2872,12 +2871,12 @@ function showDuplicateModal() {
     if (!duplicateModal && modalElement) {
         duplicateModal = new bootstrap.Modal(modalElement);
     }
-    
+
     // Limpiar campos
     document.getElementById('duplicateViewName').value = '';
     document.getElementById('duplicateError').style.display = 'none';
     document.getElementById('duplicateError').textContent = '';
-    
+
     // Mostrar modal
     if (duplicateModal) {
         duplicateModal.show();
@@ -2939,32 +2938,32 @@ function executeDuplicate() {
     const newViewName = document.getElementById('duplicateViewName').value.trim();
     const errorDiv = document.getElementById('duplicateError');
     const sourceView = '{{ str_replace("webacademia/pages/", "", $currentView) }}';
-    
+
     // Validar nombre
     if (!newViewName) {
         errorDiv.textContent = 'Por favor, ingresa un nombre para la nueva vista.';
         errorDiv.style.display = 'block';
         return;
     }
-    
+
     // Validar formato (solo letras, números y guiones bajos)
     if (!/^[a-zA-Z0-9_]+$/.test(newViewName)) {
         errorDiv.textContent = 'El nombre solo puede contener letras, números y guiones bajos.';
         errorDiv.style.display = 'block';
         return;
     }
-    
+
     // Ocultar error
     errorDiv.style.display = 'none';
-    
+
     // Deshabilitar botón y mostrar loading
     const duplicateButton = event.target;
     const originalText = duplicateButton.innerHTML;
     duplicateButton.disabled = true;
     duplicateButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Duplicando...';
-    
+
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    
+
     fetch('/builder/duplicate', {
         method: 'POST',
         headers: {
@@ -2982,12 +2981,12 @@ function executeDuplicate() {
         if (data.status === 'ok') {
             // Éxito
             showNotification('Vista duplicada correctamente', 'success');
-            
+
             // Cerrar modal
             if (duplicateModal) {
                 duplicateModal.hide();
             }
-            
+
             // Redirigir a la nueva vista después de 1 segundo
             setTimeout(() => {
                 window.location.href = `/builder?view=${encodeURIComponent(data.new_view)}`;
@@ -3027,13 +3026,13 @@ setTimeout(function() {
     if (modalElement) {
         cssEditorModal = new bootstrap.Modal(modalElement);
     }
-    
+
     // Inicializar modal de atributos
     const attrsModalElement = document.getElementById('attributesCodeModal');
     if (attrsModalElement) {
         attributesCodeModal = new bootstrap.Modal(attrsModalElement);
     }
-    
+
     // Inicializar CodeMirror cuando el modal se muestre
     const textarea = document.getElementById('customCssEditor');
     if (textarea && typeof CodeMirror !== 'undefined') {
@@ -3056,7 +3055,7 @@ function showCssEditor() {
             cssEditorModal = new bootstrap.Modal(modalElement);
         }
     }
-    
+
     // Cargar CSS personalizado actual si existe
     if (customCssEditor) {
         customCssEditor.setValue(customCss);
@@ -3076,7 +3075,7 @@ function showCssEditor() {
             customCssEditor.setValue(customCss);
         }
     }
-    
+
     if (cssEditorModal) {
         cssEditorModal.show();
     }
@@ -3093,24 +3092,24 @@ setTimeout(function() {
     const modalElement = document.getElementById('pageMetadataModal');
     if (modalElement) {
         pageMetadataModal = new bootstrap.Modal(modalElement);
-        
+
         // Contadores de caracteres
         const titleInput = document.getElementById('metadataTitle');
         const descriptionInput = document.getElementById('metadataDescription');
         const slugInput = document.getElementById('metadataSlug');
-        
+
         if (titleInput) {
             titleInput.addEventListener('input', function() {
                 document.getElementById('titleCount').textContent = this.value.length;
             });
         }
-        
+
         if (descriptionInput) {
             descriptionInput.addEventListener('input', function() {
                 document.getElementById('descriptionCount').textContent = this.value.length;
             });
         }
-        
+
         if (slugInput) {
             slugInput.addEventListener('input', function() {
                 // Convertir a minúsculas y reemplazar espacios y caracteres especiales
@@ -3130,10 +3129,10 @@ function showPageMetadataEditor() {
         console.error('Modal de metadatos no inicializado');
         return;
     }
-    
+
     const view = '{{ str_replace("webacademia/pages/", "", $currentView) }}';
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    
+
     // Cargar metadatos existentes
     fetch(`/builder/page-metadata?view=${encodeURIComponent(view)}`, {
         headers: {
@@ -3148,7 +3147,7 @@ function showPageMetadataEditor() {
             showNotification('Error al cargar metadatos', 'danger');
             return;
         }
-        
+
         // Rellenar formulario
         document.getElementById('metadataView').value = view;
         document.getElementById('metadataSlug').value = data.slug || view;
@@ -3158,12 +3157,12 @@ function showPageMetadataEditor() {
         document.getElementById('metadataOgTitle').value = data.og_title || '';
         document.getElementById('metadataOgDescription').value = data.og_description || '';
         document.getElementById('metadataRobots').value = data.robots || '';
-        
+
         // Actualizar contadores
         document.getElementById('titleCount').textContent = (data.title || '').length;
         document.getElementById('descriptionCount').textContent = (data.description || '').length;
         document.getElementById('slugPreview').textContent = data.slug || view;
-        
+
         // Mostrar modal
         pageMetadataModal.show();
     })
@@ -3177,25 +3176,25 @@ function savePageMetadata() {
     const form = document.getElementById('pageMetadataForm');
     const formData = new FormData(form);
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    
+
     // Convertir FormData a objeto
     const data = {};
     formData.forEach((value, key) => {
         data[key] = value;
     });
-    
+
     // Validar slug
     if (!data.slug || !/^[a-z0-9-]+$/.test(data.slug)) {
         showNotification('El slug solo puede contener letras minúsculas, números y guiones', 'danger');
         return;
     }
-    
+
     // Deshabilitar botón y mostrar loading
     const saveButton = event.target;
     const originalText = saveButton.innerHTML;
     saveButton.disabled = true;
     saveButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
-    
+
     fetch('/builder/page-metadata/save', {
         method: 'POST',
         headers: {
@@ -3245,9 +3244,9 @@ function showCookiesEditor() {
         console.error('Modal de cookies no inicializado');
         return;
     }
-    
+
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    
+
     // Cargar texto existente
     fetch('/builder/cookies', {
         headers: {
@@ -3262,13 +3261,13 @@ function showCookiesEditor() {
             showNotification('Error al cargar texto de cookies', 'danger');
             return;
         }
-        
+
         // Rellenar editor
         const editor = document.getElementById('cookiesTextEditor');
         if (editor) {
             editor.value = data.text || '';
         }
-        
+
         // Mostrar modal
         cookiesEditorModal.show();
     })
@@ -3284,16 +3283,16 @@ function saveCookiesText() {
         showNotification('Editor de cookies no encontrado', 'danger');
         return;
     }
-    
+
     const text = editor.value;
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    
+
     // Deshabilitar botón y mostrar loading
     const saveButton = event.target;
     const originalText = saveButton.innerHTML;
     saveButton.disabled = true;
     saveButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
-    
+
     fetch('/builder/cookies/save', {
         method: 'POST',
         headers: {
@@ -3404,7 +3403,7 @@ let availablePages = [];
 setTimeout(function() {
     const menuModalElement = document.getElementById('menuManagerModal');
     const pageModalElement = document.getElementById('pageSelectorModal');
-    
+
     if (menuModalElement) {
         menuManagerModal = new bootstrap.Modal(menuModalElement);
     }
@@ -3420,7 +3419,7 @@ function showMenuManager() {
             menuManagerModal = new bootstrap.Modal(modalElement);
         }
     }
-    
+
     if (menuManagerModal) {
         loadMenuItems();
         menuManagerModal.show();
@@ -3429,7 +3428,7 @@ function showMenuManager() {
 
 function loadMenuItems() {
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    
+
     fetch('/builder/menu', {
         headers: {
             'X-CSRF-TOKEN': token,
@@ -3443,14 +3442,14 @@ function loadMenuItems() {
     })
     .catch(error => {
         console.error('Error:', error);
-        document.getElementById('menuItemsList').innerHTML = 
+        document.getElementById('menuItemsList').innerHTML =
             '<div class="alert alert-danger">Error al cargar los items del menú</div>';
     });
 }
 
 function renderMenuItems() {
     const container = document.getElementById('menuItemsList');
-    
+
     if (menuItems.length === 0) {
         container.innerHTML = `
             <div class="text-center text-muted py-5">
@@ -3460,15 +3459,15 @@ function renderMenuItems() {
         `;
         return;
     }
-    
+
     let html = '';
     menuItems.forEach((item, index) => {
-        const activeBadge = item.active 
-            ? '<span class="badge bg-success">Activo</span>' 
+        const activeBadge = item.active
+            ? '<span class="badge bg-success">Activo</span>'
             : '<span class="badge bg-secondary">Inactivo</span>';
-        
+
         html += `
-            <div class="list-group-item d-flex justify-content-between align-items-center menu-item-draggable" 
+            <div class="list-group-item d-flex justify-content-between align-items-center menu-item-draggable"
                  data-id="${item.id}" style="cursor: move;">
                 <div class="d-flex align-items-center gap-2">
                     <i class="bi bi-grip-vertical text-muted"></i>
@@ -3488,9 +3487,9 @@ function renderMenuItems() {
             </div>
         `;
     });
-    
+
     container.innerHTML = html;
-    
+
     // Inicializar drag & drop (usando SortableJS si está disponible, o implementación básica)
     initDragAndDrop();
 }
@@ -3498,7 +3497,7 @@ function renderMenuItems() {
 function initDragAndDrop() {
     const container = document.getElementById('menuItemsList');
     const items = container.querySelectorAll('.menu-item-draggable');
-    
+
     items.forEach(item => {
         item.draggable = true;
         item.addEventListener('dragstart', handleDragStart);
@@ -3528,23 +3527,23 @@ function handleDrop(e) {
     if (e.stopPropagation) {
         e.stopPropagation();
     }
-    
+
     if (draggedElement !== this) {
         const container = document.getElementById('menuItemsList');
         const items = Array.from(container.querySelectorAll('.menu-item-draggable'));
         const draggedIndex = items.indexOf(draggedElement);
         const targetIndex = items.indexOf(this);
-        
+
         if (draggedIndex < targetIndex) {
             container.insertBefore(draggedElement, this.nextSibling);
         } else {
             container.insertBefore(draggedElement, this);
         }
-        
+
         // Actualizar orden en servidor
         updateMenuOrder();
     }
-    
+
     return false;
 }
 
@@ -3560,9 +3559,9 @@ function updateMenuOrder() {
         id: parseInt(item.dataset.id),
         order: index + 1
     }));
-    
+
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    
+
     fetch('/builder/menu/reorder', {
         method: 'POST',
         headers: {
@@ -3587,10 +3586,10 @@ function showMenuItemForm(itemId = null) {
     const formContainer = document.getElementById('menuItemFormContainer');
     const placeholder = document.getElementById('menuItemFormPlaceholder');
     const formTitle = document.getElementById('menuFormTitle');
-    
+
     formContainer.style.display = 'block';
     placeholder.style.display = 'none';
-    
+
     if (itemId) {
         formTitle.textContent = 'Editar Item';
         const item = menuItems.find(i => i.id === itemId);
@@ -3613,7 +3612,7 @@ function showMenuItemForm(itemId = null) {
 function cancelMenuItemForm() {
     const formContainer = document.getElementById('menuItemFormContainer');
     const placeholder = document.getElementById('menuItemFormPlaceholder');
-    
+
     formContainer.style.display = 'none';
     placeholder.style.display = 'block';
     document.getElementById('menuItemForm').reset();
@@ -3625,7 +3624,7 @@ function editMenuItem(id) {
 
 function saveMenuItem(event) {
     event.preventDefault();
-    
+
     const formData = new FormData(event.target);
     const data = {
         label: formData.get('label'),
@@ -3634,12 +3633,12 @@ function saveMenuItem(event) {
         target: formData.get('target') || '_self',
         active: formData.get('active') === 'on'
     };
-    
+
     const itemId = formData.get('id');
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     const url = itemId ? `/builder/menu/${itemId}` : '/builder/menu';
     const method = itemId ? 'PUT' : 'POST';
-    
+
     fetch(url, {
         method: method,
         headers: {
@@ -3669,9 +3668,9 @@ function deleteMenuItem(id) {
     if (!confirm('¿Estás seguro de que deseas eliminar este item del menú?')) {
         return;
     }
-    
+
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    
+
     fetch(`/builder/menu/${id}`, {
         method: 'DELETE',
         headers: {
@@ -3702,9 +3701,9 @@ function showPageSelector() {
             pageSelectorModal = new bootstrap.Modal(modalElement);
         }
     }
-    
+
     loadAvailablePages();
-    
+
     if (pageSelectorModal) {
         pageSelectorModal.show();
     }
@@ -3713,9 +3712,9 @@ function showPageSelector() {
 function loadAvailablePages() {
     const container = document.getElementById('availablePagesList');
     container.innerHTML = '<div class="text-center text-muted py-3"><i class="bi bi-arrow-repeat spin"></i> Cargando...</div>';
-    
+
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    
+
     fetch('/builder/menu/pages', {
         headers: {
             'X-CSRF-TOKEN': token,
@@ -3735,15 +3734,15 @@ function loadAvailablePages() {
 
 function renderAvailablePages() {
     const container = document.getElementById('availablePagesList');
-    
+
     let html = '<div class="list-group">';
-    
+
     if (availablePages.length === 0) {
         html += '<div class="text-center text-muted py-3">No hay páginas disponibles</div>';
     } else {
         availablePages.forEach(page => {
             html += `
-                <button type="button" class="list-group-item list-group-item-action" 
+                <button type="button" class="list-group-item list-group-item-action"
                         onclick="selectPage('${page.url}', '${page.label}')">
                     <strong>${page.label}</strong>
                     <br><small class="text-muted">${page.url}</small>
@@ -3751,7 +3750,7 @@ function renderAvailablePages() {
             `;
         });
     }
-    
+
     html += '</div>';
     container.innerHTML = html;
 }
@@ -3761,7 +3760,7 @@ function selectPage(url, label) {
     if (!document.getElementById('menuItemLabel').value) {
         document.getElementById('menuItemLabel').value = label;
     }
-    
+
     if (pageSelectorModal) {
         pageSelectorModal.hide();
     }

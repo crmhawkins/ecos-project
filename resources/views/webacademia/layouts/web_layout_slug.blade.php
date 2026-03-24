@@ -115,6 +115,21 @@ document.addEventListener('DOMContentLoaded', function() {
         img.style.setProperty('margin-right', '0', 'important');
         img.style.setProperty('margin-left', '0', 'important');
     });
+
+    // Formularios avanzados del builder: sincronizar destino y asegurar multipart para archivos.
+    const advancedForms = document.querySelectorAll('form.advanced-form');
+    advancedForms.forEach(function(form) {
+        const configuredEmail = form.getAttribute('data-form-email') || '';
+        let emailInput = form.querySelector('input[name="form_email"]');
+        if (!emailInput) {
+            emailInput = document.createElement('input');
+            emailInput.type = 'hidden';
+            emailInput.name = 'form_email';
+            form.prepend(emailInput);
+        }
+        emailInput.value = configuredEmail;
+        form.setAttribute('enctype', 'multipart/form-data');
+    });
 });
 </script>
 
