@@ -593,6 +593,7 @@
     {{-- <script src="{{ asset('js/builder-custom-blocks.js') }}"></script> --}}
     <script>
     let editor;
+    window.__gjsExcludedPlugins = window.__gjsExcludedPlugins || [];
     
     // Función para limpiar HTML antes de que GrapesJS lo procese
     function cleanHtmlForGrapesJS(html) {
@@ -731,12 +732,13 @@
                 // 'custom-blocks' - Deshabilitado temporalmente
             ];
             
-            // Añadir plugins opcionales si están disponibles.
-            if (window['grapesjs-tabs']) pluginsToLoad.push('grapesjs-tabs');
-            if (window['grapesjs-user-blocks']) pluginsToLoad.push('grapesjs-user-blocks');
-            if (window['grapesjs-templates']) pluginsToLoad.push('grapesjs-templates');
-            if (window['grapesjs-plugin-toolbox']) pluginsToLoad.push('grapesjs-plugin-toolbox');
-            if (window['grapesjs-component-code-editor']) pluginsToLoad.push('grapesjs-component-code-editor');
+            // Añadir plugins opcionales si están disponibles y no están excluidos por errores runtime.
+            const excluded = window.__gjsExcludedPlugins || [];
+            if (window['grapesjs-tabs'] && !excluded.includes('grapesjs-tabs')) pluginsToLoad.push('grapesjs-tabs');
+            if (window['grapesjs-user-blocks'] && !excluded.includes('grapesjs-user-blocks')) pluginsToLoad.push('grapesjs-user-blocks');
+            if (window['grapesjs-templates'] && !excluded.includes('grapesjs-templates')) pluginsToLoad.push('grapesjs-templates');
+            if (window['grapesjs-plugin-toolbox'] && !excluded.includes('grapesjs-plugin-toolbox')) pluginsToLoad.push('grapesjs-plugin-toolbox');
+            if (window['grapesjs-component-code-editor'] && !excluded.includes('grapesjs-component-code-editor')) pluginsToLoad.push('grapesjs-component-code-editor');
             
             editor = grapesjs.init({
                 container: '#gjs',
@@ -2405,15 +2407,38 @@
     window.addEventListener('unhandledrejection', function (event) {
         try {
             var message = event && event.reason && event.reason.message ? String(event.reason.message) : '';
-            if (message.includes('getFrames') && !window.__gjsUnhandledRecoveryTried) {
+            var stack = event && event.reason && event.reason.stack ? String(event.reason.stack) : '';
+            var runtimeError = message.includes('getFrames') || message.includes("reading 'load'");
+            if (!runtimeError) return;
+
+            // Detectar plugin conflictivo por stack y excluirlo en el reintento.
+            var pluginFromStack = null;
+            if (stack.includes('grapesjs-user-blocks.min.js')) pluginFromStack = 'grapesjs-user-blocks';
+            else if (stack.includes('grapesjs-templates.min.js')) pluginFromStack = 'grapesjs-templates';
+            else if (stack.includes('grapesjs-plugin-toolbox.min.js')) pluginFromStack = 'grapesjs-plugin-toolbox';
+            else if (stack.includes('grapesjs-component-code-editor.min.js')) pluginFromStack = 'grapesjs-component-code-editor';
+            else if (stack.includes('grapesjs-tabs.min.js')) pluginFromStack = 'grapesjs-tabs';
+
+            // Caso más frecuente observado: user-blocks.
+            if (!pluginFromStack) pluginFromStack = 'grapesjs-user-blocks';
+
+            if (!window.__gjsExcludedPlugins.includes(pluginFromStack)) {
+                window.__gjsExcludedPlugins.push(pluginFromStack);
+                console.warn('Plugin desactivado por error runtime:', pluginFromStack);
+            }
+
+            if (!window.__gjsUnhandledRecoveryTried) {
                 window.__gjsUnhandledRecoveryTried = true;
-                console.warn('Detectado error getFrames, reintentando en modo estable...');
+                console.warn('Detectado error runtime en plugins, reintentando sin plugin conflictivo...');
                 if (editor && typeof editor.destroy === 'function') {
                     try { editor.destroy(); } catch (e) {}
                 }
                 setTimeout(function () {
                     initializeEditor();
                 }, 50);
+                if (event && typeof event.preventDefault === 'function') {
+                    event.preventDefault();
+                }
             }
         } catch (e) {}
     });
