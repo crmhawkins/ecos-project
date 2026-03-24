@@ -740,7 +740,9 @@
             
             editor = grapesjs.init({
                 container: '#gjs',
-                fromElement: true,
+                // Evita errores de carga en ciertas combinaciones de plugins/páginas.
+                fromElement: false,
+                components: cleanedHtml,
                 autoload: false, // Desactivar autoload para evitar conflictos
                 plugins: pluginsToLoad,
                 pluginsOpts: {

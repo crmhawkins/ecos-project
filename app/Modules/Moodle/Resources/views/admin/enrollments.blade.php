@@ -41,6 +41,16 @@
         background-color: #0d6efd !important; 
         color: white !important; 
     }
+    #userSearchResults .table-responsive {
+        max-height: 360px;
+        overflow-y: auto;
+    }
+    #userSearchResults thead th {
+        position: sticky;
+        top: 0;
+        background: #fff;
+        z-index: 1;
+    }
 </style>
 @endsection
 
@@ -416,15 +426,24 @@
             });
         });
 
+        // Limpiar estado al abrir/cerrar modal para evitar selección previa accidental
+        $('#enrollUserModal').on('show.bs.modal hidden.bs.modal', function() {
+            $('#user_search').val('');
+            $('#userSearchResultsBody').empty();
+            $('#userSearchResults').hide();
+            $('#enrollBtn').prop('disabled', true);
+            $(this).find('input[type="hidden"][name="user_id"]').remove();
+        });
+
         // Enable enroll button when a user is selected (solo quitar hidden duplicados, no los radios)
         $(document).on('change', '.user-select', function() {
             $('#enrollBtn').prop('disabled', false);
-            $('input[type="hidden"][name="user_id"]').remove();
+            $('#enrollUserModal').find('input[type="hidden"][name="user_id"]').remove();
             $('<input>').attr({
                 type: 'hidden',
                 name: 'user_id',
                 value: $(this).val()
-            }).appendTo('form[action*="enroll"]');
+            }).appendTo($('#enrollUserModal form[action*="enroll"]'));
         });
 
         // Also trigger search when pressing Enter in the search field

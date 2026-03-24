@@ -131,7 +131,7 @@ class AdminController extends Controller
     public function searchUsersAjax(Request $request)
     {
         try {
-            $search = $request->input("search");
+            $search = trim((string) $request->input("search", ""));
             if (empty($search) || strlen($search) < 3) {
                 return response()->json(["success" => false, "message" => "Término de búsqueda debe tener al menos 3 caracteres"], 400);
             }
@@ -175,23 +175,25 @@ class AdminController extends Controller
                 // Continuar con otros criterios si falla
             }
             
-            // Si no encontramos nada, intentar con un criterio que sabemos que funciona
-            if (empty($allUsers)) {
-                try {
-                    $criteria = [["key" => "confirmed", "value" => "1"]];
-                    $allUsers = $this->userService->searchUsers($criteria);
-                } catch (Exception $e) {
-                    // Si todo falla, devolver error
-                    throw new Exception("No se pudieron obtener usuarios de Moodle");
-                }
-            }
-
             // Eliminar duplicados basados en el ID
             $uniqueUsers = [];
             foreach ($allUsers as $user) {
                 $uniqueUsers[$user['id']] = $user;
             }
             $allUsers = array_values($uniqueUsers);
+
+            // Filtrado final defensivo para evitar resultados no relacionados.
+            $needle = mb_strtolower($search);
+            $allUsers = array_values(array_filter($allUsers, function ($user) use ($needle) {
+                $haystack = mb_strtolower(implode(' ', [
+                    $user['firstname'] ?? '',
+                    $user['lastname'] ?? '',
+                    $user['email'] ?? '',
+                    $user['username'] ?? '',
+                ]));
+
+                return str_contains($haystack, $needle);
+            }));
 
             $formattedUsers = array_map(function($user) {
                 return [
