@@ -593,7 +593,11 @@
     {{-- <script src="{{ asset('js/builder-custom-blocks.js') }}"></script> --}}
     <script>
     let editor;
+    const FORCE_DISABLE_USER_BLOCKS = true;
     window.__gjsExcludedPlugins = window.__gjsExcludedPlugins || [];
+    if (FORCE_DISABLE_USER_BLOCKS && !window.__gjsExcludedPlugins.includes('grapesjs-user-blocks')) {
+        window.__gjsExcludedPlugins.push('grapesjs-user-blocks');
+    }
     
     // Función para limpiar HTML antes de que GrapesJS lo procese
     function cleanHtmlForGrapesJS(html) {
@@ -631,11 +635,13 @@
     function checkPluginsAvailable() {
         const requiredPlugins = {
             'grapesjs-tabs': window['grapesjs-tabs'],
-            'grapesjs-user-blocks': window['grapesjs-user-blocks'],
             'grapesjs-templates': window['grapesjs-templates'],
             'grapesjs-plugin-toolbox': window['grapesjs-plugin-toolbox'],
             'grapesjs-component-code-editor': window['grapesjs-component-code-editor']
         };
+        if (!FORCE_DISABLE_USER_BLOCKS) {
+            requiredPlugins['grapesjs-user-blocks'] = window['grapesjs-user-blocks'];
+        }
         
         const available = [];
         const missing = [];
@@ -887,6 +893,19 @@
             }
         }
     });
+
+    // Registrar comando por adelantado para evitar warning "command not found".
+    if (!editor.Commands.get('blocks-editor')) {
+        editor.Commands.add('blocks-editor', {
+            run: function (ed) {
+                ed.Modal.open({
+                    title: 'Bloques personalizados',
+                    content: '<div style="padding:16px;">La función de bloques de usuario está desactivada por estabilidad.</div>',
+                    width: '420px'
+                });
+            }
+        });
+    }
 
     // Registrar SIEMPRE el comando para evitar warning: "'blocks-editor' command not found".
     // Si el plugin define uno, lo envolvemos; si no, mostramos un modal guía.
@@ -2381,11 +2400,13 @@
     function waitForPlugins(callback, maxAttempts = 50, attempt = 0) {
         const requiredPlugins = [
             'grapesjs-tabs',
-            'grapesjs-user-blocks',
             'grapesjs-templates',
             'grapesjs-plugin-toolbox',
             'grapesjs-component-code-editor'
         ];
+        if (!FORCE_DISABLE_USER_BLOCKS) {
+            requiredPlugins.push('grapesjs-user-blocks');
+        }
         
         const allAvailable = requiredPlugins.every(name => {
             return window[name] !== undefined;
