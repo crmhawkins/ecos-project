@@ -731,8 +731,12 @@
                 // 'custom-blocks' - Deshabilitado temporalmente
             ];
             
-            // Plugins opcionales desactivados por estabilidad (rompían init en algunos entornos).
-            // Si se quieren reactivar, hacerlo uno a uno y validar compatibilidad con la versión de GrapesJS.
+            // Añadir plugins opcionales si están disponibles.
+            if (window['grapesjs-tabs']) pluginsToLoad.push('grapesjs-tabs');
+            if (window['grapesjs-user-blocks']) pluginsToLoad.push('grapesjs-user-blocks');
+            if (window['grapesjs-templates']) pluginsToLoad.push('grapesjs-templates');
+            if (window['grapesjs-plugin-toolbox']) pluginsToLoad.push('grapesjs-plugin-toolbox');
+            if (window['grapesjs-component-code-editor']) pluginsToLoad.push('grapesjs-component-code-editor');
             
             editor = grapesjs.init({
                 container: '#gjs',
@@ -873,10 +877,14 @@
         }
     });
 
+    // Registrar SIEMPRE el comando para evitar warning: "'blocks-editor' command not found".
+    // Si el plugin define uno, lo envolvemos; si no, mostramos un modal guía.
     editor.on('load', function () {
-        var cmd = editor.Commands.get('blocks-editor');
-        if (!cmd || typeof cmd.run !== 'function') return;
-        var origRun = cmd.run.bind(cmd);
+        var existingCmd = editor.Commands.get('blocks-editor');
+        var origRun = existingCmd && typeof existingCmd.run === 'function'
+            ? existingCmd.run.bind(existingCmd)
+            : null;
+
         editor.Commands.add('blocks-editor', {
             run: function (ed) {
                 var key = 'gjs_ecos_userblocks_v1';
@@ -905,7 +913,20 @@
                     });
                     return;
                 }
-                origRun(ed);
+
+                if (origRun) {
+                    return origRun(ed);
+                }
+
+                // Fallback cuando el plugin no aporta comando propio.
+                ed.Modal.open({
+                    title: 'Mis bloques personalizados',
+                    content: '<div style="padding:20px;max-width:480px;line-height:1.55;font-size:14px;color:#333;">' +
+                        '<p><strong>No se detectó el editor de bloques del plugin.</strong></p>' +
+                        '<p>Puedes seguir creando/guardando bloques y se guardarán en localStorage.</p>' +
+                        '</div>',
+                    width: '520px'
+                });
             }
         });
     });
