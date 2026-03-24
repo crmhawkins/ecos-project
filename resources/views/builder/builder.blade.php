@@ -742,7 +742,16 @@
                 container: '#gjs',
                 // Evita errores de carga en ciertas combinaciones de plugins/páginas.
                 fromElement: false,
-                components: cleanedHtml,
+                // Definir página principal explícitamente para evitar errores getFrames en postLoad.
+                pageManager: {
+                    pages: [
+                        {
+                            id: 'main',
+                            styles: '',
+                            component: cleanedHtml
+                        }
+                    ]
+                },
                 autoload: false, // Desactivar autoload para evitar conflictos
                 plugins: pluginsToLoad,
                 pluginsOpts: {
@@ -2329,7 +2338,15 @@
                     editor = grapesjs.init({
                         container: '#gjs',
                         fromElement: false,
-                        components: fallbackHtml,
+                        pageManager: {
+                            pages: [
+                                {
+                                    id: 'main',
+                                    styles: '',
+                                    component: fallbackHtml
+                                }
+                            ]
+                        },
                         autoload: false,
                         plugins: [ecosLaravelStorageFirst, 'gjs-blocks-basic'],
                         storageManager: {
@@ -2384,6 +2401,23 @@
         }
     }
     
+    // Capturar errores async de plugins (incluyendo getFrames) y forzar fallback estable.
+    window.addEventListener('unhandledrejection', function (event) {
+        try {
+            var message = event && event.reason && event.reason.message ? String(event.reason.message) : '';
+            if (message.includes('getFrames') && !window.__gjsUnhandledRecoveryTried) {
+                window.__gjsUnhandledRecoveryTried = true;
+                console.warn('Detectado error getFrames, reintentando en modo estable...');
+                if (editor && typeof editor.destroy === 'function') {
+                    try { editor.destroy(); } catch (e) {}
+                }
+                setTimeout(function () {
+                    initializeEditor();
+                }, 50);
+            }
+        } catch (e) {}
+    });
+
     // Inicializar el editor cuando el DOM esté listo y los plugins estén disponibles
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
