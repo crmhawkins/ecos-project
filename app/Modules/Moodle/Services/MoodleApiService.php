@@ -109,7 +109,11 @@ class MoodleApiService
 
         // Return cached response if available and cache is enabled
         // Skip cache for enrollment functions to get real-time data
-        $skipCacheFunctions = ['core_enrol_get_enrolled_users', 'enrol_manual_enrol_users', 'enrol_manual_unenrol_users'];
+        $skipCacheFunctions = [
+            'core_enrol_get_enrolled_users',
+            'enrol_manual_enrol_users',
+            'enrol_manual_unenrol_users',
+        ];
         if ($this->useCache && !$forceRefresh && Cache::has($cacheKey) && !in_array($function, $skipCacheFunctions)) {
             return Cache::get($cacheKey);
         }
@@ -170,12 +174,13 @@ class MoodleApiService
         if ($response->successful()) {
             $data = $response->json();
 
-            // Log the response for debugging
-            Log::info("Moodle API Response for {$function}:", [
-                'function' => $function,
-                'params' => $params,
-                'response' => $data
-            ]);
+            // Evitar logs gigantes en producción (respuesta completa puede ser enorme).
+            if (config('app.debug')) {
+                Log::debug("Moodle API response OK", [
+                    'function' => $function,
+                    'items' => is_array($data) ? count($data) : null,
+                ]);
+            }
 
             // Check for Moodle API error
             if (isset($data['exception'])) {

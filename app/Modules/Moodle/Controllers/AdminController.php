@@ -81,11 +81,11 @@ class AdminController extends Controller
                 $criteria[] = ["key" => $searchType , "value" => trim($search)];  // Búsqueda exacta sin comodines
             }
 
-            // Si no hay criterios de búsqueda, obtener todos los usuarios
+            // Evitar cargar TODOS los usuarios sin filtro (muy costoso en Moodle).
             if (empty($criteria)) {
-                $totalUsers = $this->userService->getTotalUsersCount();
-                $allUsers = $this->userService->getAllUsers(); // Obtener todos sin paginación
-                $infoMessage = "Mostrando todos los usuarios disponibles. Para buscar usuarios específicos, utiliza el campo de búsqueda arriba.";
+                $totalUsers = 0;
+                $allUsers = [];
+                $infoMessage = "Para mejorar el rendimiento, usa la búsqueda (mínimo 2 caracteres) para cargar usuarios.";
             } else {
                 $allUsers = $this->userService->searchUsers($criteria);
                 $totalUsers = count($allUsers);
@@ -572,14 +572,11 @@ class AdminController extends Controller
 
             if ($courseId) {
                 try {
-                    Log::info("Fetching enrolled users for course: {$courseId}");
                     $enrolledUsersData = $this->enrollmentService->getEnrolledUsers($courseId);
-                    Log::info("Enrolled users data received:", ['count' => count($enrolledUsersData), 'data' => $enrolledUsersData]);
                     
                     // Si no hay datos o es un array vacío, crear una colección vacía
                     if (empty($enrolledUsersData)) {
                         $enrolledUsersData = [];
-                        Log::warning("No enrolled users data received for course: {$courseId}");
                     }
                     
                     $collection = collect($enrolledUsersData);
@@ -644,15 +641,6 @@ class AdminController extends Controller
      */
     public function enrollUser(Request $request)
     {
-        // Log all incoming data for debugging
-        Log::info("Enroll User Request Data:", [
-            'all_data' => $request->all(),
-            'course_id' => $request->input('course_id'),
-            'user_id' => $request->input('user_id'),
-            'role_id' => $request->input('role_id'),
-            'send_notification' => $request->input('send_notification')
-        ]);
-
         $validated = $request->validate([
             "course_id" => "required|integer",
             "user_id" => "required|integer",
@@ -660,18 +648,11 @@ class AdminController extends Controller
         ]);
 
         try {
-            Log::info("Attempting to enroll user:", $validated);
-            
             $this->enrollmentService->enrollUser(
                 $validated["user_id"],
                 $validated["course_id"],
                 $validated["role_id"]
             );
-
-            Log::info("User enrolled successfully:", $validated);
-            
-            // Pequeño delay para que Moodle procese la matriculación
-            sleep(1);
             
             return redirect()->route("moodle.admin.enrollments", ["course_id" => $validated["course_id"]])
                              ->with("success", "Usuario matriculado correctamente.");

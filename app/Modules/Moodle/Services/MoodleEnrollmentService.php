@@ -3,6 +3,7 @@
 namespace App\Modules\Moodle\Services;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Exception;
 
 class MoodleEnrollmentService
@@ -56,6 +57,8 @@ class MoodleEnrollmentService
                 ]
             ]);
 
+            Cache::forget("moodle_enrolled_users_course_{$courseId}");
+
             return true;
         } catch (Exception $e) {
             Log::error("Moodle Enroll User Error: {$e->getMessage()}", [
@@ -99,6 +102,8 @@ class MoodleEnrollmentService
                 ]
             ]);
 
+            Cache::forget("moodle_enrolled_users_course_{$courseId}");
+
             return true;
         } catch (Exception $e) {
             Log::error("Moodle Unenroll User Error: {$e->getMessage()}", [
@@ -125,12 +130,14 @@ class MoodleEnrollmentService
                 throw new Exception("Course ID is required");
             }
 
-            // Call Moodle API to get enrolled users
-            $response = $this->apiService->call('core_enrol_get_enrolled_users', [
-                'courseid' => $courseId
-            ]);
+            $cacheKey = "moodle_enrolled_users_course_{$courseId}";
 
-            return $response;
+            return Cache::remember($cacheKey, 45, function () use ($courseId) {
+                // Call Moodle API to get enrolled users
+                return $this->apiService->call('core_enrol_get_enrolled_users', [
+                    'courseid' => $courseId
+                ]);
+            });
         } catch (Exception $e) {
             Log::error("Moodle Get Enrolled Users Error: {$e->getMessage()}", [
                 'courseId' => $courseId,

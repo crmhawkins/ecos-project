@@ -3,6 +3,7 @@
 namespace App\Modules\Moodle\Services;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Exception;
 
 class MoodleUserService
@@ -382,20 +383,22 @@ class MoodleUserService
     public function getAllUsers(): array
     {
         try {
-            // Obtener todos los usuarios confirmados de una vez
-            $params = [
-                'criteria' => [['key' => 'confirmed', 'value' => '1']]
-            ];
-            
-            $response = $this->apiService->call('core_user_get_users', $params);
-            $allUsers = $response['users'] ?? [];
+            return Cache::remember('moodle_all_users_confirmed', 300, function () {
+                // Obtener todos los usuarios confirmados de una vez
+                $params = [
+                    'criteria' => [['key' => 'confirmed', 'value' => '1']]
+                ];
 
-            // Ordenar por ID
-            usort($allUsers, function($a, $b) {
-                return $a['id'] <=> $b['id'];
+                $response = $this->apiService->call('core_user_get_users', $params);
+                $allUsers = $response['users'] ?? [];
+
+                // Ordenar por ID
+                usort($allUsers, function($a, $b) {
+                    return $a['id'] <=> $b['id'];
+                });
+
+                return $allUsers;
             });
-
-            return $allUsers;
         } catch (Exception $e) {
             Log::error("Moodle Get All Users Error: {$e->getMessage()}", [
                 'exception' => $e
@@ -413,15 +416,10 @@ class MoodleUserService
     public function getTotalUsersCount(): int
     {
         try {
-            // Obtener todos los usuarios confirmados para contar
-            $params = [
-                'criteria' => [['key' => 'confirmed', 'value' => '1']]
-            ];
-            
-            $response = $this->apiService->call('core_user_get_users', $params);
-            $allUsers = $response['users'] ?? [];
-            
-            return count($allUsers);
+            return Cache::remember('moodle_total_users_count', 300, function () {
+                // Reutilizar getAllUsers para no duplicar llamadas pesadas.
+                return count($this->getAllUsers());
+            });
         } catch (Exception $e) {
             Log::error("Moodle Get Total Users Count Error: {$e->getMessage()}", [
                 'exception' => $e
