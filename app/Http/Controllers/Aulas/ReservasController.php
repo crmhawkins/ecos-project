@@ -157,9 +157,20 @@ class ReservasController extends Controller
             'hora_fin' => $this->normalizeTimeToHm($request->input('hora_fin')),
         ]);
 
+        // Compatibilidad con esquema antiguo: la tabla requiere "curso" y "profesor".
+        // En la UI actual se usa "titulo" como referencia del curso/reserva y "solicitante" como persona.
+        $curso = $request->input('curso') ?: $request->input('titulo');
+        $profesor = $request->input('profesor') ?: ($request->input('solicitante') ?: 'Sin profesor');
+        $request->merge([
+            'curso' => $curso,
+            'profesor' => $profesor,
+        ]);
+
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
+            'curso' => 'required|string|max:255',
+            'profesor' => 'required|string|max:255',
             'solicitante' => 'required|string|max:255',
             'email_contacto' => 'nullable|email|max:255',
             'fecha_inicio' => 'required|date|after_or_equal:today',
@@ -207,9 +218,19 @@ class ReservasController extends Controller
             'hora_fin' => $this->normalizeTimeToHm($request->input('hora_fin')),
         ]);
 
+        // Compatibilidad con esquema antiguo: la tabla requiere "curso" y "profesor".
+        $curso = $request->input('curso') ?: $request->input('titulo');
+        $profesor = $request->input('profesor') ?: ($request->input('solicitante') ?: 'Sin profesor');
+        $request->merge([
+            'curso' => $curso,
+            'profesor' => $profesor,
+        ]);
+
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
+            'curso' => 'required|string|max:255',
+            'profesor' => 'required|string|max:255',
             'solicitante' => 'required|string|max:255',
             'email_contacto' => 'nullable|email|max:255',
             'fecha_inicio' => 'required|date',
