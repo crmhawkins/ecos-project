@@ -53,8 +53,8 @@
                                         <div class="requester-email">{{ $reserva->email_contacto }}</div>
                                     @endif
                                 </td>
-                                <td class="date-cell">{{ $reserva->fecha_inicio ? \Carbon\Carbon::parse($reserva->fecha_inicio)->format('d/m/Y H:i') : 'N/A' }}</td>
-                                <td class="date-cell">{{ $reserva->fecha_fin ? \Carbon\Carbon::parse($reserva->fecha_fin)->format('d/m/Y H:i') : 'N/A' }}</td>
+                                <td class="date-cell">{{ $reserva->fecha_inicio ? \Carbon\Carbon::parse($reserva->fecha_inicio)->format('d/m/Y') : 'N/A' }}</td>
+                                <td class="date-cell">{{ $reserva->fecha_fin ? \Carbon\Carbon::parse($reserva->fecha_fin)->format('d/m/Y') : 'N/A' }}</td>
                                 <td class="status-cell">
                                     @php
                                         $estadoClass = match($reserva->estado) {
