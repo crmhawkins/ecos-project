@@ -305,7 +305,6 @@
 
     <form method="POST" action="{{ route('cursos.update', $curso->id) }}" enctype="multipart/form-data">
         @csrf
-        @method('PUT')
         
         <div class="form-container">
             <div class="form-header-gradient">
