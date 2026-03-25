@@ -637,8 +637,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const files = e.dataTransfer.files;
         if (files.length > 0) {
-            fileInput.files = files;
-            fileInput.dispatchEvent(new Event('change'));
+            // Algunos navegadores bloquean asignar directamente fileInput.files.
+            // Usamos DataTransfer para dejar el archivo en el input.
+            const dataTransfer = new DataTransfer();
+            for (const file of files) {
+                dataTransfer.items.add(file);
+            }
+            fileInput.files = dataTransfer.files;
+            fileInput.dispatchEvent(new Event('change', { bubbles: true }));
         }
     });
 
