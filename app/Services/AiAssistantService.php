@@ -22,7 +22,31 @@ class AiAssistantService
 
     public function __construct()
     {
-        $this->config = AiAssistantConfig::getActiveConfig();
+        // En entorno de desarrollo/CI puede fallar la inicialización de la BD (p.ej. sin driver sqlite).
+        // Para no romper comandos de consola (route:list, etc.), aplicamos un fallback in-memory.
+        try {
+            $this->config = AiAssistantConfig::getActiveConfig();
+        } catch (\Throwable $e) {
+            Log::warning('AiAssistantService: no se pudo cargar configuración desde BD. Usando fallback en memoria.', [
+                'error' => $e->getMessage(),
+            ]);
+
+            $fallback = new \stdClass();
+            $fallback->id = null;
+            $fallback->is_active = true;
+            $fallback->assistant_name = 'Asistente ECOS';
+            $fallback->welcome_message = '¡Hola! Bienvenido a ECOS. ¿En qué podemos ayudarte hoy?';
+            $fallback->system_prompt = 'Hablas en nombre de ECOS, una empresa de formación con más de 28 años de experiencia. Ayudas a los usuarios con información sobre cursos, formación y servicios. No menciones que eres una IA ni que eres un asistente virtual; céntrate en la información práctica y útil.';
+            $fallback->ai_model = 'gpt-3.5-turbo';
+            $fallback->temperature = 0.7;
+            $fallback->max_tokens = 1000;
+            $fallback->show_courses = true;
+            $fallback->show_contact_info = true;
+            $fallback->primary_color = '#D93690';
+            $fallback->secondary_color = '#667eea';
+
+            $this->config = $fallback;
+        }
         $this->apiKey = config('services.openai.api_key', env('OPENAI_API_KEY'));
         $hawkins = config('services.hawkins_ai', []);
         $this->hawkinsBaseUrl = rtrim($hawkins['base_url'] ?? '', '/');
@@ -46,39 +70,39 @@ class AiAssistantService
         try {
             // Obtener contexto de la página actual
             $context = $this->getPageContext($pageUrl);
-            
+
             // Obtener información de cursos si es relevante
             $coursesInfo = $this->getCoursesInfo($userMessage);
-            
+
             // Construir prompt del sistema
             $systemPrompt = $this->buildSystemPrompt($context, $coursesInfo);
-            
+
             // Obtener historial de conversación
             $conversationHistory = $this->getConversationHistory($sessionId);
-            
+
             // Preparar mensajes para la API
             $messages = $this->prepareMessages($systemPrompt, $conversationHistory, $userMessage);
-            
+
             // Llamar a la IA: Hawkins (local) si está configurada, si no OpenAI
             $response = $this->useHawkinsAi
                 ? $this->callHawkinsAI($messages)
                 : $this->callOpenAI($messages);
-            
+
             // Guardar conversación
             $this->saveConversation($sessionId, $userMessage, $response, $pageUrl);
-            
+
             // Obtener enlaces relevantes
             $relevantLinks = $this->getRelevantLinks($userMessage);
-            
+
             return [
                 'message' => $response,
                 'links' => $relevantLinks,
                 'config' => $this->config
             ];
-            
+
         } catch (\Exception $e) {
             Log::error('Error en AiAssistantService: ' . $e->getMessage());
-            
+
             return [
                 'message' => 'Lo siento, ha ocurrido un error. Por favor, inténtalo de nuevo más tarde.',
                 'links' => [],
@@ -93,9 +117,9 @@ class AiAssistantService
     protected function getPageContext($pageUrl)
     {
         if (!$pageUrl) return '';
-        
+
         $context = '';
-        
+
         // Determinar el contexto según la URL
         if (str_contains($pageUrl, '/course')) {
             $context = 'El usuario está en la página de cursos.';
@@ -106,7 +130,7 @@ class AiAssistantService
         } elseif (str_contains($pageUrl, '/web/index')) {
             $context = 'El usuario está en la página principal.';
         }
-        
+
         return $context;
     }
 
@@ -116,7 +140,7 @@ class AiAssistantService
     protected function getCoursesInfo($userMessage)
     {
         $coursesInfo = '';
-        
+
         // Buscar cursos que coincidan con la consulta
         $courses = \App\Models\Cursos\Cursos::where('inactive', 0)
                          ->where('published', 1)
@@ -127,14 +151,14 @@ class AiAssistantService
                          })
                          ->limit(5)
                          ->get();
-        
+
         if ($courses->count() > 0) {
             $coursesInfo = "Cursos disponibles relacionados:\n";
             foreach ($courses as $course) {
                 $coursesInfo .= "- {$course->name}: {$course->description}\n";
             }
         }
-        
+
         return $coursesInfo;
     }
 
@@ -144,24 +168,24 @@ class AiAssistantService
     protected function buildSystemPrompt($context, $coursesInfo)
     {
         $basePrompt = $this->config->system_prompt;
-        
+
         // Refuerzo de instrucciones para evitar que hable de IA o de problemas de conexión
         $prompt = $basePrompt . "\n\n";
         $prompt .= "Reglas importantes de estilo de respuesta:\n";
         $prompt .= "- Habla siempre en nombre de ECOS (\"en ECOS hacemos...\"), no digas que eres una IA ni que eres un asistente virtual.\n";
         $prompt .= "- No digas nunca frases como \"no tengo conexión con el modelo de IA\", \"no tengo acceso al modelo\" ni menciones problemas técnicos internos.\n";
         $prompt .= "- Si hubiera cualquier problema interno, responde igualmente de forma útil y neutra, como si todo funcionara con normalidad.\n\n";
-        
+
         if ($context) {
             $prompt .= "Contexto actual: {$context}\n";
         }
-        
+
         if ($coursesInfo) {
             $prompt .= "Información de cursos:\n{$coursesInfo}\n";
         }
-        
+
         $prompt .= "\nResponde de manera útil y amable. Si mencionas cursos, incluye enlaces relevantes.";
-        
+
         return $prompt;
     }
 
@@ -171,10 +195,10 @@ class AiAssistantService
     protected function getConversationHistory($sessionId)
     {
         if (!$sessionId) return [];
-        
+
         $conversations = AiConversation::getBySession($sessionId);
         $history = [];
-        
+
         foreach ($conversations as $conv) {
             $history[] = [
                 'role' => 'user',
@@ -185,7 +209,7 @@ class AiAssistantService
                 'content' => $conv->assistant_response
             ];
         }
-        
+
         return $history;
     }
 
@@ -200,18 +224,18 @@ class AiAssistantService
                 'content' => $systemPrompt
             ]
         ];
-        
+
         // Añadir historial de conversación
         foreach ($conversationHistory as $message) {
             $messages[] = $message;
         }
-        
+
         // Añadir mensaje actual del usuario
         $messages[] = [
             'role' => 'user',
             'content' => $userMessage
         ];
-        
+
         return $messages;
     }
 
@@ -362,7 +386,7 @@ class AiAssistantService
     protected function saveConversation($sessionId, $userMessage, $assistantResponse, $pageUrl)
     {
         if (!$sessionId) return;
-        
+
         AiConversation::create([
             'session_id' => $sessionId,
             'user_message' => $userMessage,
@@ -381,7 +405,7 @@ class AiAssistantService
     protected function getRelevantLinks($userMessage)
     {
         $links = [];
-        
+
         // Buscar enlaces por categoría según el mensaje
         if (str_contains(strtolower($userMessage), 'curso') || str_contains(strtolower($userMessage), 'formación')) {
             $links = AiLink::getActiveByCategory('courses');
@@ -390,7 +414,7 @@ class AiAssistantService
         } else {
             $links = AiLink::getActiveByCategory('general');
         }
-        
+
         return $links->take(3)->toArray();
     }
 

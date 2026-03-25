@@ -267,7 +267,7 @@ class ReservasController extends Controller
 
                 if ($hayConflicto) {
                     $disponibilidad[$fechaStr][$aula->id] = 'Ocupado';
-                    $conflictos[] = "$fechaStr – Aula {$aula->nombre} ya está ocupada.";
+                    $conflictos[] = "$fechaStr – Aula {$aula->name} ya está ocupada.";
                 } else {
                     $disponibilidad[$fechaStr][$aula->id] = 'Libre';
                 }

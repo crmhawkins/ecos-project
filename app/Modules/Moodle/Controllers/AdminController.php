@@ -4,6 +4,7 @@ namespace App\Modules\Moodle\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cursos\Cursos;
+use App\Models\Cursos\Category;
 use App\Modules\Moodle\Services\MoodleApiService;
 use App\Modules\Moodle\Services\MoodleUserService;
 use App\Modules\Moodle\Services\MoodleCourseService;
@@ -471,12 +472,46 @@ class AdminController extends Controller
                 throw new Exception("La API de Moodle no devolvió un ID de curso válido.");
             }
 
-            Cursos::create([
-                "moodle_id" => $newCourseResponse["id"],
-                "name" => $validated["fullname"],
-                "description" => $validated["summary"],
-                "inactive" => 1
-            ]);
+            // En formularios HTML, un checkbox suele no enviar el campo si está desmarcado.
+            $visible = $request->has("visible") ? 1 : 0;
+            $moodleCategoryId = (int) $validated["categoryid"];
+
+            // Mapea la categoría de Moodle -> categoría local (por nombre)
+            $localCategory = null;
+            try {
+                $moodleCategories = $this->apiService->call('core_course_get_categories', [
+                    'criteria' => [
+                        ['key' => 'id', 'value' => $moodleCategoryId]
+                    ]
+                ]);
+
+                $categoryName = $moodleCategories[0]['name'] ?? 'General';
+                $localCategory = Category::firstOrCreate(
+                    ['name' => $categoryName],
+                    ['inactive' => 0]
+                );
+            } catch (Exception $e) {
+                Log::warning('No se pudo mapear categoría Moodle->local. Usando General.', [
+                    'moodleCategoryId' => $moodleCategoryId,
+                    'error' => $e->getMessage(),
+                ]);
+                $localCategory = Category::firstOrCreate(
+                    ['name' => 'General'],
+                    ['inactive' => 0]
+                );
+            }
+
+            Cursos::updateOrCreate(
+                ['moodle_id' => $newCourseResponse["id"]],
+                [
+                    "moodle_id" => $newCourseResponse["id"],
+                    "name" => $validated["fullname"],
+                    "description" => $validated["summary"],
+                    "category_id" => $localCategory ? $localCategory->id : null,
+                    "inactive" => $visible ? 0 : 1,
+                    "published" => $visible ? 1 : 0,
+                ]
+            );
 
             return redirect()->route("moodle.admin.courses")->with("success", "Curso ".$validated["shortname"]." creado correctamente en Moodle.");
         } catch (Exception $e) {
@@ -519,6 +554,46 @@ class AdminController extends Controller
 
             $this->courseService->updateCourse($courseId, $courseData);
 
+            // Sincronizar también el registro local para que aparezca en la web
+            $visible = $request->has("visible") ? 1 : 0;
+            $moodleCategoryId = (int) $validated["categoryid"];
+
+            $localCategory = null;
+            try {
+                $moodleCategories = $this->apiService->call('core_course_get_categories', [
+                    'criteria' => [
+                        ['key' => 'id', 'value' => $moodleCategoryId]
+                    ]
+                ]);
+
+                $categoryName = $moodleCategories[0]['name'] ?? 'General';
+                $localCategory = Category::firstOrCreate(
+                    ['name' => $categoryName],
+                    ['inactive' => 0]
+                );
+            } catch (Exception $e) {
+                Log::warning('No se pudo mapear categoría Moodle->local. Usando General.', [
+                    'moodleCategoryId' => $moodleCategoryId,
+                    'error' => $e->getMessage(),
+                ]);
+                $localCategory = Category::firstOrCreate(
+                    ['name' => 'General'],
+                    ['inactive' => 0]
+                );
+            }
+
+            Cursos::updateOrCreate(
+                ['moodle_id' => $courseId],
+                [
+                    "moodle_id" => $courseId,
+                    "name" => $validated["fullname"],
+                    "description" => $validated["summary"],
+                    "category_id" => $localCategory ? $localCategory->id : null,
+                    "inactive" => $visible ? 0 : 1,
+                    "published" => $visible ? 1 : 0,
+                ]
+            );
+
             return redirect()->route("moodle.admin.courses")->with("success", "Curso actualizado correctamente.");
         } catch (Exception $e) {
             Log::error("Admin Update Course Error: {" . $e->getMessage() . "}", ["courseId" => $courseId, "data" => $validated]);
@@ -546,13 +621,39 @@ class AdminController extends Controller
     public function clonarCourse($courseId)
     {
         $course = $this->courseService->getCourse($courseId);
+        $visible = !empty($course['visible']) ? 1 : 0;
+        $moodleCategoryId = (int) ($course['categoryid'] ?? 1);
+
+        $localCategory = null;
+        try {
+            $moodleCategories = $this->apiService->call('core_course_get_categories', [
+                'criteria' => [
+                    ['key' => 'id', 'value' => $moodleCategoryId]
+                ]
+            ]);
+            $categoryName = $moodleCategories[0]['name'] ?? 'General';
+            $localCategory = Category::firstOrCreate(
+                ['name' => $categoryName],
+                ['inactive' => 0]
+            );
+        } catch (Exception $e) {
+            $localCategory = Category::firstOrCreate(
+                ['name' => 'General'],
+                ['inactive' => 0]
+            );
+        }
+
         Cursos::updateOrCreate(
             ['moodle_id' => $course['id']], // condición para encontrarlo
             [
+                'moodle_id' => $course['id'],
                 'name' => $course['fullname'],
                 'description' => $course['summary'],
-                'inactive' => 1,
-            ]);
+                'category_id' => $localCategory ? $localCategory->id : null,
+                'inactive' => $visible ? 0 : 1,
+                'published' => $visible ? 1 : 0,
+            ]
+        );
 
         return redirect()->route("moodle.admin.courses")->with("success", "Curso sincronizado correctamente.");
     }
@@ -1011,6 +1112,7 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'parent' => 'nullable|integer',
             'description' => 'nullable|string',
+            'visible' => 'nullable|boolean',
         ]);
 
         try {
@@ -1018,6 +1120,27 @@ class AdminController extends Controller
             return redirect()->route('moodle.admin.categories')->with('success', 'Categoría creada correctamente.');
         } catch (Exception $e) {
             Log::error("Error al crear categoría: " . $e->getMessage());
+
+            $message = mb_strtolower($e->getMessage());
+            $accessDenied = str_contains($message, 'control de acceso') || str_contains($message, 'access control');
+
+            // Fallback: si Moodle rechaza la creación por permisos, al menos creamos la categoría local
+            // para que CRM/web puedan seguir funcionando.
+            if ($accessDenied) {
+                $visible = isset($validated['visible']) ? (int) $validated['visible'] : 1;
+                $inactive = $visible === 1 ? 0 : 1;
+
+                Category::updateOrCreate(
+                    ['name' => $validated['name']],
+                    ['inactive' => $inactive]
+                );
+
+                return redirect()->route('moodle.admin.categories')->with(
+                    'success',
+                    'Categoría creada en el sistema local (CRM/web). Moodle la ha rechazado por permisos (control de acceso).'
+                );
+            }
+
             return redirect()->route('moodle.admin.categories')->with('error', 'Error al crear la categoría: ' . $e->getMessage());
         }
     }

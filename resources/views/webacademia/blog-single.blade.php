@@ -14,20 +14,32 @@
 <meta property="og:description" content="{{ $post->og_description ?: $post->excerpt }}">
 <meta property="og:type" content="article">
 <meta property="og:url" content="{{ $post->url }}">
-@if($post->og_image)
-    <meta property="og:image" content="{{ asset('storage/' . $post->og_image) }}">
-@elseif($post->featured_image)
-    <meta property="og:image" content="{{ asset('storage/' . $post->featured_image) }}">
+@php
+    $featuredNormalized = $post->featured_image ? ltrim($post->featured_image, '/') : null;
+    $featuredSrc = $featuredNormalized
+        ? (strpos($featuredNormalized, 'storage/') === 0 ? asset($featuredNormalized) : asset('storage/' . $featuredNormalized))
+        : null;
+
+    $ogNormalized = $post->og_image ? ltrim($post->og_image, '/') : null;
+    $ogSrc = $ogNormalized
+        ? (strpos($ogNormalized, 'storage/') === 0 ? asset($ogNormalized) : asset('storage/' . $ogNormalized))
+        : null;
+@endphp
+
+@if($ogSrc)
+    <meta property="og:image" content="{{ $ogSrc }}">
+@elseif($featuredSrc)
+    <meta property="og:image" content="{{ $featuredSrc }}">
 @endif
 
 <!-- Twitter Card Meta Tags -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ $post->og_title ?: $post->title }}">
 <meta name="twitter:description" content="{{ $post->og_description ?: $post->excerpt }}">
-@if($post->og_image)
-    <meta name="twitter:image" content="{{ asset('storage/' . $post->og_image) }}">
-@elseif($post->featured_image)
-    <meta name="twitter:image" content="{{ asset('storage/' . $post->featured_image) }}">
+@if($ogSrc)
+    <meta name="twitter:image" content="{{ $ogSrc }}">
+@elseif($featuredSrc)
+    <meta name="twitter:image" content="{{ $featuredSrc }}">
 @endif
 
 <!-- Article Meta Tags -->
@@ -417,9 +429,9 @@
         <div class="row">
             <div class="col-lg-8">
                 <!-- Imagen destacada -->
-                @if($post->featured_image)
+                @if($featuredSrc)
                     <div class="mb-4">
-                        <img src="{{ asset('storage/' . $post->featured_image) }}" 
+                        <img src="{{ $featuredSrc }}" 
                              alt="{{ $post->title }}" 
                              class="img-fluid rounded shadow-lg"
                              style="width: 100%; height: 400px; object-fit: cover;">
@@ -496,7 +508,13 @@
                     <div class="related-article-card">
                         <div class="related-article-image">
                             @if($relatedPost->featured_image)
-                                <img src="{{ asset('storage/' . $relatedPost->featured_image) }}" 
+                                @php
+                                    $relatedFeaturedNormalized = ltrim($relatedPost->featured_image, '/');
+                                    $relatedFeaturedSrc = strpos($relatedFeaturedNormalized, 'storage/') === 0
+                                        ? asset($relatedFeaturedNormalized)
+                                        : asset('storage/' . $relatedFeaturedNormalized);
+                                @endphp
+                                <img src="{{ $relatedFeaturedSrc }}" 
                                      alt="{{ $relatedPost->title }}" 
                                      style="width: 100%; height: 100%; object-fit: cover;">
                             @else
@@ -568,8 +586,8 @@ const structuredData = {
     },
     "datePublished": "{{ $post->published_at->toISOString() }}",
     "dateModified": "{{ $post->updated_at->toISOString() }}",
-    @if($post->featured_image)
-    "image": "{{ asset('storage/' . $post->featured_image) }}",
+    @if($featuredSrc)
+    "image": "{{ $featuredSrc }}",
     @endif
     "mainEntityOfPage": {
         "@type": "WebPage",

@@ -307,7 +307,13 @@
                     <article class="blog-card" style="animation-delay: {{ 0.1 + ($index * 0.1) }}s;">
                         <div class="blog-card-image">
                             @if($post->featured_image)
-                                <img src="{{ asset('storage/' . $post->featured_image) }}" 
+                                @php
+                                    $featuredNormalized = ltrim($post->featured_image, '/');
+                                    $featuredSrc = strpos($featuredNormalized, 'storage/') === 0
+                                        ? asset($featuredNormalized)
+                                        : asset('storage/' . $featuredNormalized);
+                                @endphp
+                                <img src="{{ $featuredSrc }}"
                                      alt="{{ $post->title }}" 
                                      style="width: 100%; height: 100%; object-fit: cover;">
                             @else

@@ -383,7 +383,7 @@
             </div>
             <div class="reserva-info">
                 <h1>{{ $reserva->titulo }}</h1>
-                <div class="subtitle">{{ $reserva->aula->nombre ?? 'Aula no especificada' }}</div>
+                <div class="subtitle">{{ $reserva->aula->name ?? 'Aula no especificada' }}</div>
                 <div class="reserva-actions">
                     <a href="{{ route('reservas.edit', $reserva->id) }}" class="btn">
                         <i class="fas fa-edit"></i> Editar Reserva
@@ -592,26 +592,26 @@
                                     <i class="fas fa-chalkboard"></i>
                                 </div>
                                 <div class="aula-preview-info">
-                                    <h4>{{ $reserva->aula->nombre }}</h4>
-                                    <p>{{ $reserva->aula->descripcion ?? 'Aula disponible para reservas' }}</p>
+                                    <h4>{{ $reserva->aula->name }}</h4>
+                                    <p>{{ $reserva->aula->description ?? 'Aula disponible para reservas' }}</p>
                                 </div>
                             </div>
                             <div class="aula-preview-details">
                                 <div class="detail-item">
                                     <i class="fas fa-users"></i>
-                                    <span>Capacidad: {{ $reserva->aula->capacidad }} personas</span>
+                                    <span>Capacidad: {{ $reserva->aula->capacity }} personas</span>
                                 </div>
                                 <div class="detail-item">
                                     <i class="fas fa-map-marker-alt"></i>
-                                    <span>{{ $reserva->aula->planta ?? 'Planta no especificada' }}</span>
+                                    <span>{{ $reserva->aula->floor ?? 'Planta no especificada' }}</span>
                                 </div>
                                 <div class="detail-item">
                                     <i class="fas fa-building"></i>
-                                    <span>{{ $reserva->aula->edificio ?? 'Edificio no especificado' }}</span>
+                                    <span>{{ $reserva->aula->building ?? 'Edificio no especificado' }}</span>
                                 </div>
                                 <div class="detail-item">
                                     <i class="fas fa-info-circle"></i>
-                                    <span>Estado: {{ ucfirst($reserva->aula->estado ?? 'disponible') }}</span>
+                                    <span>Estado: {{ ucfirst($reserva->aula->status ?? 'disponible') }}</span>
                                 </div>
                             </div>
                         </div>

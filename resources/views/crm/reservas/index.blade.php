@@ -252,7 +252,7 @@
                         @if(isset($aulas))
                             @foreach($aulas as $aula)
                                 <option value="{{ $aula->id }}" {{ request('aula_id') == $aula->id ? 'selected' : '' }}>
-                                    {{ $aula->nombre }}
+                                    {{ $aula->name }}
                                 </option>
                             @endforeach
                         @endif

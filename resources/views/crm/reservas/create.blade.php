@@ -387,14 +387,14 @@
                                         <div class="aula-icon">
                                             <i class="fas fa-chalkboard"></i>
                                         </div>
-                                        <div class="aula-name">{{ $aula->nombre }}</div>
+                                        <div class="aula-name">{{ $aula->name }}</div>
                                     </div>
                                     <div class="aula-details">
-                                        {{ $aula->descripcion ?? 'Aula disponible para reservas' }}
+                                        {{ $aula->description ?? 'Aula disponible para reservas' }}
                                     </div>
                                     <div class="aula-capacity">
                                         <i class="fas fa-users"></i>
-                                        Capacidad: {{ $aula->capacidad }} personas
+                                        Capacidad: {{ $aula->capacity }} personas
                                     </div>
                                 </div>
                             @endforeach

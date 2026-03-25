@@ -42,7 +42,6 @@ class WebController extends Controller
 
             $query = Cursos::where('inactive', 0)
                 ->where('published', 1)
-                ->whereNotNull('moodle_id')
                 ->with('category')
                 ->select('id', 'name', 'description', 'price', 'image', 'category_id', 'moodle_id', 'duracion', 'plazas', 'lecciones', 'certificado', 'created_at');
 
@@ -72,8 +71,7 @@ class WebController extends Controller
             $categorias = \App\Models\Cursos\Category::where('inactive', 0)
                 ->whereHas('cursos', function($query) {
                     $query->where('inactive', 0)
-                          ->where('published', 1)
-                          ->whereNotNull('moodle_id');
+                          ->where('published', 1);
                 })
                 ->get();
             
@@ -89,7 +87,6 @@ class WebController extends Controller
             // En caso de error, mostrar cursos básicos sin sincronización
             $initialCursos = Cursos::where('inactive', 0)
                 ->where('published', 1)
-                ->whereNotNull('moodle_id')
                 ->with('category')
                 ->take(9)
                 ->orderBy('created_at', 'desc')
@@ -98,8 +95,7 @@ class WebController extends Controller
             $categorias = \App\Models\Cursos\Category::where('inactive', 0)
                 ->whereHas('cursos', function($query) {
                     $query->where('inactive', 0)
-                          ->where('published', 1)
-                          ->whereNotNull('moodle_id');
+                          ->where('published', 1);
                 })
                 ->get();
             
@@ -146,7 +142,6 @@ class WebController extends Controller
         // Obtener cursos relacionados
         $cursosRelacionados = Cursos::where('inactive', 0)
             ->where('published', 1)
-            ->whereNotNull('moodle_id')
             ->where('category_id', $curso->category_id)
             ->where('id', '!=', $curso->id)
             ->limit(3)
