@@ -338,7 +338,6 @@
 
     <form method="POST" action="{{ route('reservas.update', $reserva->id) }}">
         @csrf
-        @method('PUT')
         
         <div class="form-container">
             <div class="form-header-gradient">
