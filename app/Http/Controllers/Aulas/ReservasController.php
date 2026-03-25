@@ -151,6 +151,12 @@ class ReservasController extends Controller
 
        public function store(Request $request)
     {
+        // Normalizar horas a formato H:i (si llegaran como H:i:s desde BD)
+        $request->merge([
+            'hora_inicio' => $this->normalizeTimeToHm($request->input('hora_inicio')),
+            'hora_fin' => $this->normalizeTimeToHm($request->input('hora_fin')),
+        ]);
+
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
@@ -194,7 +200,13 @@ class ReservasController extends Controller
     public function update(Request $request, $id)
     {
         $reserva = Reservas::findOrFail($id);
-        
+    
+        // Normalizar horas a formato H:i (si llegaran como H:i:s desde BD)
+        $request->merge([
+            'hora_inicio' => $this->normalizeTimeToHm($request->input('hora_inicio')),
+            'hora_fin' => $this->normalizeTimeToHm($request->input('hora_fin')),
+        ]);
+
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
@@ -327,6 +339,34 @@ class ReservasController extends Controller
             'error' => false,
             'mensaje' => 'El servicio fue borrado correctamente'
         ]);
+    }
+
+    /**
+     * Normaliza una hora a formato H:i (HH:MM).
+     * Si llega como HH:MM:SS, recorta segundos.
+     */
+    private function normalizeTimeToHm($value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        // Aceptar HH:MM o HH:MM:SS y quedarnos con HH:MM
+        if (preg_match('/^(\d{2}:\d{2})(:\d{2})?$/', $value, $m)) {
+            return $m[1];
+        }
+
+        // Si viene algo empezando por HH:MM:..., recortar a HH:MM
+        if (strlen($value) >= 5 && substr($value, 2, 1) === ':') {
+            return substr($value, 0, 5);
+        }
+
+        return $value;
     }
 
 
