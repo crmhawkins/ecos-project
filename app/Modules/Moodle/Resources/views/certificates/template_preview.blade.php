@@ -1,9 +1,3 @@
-<?php
-
-namespace App\Modules\Moodle\Resources\views\certificates;
-
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>

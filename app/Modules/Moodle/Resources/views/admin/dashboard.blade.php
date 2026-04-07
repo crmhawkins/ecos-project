@@ -1,9 +1,3 @@
-<?php
-
-namespace App\Modules\Moodle\Resources\views\admin;
-
-?>
-
 @extends('moodle::admin.layout')
 
 @section('title', 'Dashboard')

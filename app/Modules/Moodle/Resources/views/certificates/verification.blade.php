@@ -1,9 +1,3 @@
-<?php
-
-namespace App\Modules\Moodle\Resources\views\certificates;
-
-?>
-
 @extends('layouts.app')
 
 @section('content')

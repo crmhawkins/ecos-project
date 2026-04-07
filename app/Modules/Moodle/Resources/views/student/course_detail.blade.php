@@ -1,9 +1,3 @@
-<?php
-
-namespace App\Modules\Moodle\Resources\views\student;
-
-?>
-
 @extends('moodle::student.layout')
 
 @section('title', 'Detalle del Curso')
