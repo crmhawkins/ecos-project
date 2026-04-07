@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Alumnos;
 
 use App\Http\Controllers\Controller;
 use App\Models\Alumnos\Alumno;
+use App\Modules\Moodle\Services\MoodleUserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AlumnosController extends Controller
 {
@@ -136,12 +138,33 @@ class AlumnosController extends Controller
      */
     public function syncMoodle(Alumno $alumno)
     {
-        // Aquí iría la lógica para sincronizar con Moodle
-        // Por ahora solo simulamos la sincronización
-        
-        $alumno->update(['moodle_id' => rand(1000, 9999)]);
+        try {
+            $moodleUserService = app(MoodleUserService::class);
 
-        return redirect()->back()
-                        ->with('success', 'Alumno sincronizado con Moodle exitosamente.');
+            $moodleUsers = $moodleUserService->searchUsers([
+                ['key' => 'email', 'value' => $alumno->email]
+            ]);
+
+            if (empty($moodleUsers)) {
+                return redirect()->back()
+                    ->with('error', 'No se encontró ningún usuario en Moodle con el email: ' . $alumno->email);
+            }
+
+            $moodleUser = $moodleUsers[0];
+            $alumno->update(['moodle_id' => $moodleUser['id']]);
+
+            return redirect()->back()
+                ->with('success', 'Alumno sincronizado con Moodle. ID Moodle: ' . $moodleUser['id']);
+
+        } catch (\Exception $e) {
+            Log::error('Error sincronizando alumno con Moodle', [
+                'alumno_id' => $alumno->id,
+                'email'     => $alumno->email,
+                'error'     => $e->getMessage(),
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Error al conectar con Moodle. Inténtalo de nuevo más tarde.');
+        }
     }
 }

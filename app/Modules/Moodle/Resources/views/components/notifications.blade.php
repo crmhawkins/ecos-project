@@ -1,9 +1,3 @@
-<?php
-
-namespace App\Modules\Moodle\Resources\views\components;
-
-?>
-
 <div class="notification {{ $type ?? 'info' }} {{ $dismissible ? 'is-dismissible' : '' }}">
     @if($dismissible)
     <button type="button" class="notification-dismiss" aria-label="Cerrar">&times;</button>
