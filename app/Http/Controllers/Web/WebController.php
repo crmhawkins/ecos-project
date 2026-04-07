@@ -304,6 +304,10 @@ class WebController extends Controller
 
     public function showSlug($slug)
     {
+        if (!preg_match('/^[a-zA-Z0-9_\-]+$/', $slug)) {
+            abort(404);
+        }
+
         $view = 'webacademia.pages.' . $slug;
 
         if (!view()->exists($view)) {

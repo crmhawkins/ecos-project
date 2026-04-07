@@ -324,12 +324,22 @@ class BuilderController extends Controller
             return response()->json(['error' => 'No file uploaded'], 400);
         }
 
+        $allowedMimes = [
+            'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+            'video/mp4', 'video/webm', 'video/ogg',
+        ];
+
         $urls = [];
 
         foreach ($files as $file) {
             $mime = $file->getMimeType();
+
+            if (!in_array($mime, $allowedMimes)) {
+                return response()->json(['error' => 'Tipo de archivo no permitido: ' . $mime], 422);
+            }
+
             $folder = str_starts_with($mime, 'video/') ? 'videos' : 'images';
-            
+
             // Guardar directamente en storage/app/public/images o videos
             // Usar el disco 'public' para asegurar que se guarde en la ubicación correcta
             $path = $file->store($folder, 'public');

@@ -351,11 +351,7 @@ class MoodleUserService
         try {
             // La API de Moodle requiere al menos un criterio válido
             if (empty($criteria)) {
-                // Si no hay criterios, obtener usuarios usando un criterio válido
-                // Usar el ID del usuario actual como punto de partida
-                $criteria = [
-                    ['key' => 'id', 'value' => '8813']  // Empezar con el usuario actual
-                ];
+                return [];
             }
 
             // Parámetros para la API

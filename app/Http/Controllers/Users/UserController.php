@@ -242,6 +242,10 @@ class UserController extends Controller
 
     public function avatar(Request $request, $id)
     {
+        $request->validate([
+            'filepond' => 'required|file|mimes:jpg,jpeg,png,gif,webp|max:2048',
+        ]);
+
         $file = $request->file('filepond');
         $new_name = uniqid(rand(), true).'.'.strtolower($file->getClientOriginalExtension());
         $result = Storage::disk('public')->put('avatars/'.$new_name, File::get($file));

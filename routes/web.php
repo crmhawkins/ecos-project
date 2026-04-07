@@ -216,13 +216,12 @@ Route::prefix('crm')->group(function () {
 
 
 
-    //pdf
-    Route::post('/invoice/generate-pdf', [InvoiceController::class, 'generatePDF'])->name('factura.generarPDF');
-    Route::post('/budget/generate-pdf', [BudgetController::class, 'generatePDF'])->name('presupuesto.generarPDF');
-
-
-
     Route::group(['middleware' => ['auth']], function () {
+
+        //pdf
+        Route::post('/invoice/generate-pdf', [InvoiceController::class, 'generatePDF'])->name('factura.generarPDF');
+        Route::post('/budget/generate-pdf', [BudgetController::class, 'generatePDF'])->name('presupuesto.generarPDF');
+
 
         Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 

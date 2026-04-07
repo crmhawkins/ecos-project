@@ -92,7 +92,7 @@ class CertificateGeneratorService
             'completionDate' => $completionDate,
             'certificateId' => $certificateId,
             'signatureImagePath' => $this->signatureImage && File::exists($this->signatureImage) ? $this->signatureImage : null,
-            'verificationUrl' => route('moodle.certificates.verify.get', $certificateId),
+            'verificationUrl' => route('moodle.certificates.verify.id', $certificateId),
             'options' => $options
         ];
 
