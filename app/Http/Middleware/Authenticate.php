@@ -16,13 +16,18 @@ class Authenticate extends Middleware
             return null;
         }
 
+        // Si el guard que falló es 'alumno', redirigir al login de la web academia
+        if (in_array('alumno', (array) $this->guards)) {
+            return url('/weblogin');
+        }
+
         // Determinar la ruta de redirección basada en el contexto
         if ($request->is('crm/*') || $request->is('moodle/*')) {
             return route('login');
         }
 
         // Para rutas de la web academia
-        if ($request->is('weblogin') || $request->is('webregister') || $request->is('perfil') || $request->is('carrito/*')) {
+        if ($request->is('weblogin') || $request->is('webregister') || $request->is('perfil') || $request->is('perfil/*') || $request->is('carrito') || $request->is('carrito/*')) {
             return url('/weblogin');
         }
 

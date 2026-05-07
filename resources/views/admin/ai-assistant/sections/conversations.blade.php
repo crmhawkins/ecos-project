@@ -41,7 +41,7 @@
                             </td>
                             <td style="padding: 16px 20px; text-align: left; border-bottom: 1px solid #f1f5f9;">
                                 <div style="display: flex; gap: 8px; align-items: center;">
-                                    <button onclick="showConversationModal('{{ addslashes($conversation->user_message) }}', '{{ addslashes($conversation->assistant_response) }}', '{{ $conversation->created_at->format('d/m/Y H:i') }}')" 
+                                    <button data-user-message="{{ $conversation->user_message }}" data-assistant-response="{{ $conversation->assistant_response }}" data-conversation-date="{{ $conversation->created_at->format('d/m/Y H:i') }}" onclick="showConversationModal(this.dataset.userMessage, this.dataset.assistantResponse, this.dataset.conversationDate)"
                                             style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border: none; border-radius: 6px; padding: 8px 12px; color: white; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: inline-flex; align-items: center; justify-content: center; gap: 5px;"
                                             onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(59, 130, 246, 0.4)'"
                                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'">

@@ -260,9 +260,9 @@
                 <h3 class="form-section-title"><i class="fas fa-tag"></i> Información Básica</h3>
                 
                 <div class="form-group">
-                    <label for="nombre">Nombre de la Categoría <span style="color: red;">*</span></label>
-                    <input type="text" name="nombre" id="nombre" class="form-control" 
-                           value="{{ old('nombre') }}" placeholder="Nombre de la categoría" required>
+                    <label for="name">Nombre de la Categoría <span style="color: red;">*</span></label>
+                    <input type="text" name="name" id="name" class="form-control"
+                           value="{{ old('name') }}" placeholder="Nombre de la categoría" required>
                 </div>
 
                 <div class="form-group">
@@ -375,7 +375,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Generar slug automático
-    const nombreInput = document.getElementById('nombre');
+    const nombreInput = document.getElementById('name');
     const slugInput = document.getElementById('slug');
     
     nombreInput.addEventListener('input', function() {

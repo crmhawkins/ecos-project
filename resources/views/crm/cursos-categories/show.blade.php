@@ -33,11 +33,11 @@
                 </div>
                 <div class="col-md-4 text-end">
                     <div class="hero-actions" style="display: flex; gap: 12px; align-items: center; justify-content: flex-end;">
-                        <a href="{{ route('cursosCategoria.edit', $categoria->id) }}" class="btn btn-light" style="padding: 12px 24px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; text-decoration: none; transition: all 0.3s ease; border: none;">
+                        <a href="{{ route('cursosCategoria.edit', $categoria->id) }}" class="btn btn-warning" style="background: #ffc107; color: #212529; padding: 12px 24px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; transition: all 0.3s ease; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
                             <i class="fas fa-edit"></i>
                             Editar Categoría
                         </a>
-                        <a href="{{ route('cursosCategoria.index') }}" class="btn btn-outline-light" style="padding: 12px 24px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 8px; text-decoration: none; transition: all 0.3s ease; border: 2px solid rgba(255, 255, 255, 0.3);">
+                        <a href="{{ route('cursosCategoria.index') }}" class="btn btn-secondary" style="background: #ffffff; color: #D93690; padding: 12px 24px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; transition: all 0.3s ease; border: 2px solid #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
                             <i class="fas fa-arrow-left"></i>
                             Volver al Listado
                         </a>

@@ -100,6 +100,19 @@ Route::post('/builder/form-submit', [BuilderController::class, 'handleFormSubmit
 
 Route::get('/web/{slug}',[WebController::class, 'showSlug'])->name('webacademia.slug');
 
+// Páginas legales
+Route::get('/aviso-legal', function () {
+    return view('webacademia.legal.aviso-legal');
+})->name('webacademia.aviso_legal');
+
+Route::get('/politica-privacidad', function () {
+    return view('webacademia.legal.privacidad');
+})->name('webacademia.privacidad');
+
+Route::get('/politica-cookies', function () {
+    return view('webacademia.legal.cookies');
+})->name('webacademia.cookies');
+
 Route::get('/', function () {
     return view('webacademia.index');
 });

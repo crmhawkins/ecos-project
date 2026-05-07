@@ -33,12 +33,17 @@ class CursosTable extends Component
 
     protected function actualizarServicios()
     {
-        $query = Cursos::when($this->buscar, function ($query) {
-                    $query->where('cursos.name', 'like', '%' . $this->buscar . '%')
-                          ->orWhere('price', 'like', '%' . $this->buscar . '%');
+        $buscar = $this->buscar;
+        $selectedCategoria = $this->selectedCategoria;
+
+        $query = Cursos::when($buscar, function ($query) use ($buscar) {
+                    $query->where(function ($q) use ($buscar) {
+                        $q->where('cursos.name', 'like', '%' . $buscar . '%')
+                          ->orWhere('price', 'like', '%' . $buscar . '%');
+                    });
                 })
-                ->when($this->selectedCategoria, function ($query) {
-                    $query->where('category_id', $this->selectedCategoria);
+                ->when($selectedCategoria, function ($query) use ($selectedCategoria) {
+                    $query->where('category_id', $selectedCategoria);
                 })
                 ->leftjoin('cursos_category', 'cursos.category_id', '=', 'cursos_category.id')
                 ->select('cursos.*', 'cursos_category.name as categoria_nombre');
@@ -46,7 +51,9 @@ class CursosTable extends Component
         $query->orderBy($this->sortColumn, $this->sortDirection);
 
         // Verifica si se seleccionó 'all' para mostrar todos los registros
-        $this->services = $this->perPage === 'all' ? $query->get() : $query->paginate(is_numeric($this->perPage) ? $this->perPage : 10);
+        $this->services = $this->perPage === 'all'
+            ? $query->paginate(9999)
+            : $query->paginate(is_numeric($this->perPage) ? (int) $this->perPage : 10);
     }
 
     public function getServices()

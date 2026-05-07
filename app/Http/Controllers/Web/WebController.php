@@ -535,8 +535,10 @@ class WebController extends Controller
                 'name' => 'required|string|max:255',
                 'surname' => 'required|string|max:255',
                 'email' => 'required|email|unique:alumnos,email,' . $alumno->id,
-                'phone' => 'nullable|string|max:20',
+                'phone' => ['nullable', 'regex:/^[+]?[0-9\s\-]{9,20}$/'],
                 'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            ], [
+                'phone.regex' => 'El teléfono debe tener entre 9 y 20 dígitos y solo puede contener números, espacios, guiones o el prefijo +.',
             ]);
 
             // Actualizar datos básicos

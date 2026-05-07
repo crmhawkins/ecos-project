@@ -12,50 +12,9 @@
                 <img src="{{ asset('assets/images/default-course.svg') }}" alt="Curso por defecto" style="width: 100%; height: 100%; object-fit: cover;">
             @endif
             
-            <!-- Precio -->
+            <!-- Precio (siempre desde la BD para mantener consistencia) -->
             <div class="course-price" style="position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.95); color: #333; padding: 8px 15px; border-radius: 20px; font-weight: 600; font-size: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                @php
-                    // Generar precios realistas para el mercado español (en euros)
-                    $courseName = strtolower($curso->name);
-                    
-                    // Precios basados en nivel y tipo de curso
-                    if (strpos($courseName, 'básico') !== false || strpos($courseName, 'basic') !== false) {
-                        $displayPrice = 89;
-                    } elseif (strpos($courseName, 'avanzado') !== false || strpos($courseName, 'advanced') !== false) {
-                        $displayPrice = 179;
-                    } elseif (strpos($courseName, 'profesional') !== false || strpos($courseName, 'professional') !== false) {
-                        $displayPrice = 259;
-                    } elseif (strpos($courseName, 'excel') !== false) {
-                        $displayPrice = 119;
-                    } elseif (strpos($courseName, 'seguridad') !== false) {
-                        $displayPrice = 149;
-                    } elseif (strpos($courseName, 'prevención') !== false || strpos($courseName, 'riesgos') !== false) {
-                        $displayPrice = 139;
-                    } elseif (strpos($courseName, 'marketing') !== false || strpos($courseName, 'comercial') !== false) {
-                        $displayPrice = 169;
-                    } elseif (strpos($courseName, 'idiomas') !== false || strpos($courseName, 'inglés') !== false) {
-                        $displayPrice = 199;
-                    } elseif (strpos($courseName, 'informática') !== false || strpos($courseName, 'digital') !== false) {
-                        $displayPrice = 159;
-                    } elseif (strpos($courseName, 'gestión') !== false || strpos($courseName, 'administración') !== false) {
-                        $displayPrice = 149;
-                    } elseif (strpos($courseName, 'hostelería') !== false || strpos($courseName, 'turismo') !== false) {
-                        $displayPrice = 129;
-                    } elseif (strpos($courseName, 'guardería') !== false || strpos($courseName, 'infantil') !== false) {
-                        $displayPrice = 109;
-                    } elseif ($curso->lecciones > 50) {
-                        $displayPrice = 219;
-                    } elseif ($curso->lecciones > 30) {
-                        $displayPrice = 169;
-                    } elseif ($curso->lecciones > 15) {
-                        $displayPrice = 139;
-                    } elseif ($curso->lecciones < 5) {
-                        $displayPrice = 79;
-                    } else {
-                        $displayPrice = 129;
-                    }
-                @endphp
-                {{ $displayPrice }}€
+                {{ number_format((float) ($curso->price ?? 0), 2) }}€
             </div>
             
             <!-- Categoría -->

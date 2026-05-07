@@ -27,16 +27,32 @@ class CursosCategoriesTable extends Component
 
     protected function actualizarServiciosCategoria()
     {
+        $buscar = $this->buscar;
 
-        $query = Category::where('inactive',0)
-        ->when($this->buscar, function ($query) {
-                    $query->where('name', 'like', '%' . $this->buscar . '%');
-                });
+        $query = Category::where('inactive', 0)
+            ->when($buscar, function ($query) use ($buscar) {
+                $query->where('name', 'like', '%' . $buscar . '%');
+            });
 
         $query->orderBy($this->sortColumn, $this->sortDirection);
 
         // Verifica si se seleccionó 'all' para mostrar todos los registros
-        $this->categorias = $this->perPage === 'all' ? $query->get() : $query->paginate(is_numeric($this->perPage) ? $this->perPage : 10);
+        $this->categorias = $this->perPage === 'all'
+            ? $query->paginate(9999)
+            : $query->paginate(is_numeric($this->perPage) ? (int) $this->perPage : 10);
+    }
+
+    public function limpiarFiltros()
+    {
+        $this->buscar = '';
+        $this->selectedCategoria = '';
+        $this->perPage = 10;
+        $this->resetPage();
+    }
+
+    public function confirmarEliminacion($id)
+    {
+        $this->dispatchBrowserEvent('confirm-delete-category', ['id' => $id]);
     }
 
     public function getCategorias()

@@ -23,16 +23,31 @@ class AlumnosController extends Controller
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('surname', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('username', 'like', "%{$search}%");
+                  ->orWhere('username', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhereRaw("CONCAT(COALESCE(name,''), ' ', COALESCE(surname,'')) LIKE ?", ["%{$search}%"])
+                  ->orWhereRaw("CONCAT(COALESCE(surname,''), ' ', COALESCE(name,'')) LIKE ?", ["%{$search}%"]);
             });
         }
 
-        if ($request->filled('moodle_status')) {
-            if ($request->moodle_status === 'synced') {
+        // Filtro estado Moodle (acepta ambos parámetros: sync_status (vista) y moodle_status (legacy))
+        $syncStatus = $request->input('sync_status', $request->input('moodle_status'));
+        if (!empty($syncStatus)) {
+            if (in_array($syncStatus, ['synced', 'sincronizados', 'sincronizado'])) {
                 $query->whereNotNull('moodle_id');
-            } elseif ($request->moodle_status === 'not_synced') {
+            } elseif (in_array($syncStatus, ['unsynced', 'not_synced', 'no_sincronizados', 'no_sincronizado'])) {
                 $query->whereNull('moodle_id');
             }
+        }
+
+        // Filtro de fecha (date_from/date_to en la vista, también acepta fecha_desde/fecha_hasta)
+        $fechaDesde = $request->input('date_from', $request->input('fecha_desde'));
+        $fechaHasta = $request->input('date_to', $request->input('fecha_hasta'));
+        if (!empty($fechaDesde)) {
+            $query->whereDate('created_at', '>=', $fechaDesde);
+        }
+        if (!empty($fechaHasta)) {
+            $query->whereDate('created_at', '<=', $fechaHasta);
         }
 
         $alumnos = $query->withCount('cursos')
