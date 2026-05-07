@@ -46,7 +46,7 @@
 
         {{-- Botón flotante --}}
         <div wire:click="toggleChat"
-             style="position:fixed; bottom:24px; left:24px; z-index:9998; cursor:pointer;">
+             style="position:fixed; bottom:80px; left:10px; z-index:9998; cursor:pointer;">
             <div style="
                 width:60px; height:60px;
                 background: linear-gradient(135deg, {{ $config['primary_color'] ?? '#D93690' }} 0%, {{ $config['secondary_color'] ?? '#667eea' }} 100%);
@@ -76,7 +76,7 @@
         @if($isOpen)
         {{-- Ventana del chat --}}
         <div style="
-            position:fixed; bottom:100px; left:24px; z-index:9999;
+            position:fixed; bottom:150px; left:10px; z-index:9999;
             width:min(480px, calc(100vw - 48px));
             height:min(680px, calc(100vh - 140px));
             background:#fff;
