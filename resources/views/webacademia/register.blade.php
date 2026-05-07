@@ -660,6 +660,43 @@
     </div>
 </section>
 
+<!-- Modal Política de Privacidad -->
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #D93690 0%, #667eea 100%); color: white;">
+                <h5 class="modal-title" id="privacyModalLabel">
+                    <i class="fas fa-shield-alt me-2"></i> Política de Privacidad
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" style="font-size: 0.9rem; line-height: 1.7; color: #444;">
+                <h6 style="color: #D93690; font-weight: 700;">1. Responsable del tratamiento</h6>
+                <p>Grupo ECOS — <a href="mailto:info@grupoecos.net">info@grupoecos.net</a> — grupoecos.net</p>
+
+                <h6 style="color: #D93690; font-weight: 700;">2. Finalidad</h6>
+                <p>Los datos personales proporcionados durante el registro se utilizan para gestionar tu cuenta de alumno, acceder a los cursos contratados y, si lo has consentido, enviarte información sobre novedades y promociones.</p>
+
+                <h6 style="color: #D93690; font-weight: 700;">3. Base jurídica</h6>
+                <p>El tratamiento se basa en la ejecución del contrato de acceso a la plataforma (art. 6.1.b RGPD) y, para comunicaciones comerciales, en tu consentimiento expreso (art. 6.1.a RGPD).</p>
+
+                <h6 style="color: #D93690; font-weight: 700;">4. Conservación</h6>
+                <p>Los datos se conservan mientras la cuenta esté activa y, una vez cancelada, durante los plazos legales aplicables.</p>
+
+                <h6 style="color: #D93690; font-weight: 700;">5. Destinatarios</h6>
+                <p>No se ceden datos a terceros salvo obligación legal o prestadores de servicios tecnológicos con contrato de encargo de tratamiento.</p>
+
+                <h6 style="color: #D93690; font-weight: 700;">6. Tus derechos</h6>
+                <p>Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a <a href="mailto:info@grupoecos.net">info@grupoecos.net</a>. También tienes derecho a reclamar ante la <a href="https://www.aepd.es" target="_blank">AEPD</a>.</p>
+            </div>
+            <div class="modal-footer">
+                <a href="{{ route('webacademia.privacidad') }}" target="_blank" class="btn btn-outline-secondary btn-sm">Ver política completa</a>
+                <button type="button" class="btn btn-sm" data-bs-dismiss="modal" style="background: #D93690; color: white; border: none; padding: 6px 18px; border-radius: 20px;">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('registerForm');

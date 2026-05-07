@@ -66,6 +66,7 @@ use App\Http\Controllers\Blog\BlogController;
 use App\Http\Controllers\Alumnos\AlumnosController;
 use App\Http\Controllers\Builder\BuilderController;
 use App\Http\Controllers\Builder\MenuController;
+use App\Http\Controllers\Backup\BackupController;
 
 // Builder público SOLO para usuarios autenticados del CRM
 Route::middleware(['auth'])->group(function () {
@@ -83,6 +84,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/builder/cookies', [BuilderController::class, 'getCookiesText'])->name('builder.cookies.get');
     Route::post('/builder/cookies/save', [BuilderController::class, 'saveCookiesText'])->name('builder.cookies.save');
     Route::post('/builder/duplicate', [BuilderController::class, 'duplicate'])->name('builder.duplicate');
+
+    // Backup
+    Route::get('/crm/backup', [BackupController::class, 'index'])->name('backup.index');
+    Route::post('/crm/backup/schedule', [BackupController::class, 'store'])->name('backup.schedule');
+    Route::get('/crm/backup/download', [BackupController::class, 'download'])->name('backup.download');
 
     // Rutas para gestión del menú
     Route::get('/builder/menu', [MenuController::class, 'index'])->name('builder.menu.index');

@@ -28,7 +28,11 @@
     <section class="section pt-4">
         <div class="card">
             <div class="card-body">
-                <form action="" method="">
+                @if(session('success'))
+                    <div class="alert alert-success"><i class="bi bi-check-circle"></i> {{ session('success') }}</div>
+                @endif
+
+                <form action="{{ route('backup.schedule') }}" method="POST">
                     @csrf
                     <div class="mb-3">
                         <label for="backupFrequency" class="form-label" style="width: 200px">Frecuencia del Backup</label>
@@ -38,12 +42,12 @@
                             <option value="monthly">Mensual</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary">Programar Backup</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-clock"></i> Programar Backup</button>
                 </form>
 
                 <div class="mt-4">
                     <h4>Descargar Backup</h4>
-                    <a href="#" class="btn btn-secondary">Descargar Backup</a>
+                    <a href="{{ route('backup.download') }}" class="btn btn-secondary"><i class="bi bi-download"></i> Descargar Backup SQL</a>
                 </div>
             </div>
         </div>

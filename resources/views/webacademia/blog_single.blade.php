@@ -79,7 +79,8 @@
 					<div class="comment_form">
 						<h3 class="blog_head_title">Add a Comment</h3>
 						<div class="contact comment-box">
-							<form id="contact-form" method="post" enctype="multipart/form-data">
+							<form id="contact-form" method="post" action="{{ route('webacademia.handleContactForm') }}" enctype="multipart/form-data">
+								@csrf
 								<div class="row">
 									<div class="form-group col-md-6">
 										<input type="text" name="name" class="form-control" id="first-name" placeholder="Name" required="required">
@@ -113,10 +114,7 @@
 						<div class="newsletter-form">
 							<h4>Subscribe for get updates</h4>
 							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ultricies quam nisi my business</p>
-							<form action="#" class="subscribe">
-								<input type="text" class="subscribe__input" placeholder="Email Address">
-								<button type="button" class="sub_btn">Subscribe</button>
-							</form>
+							<p style="font-size:0.85rem;color:#888;">Síguenos en redes sociales para estar al día.</p>
 						</div>
 					</div><!-- END SINGLE POST -->
 					<div class="sidebar-post">
