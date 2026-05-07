@@ -25,9 +25,6 @@
     @livewireStyles
     @yield('css')
     @stack('styles')
-    <style>
-        #topcontrol { bottom: 100px !important; right: 24px !important; }
-    </style>
 
 </head>
 <body>
