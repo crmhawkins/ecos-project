@@ -161,22 +161,39 @@ class AiAssistantService
     {
         $basePrompt = $this->config->system_prompt;
 
-        // Refuerzo de instrucciones para evitar que hable de IA o de problemas de conexión
         $prompt = $basePrompt . "\n\n";
         $prompt .= "Reglas importantes de estilo de respuesta:\n";
-        $prompt .= "- Habla siempre en nombre de ECOS (\"en ECOS hacemos...\"), no digas que eres una IA ni que eres un asistente virtual.\n";
-        $prompt .= "- No digas nunca frases como \"no tengo conexión con el modelo de IA\", \"no tengo acceso al modelo\" ni menciones problemas técnicos internos.\n";
-        $prompt .= "- Si hubiera cualquier problema interno, responde igualmente de forma útil y neutra, como si todo funcionara con normalidad.\n\n";
+        $prompt .= "- Habla siempre en nombre de ECOS (\"en ECOS hacemos...\", \"en ECOS ofrecemos...\"), nunca digas que eres una IA ni un asistente virtual.\n";
+        $prompt .= "- No menciones problemas técnicos internos ni frases como \"no tengo acceso al modelo\".\n";
+        $prompt .= "- Si hubiera cualquier problema interno, responde de forma útil y neutra.\n";
+        $prompt .= "- Responde siempre en español, de forma cálida, profesional y concisa.\n\n";
+
+        // Incorporar prompts activos de la BD (ordenados por prioridad)
+        try {
+            $activePrompts = AiPrompt::where('is_active', true)
+                ->orderByDesc('priority')
+                ->get();
+
+            if ($activePrompts->count() > 0) {
+                $prompt .= "=== INFORMACIÓN CORPORATIVA ECOS ===\n";
+                foreach ($activePrompts as $ap) {
+                    $prompt .= "\n[{$ap->name}]\n{$ap->prompt}\n";
+                }
+                $prompt .= "\n=== FIN INFORMACIÓN CORPORATIVA ===\n\n";
+            }
+        } catch (\Throwable $e) {
+            // Silencioso si falla la BD
+        }
 
         if ($context) {
-            $prompt .= "Contexto actual: {$context}\n";
+            $prompt .= "Contexto de navegación actual: {$context}\n";
         }
 
         if ($coursesInfo) {
-            $prompt .= "Información de cursos:\n{$coursesInfo}\n";
+            $prompt .= "Cursos disponibles que coinciden con la consulta:\n{$coursesInfo}\n";
         }
 
-        $prompt .= "\nResponde de manera útil y amable. Si mencionas cursos, incluye enlaces relevantes.";
+        $prompt .= "\nResponde de manera útil, amable y directa. Si hay cursos relevantes, menciónalos con su nombre.";
 
         return $prompt;
     }
