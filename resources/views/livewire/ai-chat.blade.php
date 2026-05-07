@@ -190,8 +190,8 @@
                     </div>
                 </template>
 
-                {{-- Burbuja streaming (visible mientras dura sendMessage) --}}
-                <div wire:loading wire:target="sendMessage"
+                {{-- Burbuja streaming (controlada por Alpine store, no wire:loading) --}}
+                <div x-data x-show="$store.ecosChat.sending" x-cloak
                      class="ecos-streaming-bubble"
                      style="display:flex; justify-content:flex-start; gap:8px;">
                     <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,{{ $config['primary_color'] ?? '#D93690' }},{{ $config['secondary_color'] ?? '#667eea' }}); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; margin-top:4px;">🤖</div>
@@ -207,7 +207,7 @@
             {{-- Input --}}
             <div style="padding:14px 16px; background:white; border-top:1px solid #f1f5f9; flex-shrink:0;">
                 <form wire:submit.prevent="sendMessage"
-                      @submit="captureAndSend()"
+                      @submit="captureAndSend(); $store.ecosChat.sending = true"
                       style="display:flex; gap:10px; align-items:center;">
                     <input id="ecos-chat-input"
                            type="text"
@@ -254,6 +254,7 @@
 </div>
 
 <style>
+[x-cloak] { display: none !important; }
 @keyframes chatSlideIn {
     from { opacity:0; transform: translateY(20px) scale(0.95); }
     to   { opacity:1; transform: translateY(0) scale(1); }
@@ -282,13 +283,16 @@
 </style>
 
 <script>
+document.addEventListener('alpine:init', function () {
+    Alpine.store('ecosChat', { sending: false });
+});
 document.addEventListener('livewire:initialized', function () {
     Livewire.on('scrollToBottom', function () {
+        Alpine.store('ecosChat').sending = false;
         var el = document.getElementById('chat-messages');
         if (el) el.scrollTop = el.scrollHeight;
         window.dispatchEvent(new CustomEvent('ecos-response-ready'));
     });
-    // Scroll inicial
     var el = document.getElementById('chat-messages');
     if (el) el.scrollTop = el.scrollHeight;
 });
