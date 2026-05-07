@@ -261,9 +261,10 @@ class AiAssistantService
 
         try {
             $response = Http::timeout(120)->post($ollamaUrl, [
-                'model'  => $modelo,
-                'prompt' => $prompt,
-                'stream' => false,
+                'model'   => $modelo,
+                'prompt'  => $prompt,
+                'stream'  => false,
+                'options' => ['num_predict' => 300, 'temperature' => 0.6],
             ]);
 
             if (!$response->successful()) {

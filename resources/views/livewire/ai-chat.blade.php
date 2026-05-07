@@ -150,7 +150,7 @@
                         <div style="display:flex; justify-content:flex-start; gap:8px; animation:msgFadeIn 0.2s ease;">
                             <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,{{ $config['primary_color'] ?? '#D93690' }},{{ $config['secondary_color'] ?? '#667eea' }}); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; margin-top:4px;">🤖</div>
                             <div class="ecos-ai-bubble"
-                                 data-typed="1"
+                                 data-typed="{{ $idx === $newestMessageIndex ? '0' : '1' }}"
                                  data-text="{{ $message['content'] }}"
                                  style="
                                     max-width:75%; padding:12px 16px; border-radius:18px 18px 18px 4px;

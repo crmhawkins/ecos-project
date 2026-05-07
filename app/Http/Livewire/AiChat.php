@@ -15,6 +15,7 @@ class AiChat extends Component
     public $config = [];
     public $sessionId;
     public $currentPageUrl;
+    public int $newestMessageIndex = -1;
 
     protected $listeners = ['toggleChat', 'sendMessage'];
 
@@ -96,15 +97,16 @@ class AiChat extends Component
                 'timestamp' => now()->format('H:i'),
                 'links' => $response['links'] ?? []
             ];
+            $this->newestMessageIndex = count($this->messages) - 1;
         } catch (\Exception $e) {
             \Log::error('AiChat sendMessage error:', ['error' => $e->getMessage()]);
-            
-            // Respuesta de fallback en caso de error
+
             $this->messages[] = [
                 'type' => 'assistant',
                 'content' => 'Lo siento, hay un problema técnico. Por favor, inténtalo de nuevo más tarde.',
                 'timestamp' => now()->format('H:i')
             ];
+            $this->newestMessageIndex = count($this->messages) - 1;
         }
 
         $this->isLoading = false;
@@ -114,6 +116,7 @@ class AiChat extends Component
     public function clearChat()
     {
         $this->messages = [];
+        $this->newestMessageIndex = -1;
         $this->addWelcomeMessage();
     }
 
