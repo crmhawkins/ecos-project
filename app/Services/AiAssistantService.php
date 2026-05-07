@@ -399,14 +399,23 @@ class AiAssistantService
      */
     protected function getRelevantLinks($userMessage)
     {
-        $links = [];
+        $msg = strtolower($userMessage);
 
-        // Buscar enlaces por categoría según el mensaje
-        if (str_contains(strtolower($userMessage), 'curso') || str_contains(strtolower($userMessage), 'formación')) {
-            $links = AiLink::getActiveByCategory('courses');
-        } elseif (str_contains(strtolower($userMessage), 'contacto') || str_contains(strtolower($userMessage), 'teléfono')) {
-            $links = AiLink::getActiveByCategory('contact');
-        } else {
+        $category = match(true) {
+            str_contains($msg, 'oposic')                                                   => 'oposiciones',
+            str_contains($msg, 'seguridad') || str_contains($msg, 'vigilant')              => 'seguridad',
+            str_contains($msg, 'certificado') || str_contains($msg, 'profesionalidad')     => 'certificados',
+            str_contains($msg, 'campus') || str_contains($msg, 'online') || str_contains($msg, 'moodle') || str_contains($msg, 'virtual') => 'campus',
+            str_contains($msg, 'inscri') || str_contains($msg, 'matric') || str_contains($msg, 'precio') || str_contains($msg, 'coste') => 'inscripcion',
+            str_contains($msg, 'curso') || str_contains($msg, 'formaci')                   => 'courses',
+            str_contains($msg, 'contacto') || str_contains($msg, 'tel') || str_contains($msg, 'email') || str_contains($msg, 'sede') || str_contains($msg, 'direcci') => 'contact',
+            default                                                                        => 'general',
+        };
+
+        $links = AiLink::getActiveByCategory($category);
+
+        // Fallback a general si la categoría específica no tiene enlaces
+        if ($links->isEmpty()) {
             $links = AiLink::getActiveByCategory('general');
         }
 
