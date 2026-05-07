@@ -339,7 +339,7 @@
     </style>
     
     @yield('css')
-    <link href="{{ asset('resources/css/cursos-table.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/cursos-table.css') }}" rel="stylesheet">
 </head>
 <body>
     <!-- NAVBAR -->
