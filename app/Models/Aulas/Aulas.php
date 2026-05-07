@@ -5,6 +5,7 @@ namespace App\Models\Aulas;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Aulas\Reservas;
 
 class Aulas extends Model
 {
@@ -43,6 +44,9 @@ class Aulas extends Model
         'created_at', 'updated_at', 'deleted_at',
     ];
 
-
+    public function reservas()
+    {
+        return $this->hasMany(Reservas::class, 'aula_id');
+    }
 }
 

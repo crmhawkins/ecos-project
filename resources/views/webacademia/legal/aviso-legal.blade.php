@@ -27,7 +27,7 @@
                     <p>En cumplimiento del artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE), se informa de los siguientes datos identificativos del titular del sitio web:</p>
                     <ul>
                         <li><strong>Denominación social:</strong> Grupo ECOS</li>
-                        <li><strong>Actividad:</strong> Formación y educación online</li>
+                        <li><strong>Actividad:</strong> Centro de formación con más de 28 años de experiencia en Ceuta, Estepona y Melilla</li>
                         <li><strong>Correo electrónico:</strong> <a href="mailto:info@grupoecos.net">info@grupoecos.net</a></li>
                         <li><strong>Sitio web:</strong> grupoecos.net</li>
                     </ul>

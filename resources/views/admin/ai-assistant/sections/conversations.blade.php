@@ -8,7 +8,7 @@
     <div style="padding: 24px;">
         <p style="color: #6b7280; margin-bottom: 20px;">Revisa las conversaciones que los usuarios han tenido con el asistente de IA.</p>
         
-        <div style="overflow-x: auto;">
+        <div style="overflow-x: auto; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
             <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
                 <thead>
                     <tr style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">

@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"git rebase --abort && git pull origin main --no-rebase && git log --oneline -3\",\"description\":\"Abortar rebase y hacer merge normal\"}",
+  "error": "Exit code 1\nFrom https://github.com/crmhawkins/ecos-project\n * branch            main       -> FETCH_HEAD\nAuto-merging app/Http/Controllers/Alumnos/AlumnosController.php\nAuto-merging app/Http/Controllers/Web/WebController.php\nAuto-merging app/Http/Livewire/CursosCategoriesTable.php\nAuto-merging app/Http/Livewire/CursosTable.php\nCONFLICT (content): Merge conflict in app/Http/Livewire/CursosTable.php\nAuto-merging app/Http/Middleware/Authenticate.php\nCONFLICT (content): Merge conflict in app/Http/M...",
+  "timestamp": "2026-05-07T15:23:57.298Z",
+  "retry_count": 3
+}

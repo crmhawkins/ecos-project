@@ -169,16 +169,20 @@ class WebController extends Controller
             'message' => 'required|string|max:5000',
         ]);
 
-        $to = config('mail.contact_to', config('mail.from.address'));
+        try {
+            $to = config('mail.contact_to', config('mail.from.address'));
 
-        Mail::raw(
-            "Nombre: {$data['name']}\nEmail: {$data['email']}\n\nMensaje:\n{$data['message']}",
-            function ($message) use ($data, $to) {
-                $subject = $data['subject'] ?: 'Nuevo mensaje de formulario de contacto';
-                $message->to($to)
-                    ->subject($subject);
-            }
-        );
+            Mail::raw(
+                "Nombre: {$data['name']}\nEmail: {$data['email']}\n\nMensaje:\n{$data['message']}",
+                function ($message) use ($data, $to) {
+                    $subject = $data['subject'] ?: 'Nuevo mensaje de formulario de contacto';
+                    $message->to($to)
+                        ->subject($subject);
+                }
+            );
+        } catch (\Exception $e) {
+            Log::error('Error enviando formulario de contacto: ' . $e->getMessage());
+        }
 
         if ($request->wantsJson()) {
             return response()->json(['status' => 'ok']);
@@ -198,6 +202,7 @@ class WebController extends Controller
                 'password' => 'required|string|min:8|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/',
                 'password_confirmation' => 'required|string|min:8',
                 'privacy_policy' => 'required|accepted',
+                'phone' => 'nullable|string|max:20',
                 'marketing_consent' => 'sometimes|boolean',
             ],[
                 'name.required' => 'El nombre es obligatorio',
@@ -240,6 +245,7 @@ class WebController extends Controller
                 'name' => trim(ucwords(strtolower($request->name))),
                 'surname' => trim(ucwords(strtolower($request->surname))),
                 'email' => trim(strtolower($request->email)),
+                'phone' => $request->phone ? trim($request->phone) : null,
                 'password' => Hash::make($request->password),
                 'created_at' => now(),
                 'updated_at' => now(),

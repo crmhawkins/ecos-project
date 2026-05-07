@@ -48,18 +48,10 @@ class AiAssistantService
             $this->config = $fallback;
         }
         $this->apiKey = config('services.openai.api_key', env('OPENAI_API_KEY'));
-        $hawkins = config('services.hawkins_ai', []);
-        $this->hawkinsBaseUrl = rtrim($hawkins['base_url'] ?? '', '/');
-        $this->hawkinsApiKey = $hawkins['api_key'] ?? '';
-        $this->useHawkinsAi = $this->hawkinsBaseUrl !== '' && $this->hawkinsApiKey !== '';
-        if ($this->useHawkinsAi) {
-            Log::channel('single')->debug('AiAssistant: usando Hawkins AI', ['base_url' => $this->hawkinsBaseUrl]);
-        } else {
-            Log::channel('single')->warning('AiAssistant: Hawkins no configurada (base_url o api_key vacío). Se usará OpenAI o mensaje de fallo.', [
-                'base_url_set' => $this->hawkinsBaseUrl !== '',
-                'api_key_set' => $this->hawkinsApiKey !== '',
-            ]);
-        }
+        $this->hawkinsBaseUrl = env('OLLAMA_BASE_URL', 'http://217.160.39.79:11434');
+        $this->hawkinsApiKey = '';
+        $this->useHawkinsAi = true;
+        Log::channel('single')->debug('AiAssistant: usando Ollama', ['url' => $this->hawkinsBaseUrl]);
     }
 
     /**
@@ -169,22 +161,40 @@ class AiAssistantService
     {
         $basePrompt = $this->config->system_prompt;
 
-        // Refuerzo de instrucciones para evitar que hable de IA o de problemas de conexión
         $prompt = $basePrompt . "\n\n";
         $prompt .= "Reglas importantes de estilo de respuesta:\n";
-        $prompt .= "- Habla siempre en nombre de ECOS (\"en ECOS hacemos...\"), no digas que eres una IA ni que eres un asistente virtual.\n";
-        $prompt .= "- No digas nunca frases como \"no tengo conexión con el modelo de IA\", \"no tengo acceso al modelo\" ni menciones problemas técnicos internos.\n";
-        $prompt .= "- Si hubiera cualquier problema interno, responde igualmente de forma útil y neutra, como si todo funcionara con normalidad.\n\n";
+        $prompt .= "- Habla siempre en nombre de ECOS (\"en ECOS hacemos...\", \"en ECOS ofrecemos...\"), nunca digas que eres una IA ni un asistente virtual.\n";
+        $prompt .= "- No menciones problemas técnicos internos ni frases como \"no tengo acceso al modelo\".\n";
+        $prompt .= "- Si hubiera cualquier problema interno, responde de forma útil y neutra.\n";
+        $prompt .= "- Responde siempre en español, de forma cálida, profesional y concisa.\n";
+        $prompt .= "- IMPORTANTE: Sé breve. Máximo 3-4 frases por respuesta. No hagas listas largas. Si hay varios cursos, menciona solo los más relevantes (máximo 2-3). Ve directo al grano.\n\n";
+
+        // Incorporar prompts activos de la BD (ordenados por prioridad)
+        try {
+            $activePrompts = AiPrompt::where('is_active', true)
+                ->orderByDesc('priority')
+                ->get();
+
+            if ($activePrompts->count() > 0) {
+                $prompt .= "=== INFORMACIÓN CORPORATIVA ECOS ===\n";
+                foreach ($activePrompts as $ap) {
+                    $prompt .= "\n[{$ap->name}]\n{$ap->prompt}\n";
+                }
+                $prompt .= "\n=== FIN INFORMACIÓN CORPORATIVA ===\n\n";
+            }
+        } catch (\Throwable $e) {
+            // Silencioso si falla la BD
+        }
 
         if ($context) {
-            $prompt .= "Contexto actual: {$context}\n";
+            $prompt .= "Contexto de navegación actual: {$context}\n";
         }
 
         if ($coursesInfo) {
-            $prompt .= "Información de cursos:\n{$coursesInfo}\n";
+            $prompt .= "Cursos disponibles que coinciden con la consulta:\n{$coursesInfo}\n";
         }
 
-        $prompt .= "\nResponde de manera útil y amable. Si mencionas cursos, incluye enlaces relevantes.";
+        $prompt .= "\nResponde de manera útil, amable y directa. Máximo 3-4 frases. Si hay cursos relevantes, menciona solo los más importantes.";
 
         return $prompt;
     }
@@ -240,49 +250,36 @@ class AiAssistantService
     }
 
     /**
-     * Llamar a la API Hawkins (IA local)
-     * POST /chat/chat con {"prompt":"", "modelo":""}, header x-api-key
+     * Llamar a Ollama directamente (217.160.39.79:11434)
      */
     protected function callHawkinsAI(array $messages): string
     {
         $prompt = $this->buildPromptForHawkins($messages);
-        $url = $this->hawkinsBaseUrl . '/chat/chat';
-        $modelo = $this->config->ai_model ?: 'gpt-oss:120b-cloud';
+        $modelo = $this->config->ai_model ?: 'qwen3:latest';
+        $ollamaUrl = env('OLLAMA_BASE_URL', 'http://217.160.39.79:11434') . '/api/generate';
         $mensajeAmigable = 'Lo siento, no he podido conectar con el asistente en este momento. Por favor, inténtalo de nuevo más tarde.';
 
         try {
-            $response = Http::withHeaders([
-                'x-api-key' => $this->hawkinsApiKey,
-                'Content-Type' => 'application/json',
-            ])->timeout(120)->post($url, [
-                'prompt' => $prompt,
-                'modelo' => $modelo,
+            $response = Http::timeout(120)->post($ollamaUrl, [
+                'model'   => $modelo,
+                'prompt'  => $prompt,
+                'stream'  => false,
+                'options' => ['num_predict' => 300, 'temperature' => 0.6],
             ]);
 
             if (!$response->successful()) {
-                Log::error('Hawkins AI falló: HTTP ' . $response->status() . '. URL: ' . $url . '. Respuesta: ' . $response->body());
+                Log::error('Ollama falló: HTTP ' . $response->status() . ' — ' . $response->body());
                 return $mensajeAmigable;
             }
 
             $data = $response->json();
-            if (!empty($data['respuesta'])) {
-                return (string) $data['respuesta'];
-            }
-            $fallback = $data['metadata']['message']['content'] ?? null;
-            if ($fallback) {
-                return (string) $fallback;
-            }
-            if (!empty($data['success'])) {
-                Log::warning('Hawkins AI: success=true pero sin campo respuesta ni metadata.message.content');
-                return $mensajeAmigable;
-            }
-            Log::warning('Hawkins AI: respuesta sin contenido válido', ['keys' => $data ? array_keys($data) : [], 'body' => $response->body()]);
-            return $mensajeAmigable;
+            return (string) ($data['response'] ?? $mensajeAmigable);
+
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
-            Log::error('Hawkins AI falló: no se pudo conectar (timeout o red). ' . $e->getMessage());
+            Log::error('Ollama: timeout o sin conexión. ' . $e->getMessage());
             return $mensajeAmigable;
         } catch (\Throwable $e) {
-            Log::error('Hawkins AI falló: excepción. ' . $e->getMessage(), ['exception' => get_class($e)]);
+            Log::error('Ollama: excepción. ' . $e->getMessage());
             return $mensajeAmigable;
         }
     }
@@ -381,6 +378,74 @@ class AiAssistantService
     }
 
     /**
+     * Procesar mensaje con streaming (chunks en tiempo real via callback)
+     */
+    public function processMessageStreaming($userMessage, $sessionId, $pageUrl, callable $onChunk): array
+    {
+        try {
+            $context      = $this->getPageContext($pageUrl);
+            $coursesInfo  = $this->getCoursesInfo($userMessage);
+            $systemPrompt = $this->buildSystemPrompt($context, $coursesInfo);
+            $history      = $this->getConversationHistory($sessionId);
+            $messages     = $this->prepareMessages($systemPrompt, $history, $userMessage);
+            $prompt       = $this->buildPromptForHawkins($messages);
+
+            $modelo    = $this->config->ai_model ?: 'qwen3-vl:8b-instruct';
+            $ollamaUrl = env('OLLAMA_BASE_URL', 'http://217.160.39.79:11434') . '/api/generate';
+
+            $fullResponse = '';
+
+            $response = Http::withOptions(['stream' => true])
+                ->timeout(120)
+                ->post($ollamaUrl, [
+                    'model'   => $modelo,
+                    'prompt'  => $prompt,
+                    'stream'  => true,
+                    'options' => ['num_predict' => 300, 'temperature' => 0.6],
+                ]);
+
+            if (!$response->successful()) {
+                Log::error('Ollama streaming falló: HTTP ' . $response->status());
+                $errMsg = 'Lo siento, no he podido conectar con el asistente en este momento.';
+                $onChunk($errMsg);
+                $fullResponse = $errMsg;
+            } else {
+                $body   = $response->getBody();
+                $buffer = '';
+                while (!$body->eof()) {
+                    $char = $body->read(1);
+                    if ($char === '') break;
+                    $buffer .= $char;
+                    if (str_ends_with($buffer, "\n")) {
+                        $line   = trim($buffer);
+                        $buffer = '';
+                        if (empty($line)) continue;
+                        $data = json_decode($line, true);
+                        if (isset($data['response']) && $data['response'] !== '') {
+                            $fullResponse .= $data['response'];
+                            $onChunk($data['response']);
+                        }
+                        if ($data['done'] ?? false) break;
+                    }
+                }
+            }
+
+            $this->saveConversation($sessionId, $userMessage, $fullResponse, $pageUrl);
+
+            return [
+                'message' => $fullResponse,
+                'links'   => $this->getRelevantLinks($userMessage),
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Error en AiAssistantService streaming: ' . $e->getMessage());
+            $errMsg = 'Lo siento, ha ocurrido un error. Por favor, inténtalo de nuevo más tarde.';
+            $onChunk($errMsg);
+            return ['message' => $errMsg, 'links' => []];
+        }
+    }
+
+    /**
      * Guardar conversación
      */
     protected function saveConversation($sessionId, $userMessage, $assistantResponse, $pageUrl)
@@ -404,14 +469,23 @@ class AiAssistantService
      */
     protected function getRelevantLinks($userMessage)
     {
-        $links = [];
+        $msg = strtolower($userMessage);
 
-        // Buscar enlaces por categoría según el mensaje
-        if (str_contains(strtolower($userMessage), 'curso') || str_contains(strtolower($userMessage), 'formación')) {
-            $links = AiLink::getActiveByCategory('courses');
-        } elseif (str_contains(strtolower($userMessage), 'contacto') || str_contains(strtolower($userMessage), 'teléfono')) {
-            $links = AiLink::getActiveByCategory('contact');
-        } else {
+        $category = match(true) {
+            str_contains($msg, 'oposic')                                                   => 'oposiciones',
+            str_contains($msg, 'seguridad') || str_contains($msg, 'vigilant')              => 'seguridad',
+            str_contains($msg, 'certificado') || str_contains($msg, 'profesionalidad')     => 'certificados',
+            str_contains($msg, 'campus') || str_contains($msg, 'online') || str_contains($msg, 'moodle') || str_contains($msg, 'virtual') => 'campus',
+            str_contains($msg, 'inscri') || str_contains($msg, 'matric') || str_contains($msg, 'precio') || str_contains($msg, 'coste') => 'inscripcion',
+            str_contains($msg, 'curso') || str_contains($msg, 'formaci')                   => 'courses',
+            str_contains($msg, 'contacto') || str_contains($msg, 'tel') || str_contains($msg, 'email') || str_contains($msg, 'sede') || str_contains($msg, 'direcci') || str_contains($msg, 'horario') || str_contains($msg, 'donde estai') => 'contact',
+            default                                                                        => 'general',
+        };
+
+        $links = AiLink::getActiveByCategory($category);
+
+        // Fallback a general si la categoría específica no tiene enlaces
+        if ($links->isEmpty()) {
             $links = AiLink::getActiveByCategory('general');
         }
 

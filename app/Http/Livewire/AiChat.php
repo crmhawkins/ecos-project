@@ -15,6 +15,7 @@ class AiChat extends Component
     public $config = [];
     public $sessionId;
     public $currentPageUrl;
+    public int $newestMessageIndex = -1;
 
     protected $listeners = ['toggleChat', 'sendMessage'];
 
@@ -74,7 +75,6 @@ class AiChat extends Component
     {
         if (empty($this->newMessage)) return;
 
-        // Añadir mensaje del usuario
         $this->messages[] = [
             'type' => 'user',
             'content' => $this->newMessage,
@@ -86,25 +86,29 @@ class AiChat extends Component
         $this->isLoading = true;
 
         try {
-            // Usar el servicio de IA real
             $aiService = app(AiAssistantService::class);
-            $response = $aiService->processMessage($userMessage, $this->sessionId, $this->currentPageUrl);
-            
+            $response = $aiService->processMessageStreaming(
+                $userMessage,
+                $this->sessionId,
+                $this->currentPageUrl,
+                fn($chunk) => $this->stream(to: 'streamingMessage', content: $chunk, replace: false)
+            );
+
             $this->messages[] = [
                 'type' => 'assistant',
                 'content' => $response['message'],
                 'timestamp' => now()->format('H:i'),
                 'links' => $response['links'] ?? []
             ];
+            $this->newestMessageIndex = -1; // ya visto en streaming, no typewriter
         } catch (\Exception $e) {
             \Log::error('AiChat sendMessage error:', ['error' => $e->getMessage()]);
-            
-            // Respuesta de fallback en caso de error
             $this->messages[] = [
                 'type' => 'assistant',
                 'content' => 'Lo siento, hay un problema técnico. Por favor, inténtalo de nuevo más tarde.',
                 'timestamp' => now()->format('H:i')
             ];
+            $this->newestMessageIndex = count($this->messages) - 1;
         }
 
         $this->isLoading = false;
@@ -114,6 +118,7 @@ class AiChat extends Component
     public function clearChat()
     {
         $this->messages = [];
+        $this->newestMessageIndex = -1;
         $this->addWelcomeMessage();
     }
 

@@ -1,4 +1,4 @@
-<div>
+<div x-data="{ showDeleteModal: false, categoryToDelete: null }">
     <style>
         /* Estilos para filtros y tabla */
         .filters-card {
@@ -545,11 +545,10 @@
                                     <a href="{{ route('cursosCategoria.edit', $categoria->id) }}" class="btn-action btn-action-secondary" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button 
-                                        wire:click="confirmarEliminacion({{ $categoria->id }})" 
-                                        class="btn-action btn-action-danger" 
+                                    <button
+                                        wire:click="confirmarEliminacion({{ $categoria->id }})"
+                                        class="btn-action btn-action-danger"
                                         title="Eliminar"
-                                        x-data="{ categoryToDelete: null }"
                                         @click="categoryToDelete = {{ $categoria->id }}; showDeleteModal = true"
                                     >
                                         <i class="fas fa-trash"></i>
@@ -575,18 +574,24 @@
         </div>
     </div>
 
-    <!-- Paginación moderna - EXACTAMENTE igual que cursos -->
+    <!-- Paginación moderna -->
     <div class="pagination-card">
         <div class="pagination-info">
-            <span>Mostrando {{ $categorias->firstItem() ?? 0 }} a {{ $categorias->lastItem() ?? 0 }} de {{ $categorias->total() }} resultados</span>
+            @if(method_exists($categorias, 'firstItem'))
+                <span>Mostrando {{ $categorias->firstItem() ?? 0 }} a {{ $categorias->lastItem() ?? 0 }} de {{ $categorias->total() }} resultados</span>
+            @else
+                <span>Mostrando {{ $categorias->count() }} resultados</span>
+            @endif
         </div>
         <div class="pagination-links">
-            {{ $categorias->links('vendor.pagination.bootstrap-5') }}
+            @if(method_exists($categorias, 'links'))
+                {{ $categorias->links('vendor.pagination.bootstrap-5') }}
+            @endif
         </div>
     </div>
 
     <!-- Modal de confirmación de eliminación -->
-    <div x-data="{ showDeleteModal: false, categoryToDelete: null }" x-show="showDeleteModal" style="display: none;">
+    <div x-show="showDeleteModal" style="display: none;">
         <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;">
             <div style="background: white; border-radius: 16px; padding: 32px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);">
                 <div style="text-align: center; margin-bottom: 24px;">

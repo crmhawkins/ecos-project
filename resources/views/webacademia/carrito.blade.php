@@ -522,6 +522,14 @@
 </div>
 <!--/ End Shopping Cart -->
 
+<form id="qty-form" method="POST" style="display:none;">
+    @csrf
+    <input type="hidden" name="cantidad" id="qty-value">
+</form>
+<form id="remove-form" method="POST" style="display:none;">
+    @csrf
+</form>
+
 <script>
 function updateQuantity(cursoId, newQuantity) {
     newQuantity = parseInt(newQuantity, 10);

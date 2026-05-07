@@ -52,7 +52,8 @@ class AlumnosController extends Controller
 
         $alumnos = $query->withCount('cursos')
                         ->orderBy('created_at', 'desc')
-                        ->paginate(15);
+                        ->paginate(15)
+                        ->withQueryString();
 
         // Estadísticas para la vista
         $totalAlumnos = Alumno::count();

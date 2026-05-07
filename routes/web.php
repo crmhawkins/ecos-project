@@ -174,6 +174,7 @@ Route::get('/index_3', function () {
 });
 
 
+
 Route::get('/weblogin', function () { return view('webacademia.login');});
 Route::post('/weblogin', [WebController::class, 'login'])->name('webacademia.login');
 

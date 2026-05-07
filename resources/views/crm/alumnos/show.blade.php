@@ -455,7 +455,7 @@
                             <div class="stat-label">Cursos</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-number">{{ $alumno->created_at->diffInDays(now()) }}</div>
+                            <div class="stat-number">{{ (int)$alumno->created_at->diffInDays(now()) }}</div>
                             <div class="stat-label">Días Registrado</div>
                         </div>
                     </div>

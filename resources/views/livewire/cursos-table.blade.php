@@ -1,4 +1,4 @@
-<div>
+<div x-data="{ showDeleteModal: false, courseToDelete: null }">
 
     @if ( $servicios )
 
@@ -62,7 +62,12 @@
                                 <td class="image-cell">
                                     <div class="image-placeholder">
                                         @if($servicio->image)
-                                            <img src="{{ asset('storage/' . $servicio->image) }}" alt="Imagen del curso" class="course-image">
+                                            @php
+                                                $imgSrc = Str::startsWith($servicio->image, 'http')
+                                                    ? $servicio->image
+                                                    : asset('storage/' . ltrim($servicio->image, '/storage/'));
+                                            @endphp
+                                            <img src="{{ $imgSrc }}" alt="Imagen del curso" class="course-image">
                                         @else
                                             <i class="fas fa-image"></i>
                                         @endif
@@ -112,7 +117,7 @@
     @endif
 
     <!-- Modal de confirmación de eliminación -->
-    <div x-data="{ showDeleteModal: false, courseToDelete: null }" x-show="showDeleteModal" class="modal-overlay" style="display: none;">
+    <div x-show="showDeleteModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
                 <h3><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h3>

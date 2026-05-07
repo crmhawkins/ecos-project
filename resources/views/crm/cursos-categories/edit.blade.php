@@ -284,7 +284,7 @@
         
         <div class="form-container">
             <div class="form-header-gradient">
-                <h1><i class="fas fa-edit"></i> Editar Categoría: {{ $categoria->nombre }}</h1>
+                <h1><i class="fas fa-edit"></i> Editar Categoría: {{ $categoria->name }}</h1>
                 <a href="{{ route('cursosCategoria.index') }}" class="btn-back">
                     <i class="fas fa-arrow-left"></i> Volver al Listado
                 </a>

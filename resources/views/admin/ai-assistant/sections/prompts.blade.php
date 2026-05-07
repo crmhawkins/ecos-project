@@ -91,72 +91,97 @@
     </div>
 </div>
 
-<!-- Modal Crear / Editar Prompt -->
-<div class="modal fade" id="promptModal" tabindex="-1" aria-labelledby="promptModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #D93690 0%, #667eea 100%); color: white;">
-                <h5 class="modal-title" id="promptModalLabel">
-                    <i class="fas fa-lightbulb" style="margin-right: 8px;"></i>
-                    <span id="promptModalTitle">Nuevo Prompt</span>
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
-                    <span aria-hidden="true">&times;</span>
+<!-- Modal Overlay -->
+<div id="promptModalOverlay" onclick="if(event.target===this)closePromptModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:white; border-radius:16px; width:100%; max-width:600px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden;">
+        <!-- Header -->
+        <div style="background:linear-gradient(135deg,#D93690 0%,#667eea 100%); padding:20px 24px; display:flex; align-items:center; justify-content:space-between;">
+            <h5 style="margin:0; color:white; font-size:1.1rem; font-weight:700; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-lightbulb"></i>
+                <span id="promptModalTitle">Nuevo Prompt</span>
+            </h5>
+            <button onclick="closePromptModal()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center;">&times;</button>
+        </div>
+
+        <!-- Form -->
+        <form id="promptForm" method="POST" action="{{ route('admin.ai-assistant.create-prompt') }}">
+            @csrf
+            <input type="hidden" name="_method" id="promptFormMethod" value="POST">
+            <input type="hidden" id="promptIdHidden">
+
+            <div style="padding:24px; display:flex; flex-direction:column; gap:18px;">
+                <!-- Categoría + Nombre en 2 cols -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div>
+                        <label style="display:block; font-size:0.78rem; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Categoría *</label>
+                        <input type="text" id="promptCategory" name="category" required
+                               style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; font-size:0.9rem; color:#111827; box-sizing:border-box; transition:border-color 0.2s;"
+                               onfocus="this.style.borderColor='#D93690';this.style.boxShadow='0 0 0 3px rgba(217,54,144,0.1)'"
+                               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:0.78rem; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Nombre *</label>
+                        <input type="text" id="promptName" name="name" required
+                               style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; font-size:0.9rem; color:#111827; box-sizing:border-box; transition:border-color 0.2s;"
+                               onfocus="this.style.borderColor='#D93690';this.style.boxShadow='0 0 0 3px rgba(217,54,144,0.1)'"
+                               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'">
+                    </div>
+                </div>
+
+                <!-- Prompt textarea -->
+                <div>
+                    <label style="display:block; font-size:0.78rem; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Prompt *</label>
+                    <textarea id="promptText" name="prompt" rows="5" required
+                              style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; font-size:0.9rem; color:#111827; box-sizing:border-box; resize:vertical; font-family:inherit; transition:border-color 0.2s;"
+                              onfocus="this.style.borderColor='#D93690';this.style.boxShadow='0 0 0 3px rgba(217,54,144,0.1)'"
+                              onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"></textarea>
+                </div>
+
+                <!-- Prioridad + Activo -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:end;">
+                    <div>
+                        <label style="display:block; font-size:0.78rem; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Prioridad (0-100)</label>
+                        <input type="number" id="promptPriority" name="priority" min="0" max="100" value="0" required
+                               style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:8px; font-size:0.9rem; color:#111827; box-sizing:border-box; transition:border-color 0.2s;"
+                               onfocus="this.style.borderColor='#D93690';this.style.boxShadow='0 0 0 3px rgba(217,54,144,0.1)'"
+                               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'">
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px; padding-bottom:2px;">
+                        <label style="position:relative; display:inline-flex; align-items:center; cursor:pointer; gap:10px;">
+                            <input type="checkbox" id="promptIsActive" name="is_active" value="1" checked style="display:none;">
+                            <span id="toggleTrack" onclick="toggleActive()" style="width:44px; height:24px; background:#D93690; border-radius:12px; display:inline-block; position:relative; cursor:pointer; transition:background 0.2s;">
+                                <span id="toggleThumb" style="position:absolute; top:2px; left:2px; width:20px; height:20px; background:white; border-radius:50%; transition:left 0.2s; left:22px;"></span>
+                            </span>
+                            <span style="font-size:0.9rem; font-weight:600; color:#374151;">Activo</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="padding:16px 24px; border-top:1px solid #f0f0f0; display:flex; gap:10px; justify-content:flex-end; background:#fafafa;">
+                <button type="button" onclick="closePromptModal()" style="padding:10px 20px; border-radius:8px; border:1px solid #e5e7eb; background:white; color:#6b7280; font-weight:600; font-size:0.85rem; cursor:pointer;">
+                    Cancelar
+                </button>
+                <button type="submit" style="padding:10px 20px; border-radius:8px; border:none; background:linear-gradient(135deg,#D93690,#667eea); color:white; font-weight:700; font-size:0.85rem; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                    <i class="fas fa-save"></i> Guardar
                 </button>
             </div>
-            <form id="promptForm" method="POST" action="{{ route('admin.ai-assistant.create-prompt') }}">
-                @csrf
-                <input type="hidden" name="_method" id="promptFormMethod" value="POST">
-                <input type="hidden" id="promptIdHidden">
-                <div class="modal-body" style="padding: 24px;">
-                    <div class="form-group mb-3">
-                        <label for="promptCategory" class="font-weight-semibold">Categoría</label>
-                        <input type="text" id="promptCategory" name="category" class="form-control" required>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="promptName" class="font-weight-semibold">Nombre</label>
-                        <input type="text" id="promptName" name="name" class="form-control" required>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="promptText" class="font-weight-semibold">Prompt</label>
-                        <textarea id="promptText" name="prompt" class="form-control" rows="6" required></textarea>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6 mb-3">
-                            <label for="promptPriority" class="font-weight-semibold">Prioridad (0-100)</label>
-                            <input type="number" id="promptPriority" name="priority" class="form-control" min="0" max="100" value="0" required>
-                        </div>
-                        <div class="form-group col-md-6 mb-3 d-flex align-items-center">
-                            <div class="form-check mt-3">
-                                <input type="checkbox" class="form-check-input" id="promptIsActive" name="is_active" value="1" checked>
-                                <label class="form-check-label" for="promptIsActive">Activo</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save" style="margin-right: 6px;"></i>
-                        Guardar
-                    </button>
-                </div>
-            </form>
-        </div>
+        </form>
     </div>
 </div>
 
 <script>
     window.aiPrompts = @json($prompts ?? []);
-    let promptModalInstance = null;
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const modalElement = document.getElementById('promptModal');
-        if (modalElement && typeof $ !== 'undefined' && typeof $(modalElement).modal === 'function') {
-            // Bootstrap 4 (usado en el layout CRM)
-            promptModalInstance = $(modalElement);
-        }
-    });
+    function openPromptModal() {
+        const overlay = document.getElementById('promptModalOverlay');
+        overlay.style.display = 'flex';
+    }
+
+    function closePromptModal() {
+        document.getElementById('promptModalOverlay').style.display = 'none';
+    }
 
     function openNewPromptModal() {
         document.getElementById('promptModalTitle').innerText = 'Nuevo Prompt';
@@ -168,10 +193,8 @@
         document.getElementById('promptText').value = '';
         document.getElementById('promptPriority').value = 0;
         document.getElementById('promptIsActive').checked = true;
-
-        if (promptModalInstance) {
-            promptModalInstance.modal('show');
-        }
+        syncToggle(true);
+        openPromptModal();
     }
 
     function editPrompt(id) {
@@ -181,7 +204,6 @@
             alert('No se ha encontrado la información de este prompt.');
             return;
         }
-
         document.getElementById('promptModalTitle').innerText = 'Editar Prompt';
         document.getElementById('promptForm').action = '{{ url('crm/ai-assistant/prompts') }}/' + id;
         document.getElementById('promptFormMethod').value = 'PUT';
@@ -190,10 +212,26 @@
         document.getElementById('promptName').value = prompt.name || '';
         document.getElementById('promptText').value = prompt.prompt || '';
         document.getElementById('promptPriority').value = prompt.priority ?? 0;
-        document.getElementById('promptIsActive').checked = !!prompt.is_active;
-
-        if (promptModalInstance) {
-            promptModalInstance.modal('show');
-        }
+        const active = !!prompt.is_active;
+        document.getElementById('promptIsActive').checked = active;
+        syncToggle(active);
+        openPromptModal();
     }
+
+    function toggleActive() {
+        const cb = document.getElementById('promptIsActive');
+        cb.checked = !cb.checked;
+        syncToggle(cb.checked);
+    }
+
+    function syncToggle(active) {
+        const track = document.getElementById('toggleTrack');
+        const thumb = document.getElementById('toggleThumb');
+        track.style.background = active ? '#D93690' : '#d1d5db';
+        thumb.style.left = active ? '22px' : '2px';
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closePromptModal();
+    });
 </script>

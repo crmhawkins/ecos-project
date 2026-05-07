@@ -203,6 +203,13 @@ class ReservasController extends Controller
             'prioridad.in' => 'La prioridad debe ser: baja, media o alta',
         ]);
 
+        $aula = Aulas::find($data['aula_id']);
+        if ($aula && $aula->inactive) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['aula_id' => 'El aula seleccionada está inactiva y no está disponible para reservas.']);
+        }
+
         Reservas::create($data);
 
         return redirect()->route('reservas.index')->with('success', 'Reserva creada exitosamente');

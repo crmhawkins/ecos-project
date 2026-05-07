@@ -32,7 +32,7 @@
     <!-- Style CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     @yield('css')
-    
+
     @if(!empty($contentView))
         @php
             // Renderizar la vista una sola vez y almacenar el contenido en el contenedor de la app

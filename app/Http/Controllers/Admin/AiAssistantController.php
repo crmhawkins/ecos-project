@@ -38,7 +38,7 @@ class AiAssistantController extends Controller
     public function prompts()
     {
         $config = AiAssistantConfig::getActiveConfig();
-        $prompts = AiPrompt::getAllActive();
+        $prompts = AiPrompt::orderBy('priority', 'desc')->get();
         return view('admin.ai-assistant.prompts', compact('config', 'prompts'));
     }
 
@@ -48,7 +48,7 @@ class AiAssistantController extends Controller
     public function links()
     {
         $config = AiAssistantConfig::getActiveConfig();
-        $links = AiLink::getAllActive();
+        $links = AiLink::orderBy('priority', 'desc')->get();
         return view('admin.ai-assistant.links', compact('config', 'links'));
     }
 
@@ -131,7 +131,9 @@ class AiAssistantController extends Controller
         ]);
 
         $prompt = AiPrompt::findOrFail($id);
-        $prompt->update($request->all());
+        $prompt->update(array_merge($request->all(), [
+            'is_active' => $request->boolean('is_active'),
+        ]));
 
         return redirect()->back()->with('success', 'Prompt actualizado correctamente.');
     }
@@ -183,7 +185,9 @@ class AiAssistantController extends Controller
         ]);
 
         $link = AiLink::findOrFail($id);
-        $link->update($request->all());
+        $link->update(array_merge($request->all(), [
+            'is_active' => $request->boolean('is_active'),
+        ]));
 
         return redirect()->back()->with('success', 'Enlace actualizado correctamente.');
     }

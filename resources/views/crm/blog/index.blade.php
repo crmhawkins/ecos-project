@@ -538,8 +538,8 @@
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 
-                                <form method="POST" action="{{ route('crm.blog.destroy', $post->id) }}" 
-                                      style="display: inline;" 
+                                <form method="POST" action="{{ route('crm.blog.destroy', $post->id) }}"
+                                      style="display: contents;"
                                       onsubmit="return confirm('¿Estás seguro de que quieres eliminar este artículo?')">
                                     @csrf
                                     @method('DELETE')

@@ -39,11 +39,11 @@ class CursosTable extends Component
         $query = Cursos::when($buscar, function ($query) use ($buscar) {
                     $query->where(function ($q) use ($buscar) {
                         $q->where('cursos.name', 'like', '%' . $buscar . '%')
-                          ->orWhere('price', 'like', '%' . $buscar . '%');
+                          ->orWhere('cursos.price', 'like', '%' . $buscar . '%');
                     });
                 })
                 ->when($selectedCategoria, function ($query) use ($selectedCategoria) {
-                    $query->where('category_id', $selectedCategoria);
+                    $query->where('cursos.category_id', $selectedCategoria);
                 })
                 ->leftjoin('cursos_category', 'cursos.category_id', '=', 'cursos_category.id')
                 ->select('cursos.*', 'cursos_category.name as categoria_nombre');
@@ -91,12 +91,20 @@ class CursosTable extends Component
         $this->resetPage();
     }
 
+    public function limpiarFiltros()
+    {
+        $this->buscar = '';
+        $this->selectedCategoria = '';
+        $this->perPage = 10;
+        $this->resetPage();
+    }
+
     public function delete($id)
     {
         try {
             $curso = Cursos::findOrFail($id);
             $curso->delete();
-            
+
             session()->flash('success', 'Curso eliminado exitosamente.');
         } catch (\Exception $e) {
             session()->flash('error', 'Error al eliminar el curso: ' . $e->getMessage());
