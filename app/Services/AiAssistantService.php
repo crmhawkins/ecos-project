@@ -408,7 +408,7 @@ class AiAssistantService
             str_contains($msg, 'campus') || str_contains($msg, 'online') || str_contains($msg, 'moodle') || str_contains($msg, 'virtual') => 'campus',
             str_contains($msg, 'inscri') || str_contains($msg, 'matric') || str_contains($msg, 'precio') || str_contains($msg, 'coste') => 'inscripcion',
             str_contains($msg, 'curso') || str_contains($msg, 'formaci')                   => 'courses',
-            str_contains($msg, 'contacto') || str_contains($msg, 'tel') || str_contains($msg, 'email') || str_contains($msg, 'sede') || str_contains($msg, 'direcci') => 'contact',
+            str_contains($msg, 'contacto') || str_contains($msg, 'tel') || str_contains($msg, 'email') || str_contains($msg, 'sede') || str_contains($msg, 'direcci') || str_contains($msg, 'horario') || str_contains($msg, 'donde estai') => 'contact',
             default                                                                        => 'general',
         };
 
