@@ -70,11 +70,8 @@ class AiChat extends Component
         $this->isOpen = !$this->isOpen;
     }
 
-    public function sendMessage($directMessage = null)
+    public function sendMessage()
     {
-        if ($directMessage !== null) {
-            $this->newMessage = $directMessage;
-        }
         if (empty($this->newMessage)) return;
 
         // Añadir mensaje del usuario
