@@ -471,7 +471,7 @@ Route::prefix('crm')->group(function () {
         Route::get('/petition/create', [PetitionController::class, 'create'])->name('peticion.create');
         Route::get('/petition/edit/{id}', [PetitionController::class, 'edit'])->name('peticion.edit');
         Route::post('/petition/store', [PetitionController::class, 'store'])->name('peticion.store');
-        Route::post('/budpetitionget/update/{id}', [PetitionController::class, 'update'])->name('peticion.update');
+        Route::post('/budget-petition/update/{id}', [PetitionController::class, 'update'])->name('peticion.update');
         Route::post('/petition/destroy', [PetitionController::class, 'destroy'])->name('peticion.delete');
 
         Route::get('/order', [OrdenesController::class, 'index'])->name('order.index');

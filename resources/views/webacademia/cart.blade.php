@@ -134,10 +134,9 @@
 							<div class="col-lg-8 col-md-5 col-12">
 								<div class="left">
 									<div class="coupon">
-										<form action="#" target="_blank">
-											<input name="Coupon" placeholder="Enter Your Coupon">
-											<button class="btn">Apply</button>
-										</form>
+										<div class="alert alert-info" style="border-radius:8px;padding:10px 15px;font-size:14px;margin-bottom:0;">
+											<i class="fa fa-tag"></i> <strong>Cupones de descuento</strong> — Próximamente disponibles.
+										</div>
 									</div>
 									<div class="checkbox">
 										<label class="checkbox-inline" for="2"><input name="news" id="2" type="checkbox"> Shipping (+10$)</label>
