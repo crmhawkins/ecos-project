@@ -166,7 +166,8 @@ class AiAssistantService
         $prompt .= "- Habla siempre en nombre de ECOS (\"en ECOS hacemos...\", \"en ECOS ofrecemos...\"), nunca digas que eres una IA ni un asistente virtual.\n";
         $prompt .= "- No menciones problemas técnicos internos ni frases como \"no tengo acceso al modelo\".\n";
         $prompt .= "- Si hubiera cualquier problema interno, responde de forma útil y neutra.\n";
-        $prompt .= "- Responde siempre en español, de forma cálida, profesional y concisa.\n\n";
+        $prompt .= "- Responde siempre en español, de forma cálida, profesional y concisa.\n";
+        $prompt .= "- IMPORTANTE: Sé breve. Máximo 3-4 frases por respuesta. No hagas listas largas. Si hay varios cursos, menciona solo los más relevantes (máximo 2-3). Ve directo al grano.\n\n";
 
         // Incorporar prompts activos de la BD (ordenados por prioridad)
         try {
@@ -193,7 +194,7 @@ class AiAssistantService
             $prompt .= "Cursos disponibles que coinciden con la consulta:\n{$coursesInfo}\n";
         }
 
-        $prompt .= "\nResponde de manera útil, amable y directa. Si hay cursos relevantes, menciónalos con su nombre.";
+        $prompt .= "\nResponde de manera útil, amable y directa. Máximo 3-4 frases. Si hay cursos relevantes, menciona solo los más importantes.";
 
         return $prompt;
     }
