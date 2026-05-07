@@ -190,17 +190,25 @@
                     </div>
                 </template>
 
-                {{-- Indicador "escribiendo..." --}}
-                @if($isLoading)
-                    <div style="display:flex; justify-content:flex-start; gap:8px;">
-                        <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,{{ $config['primary_color'] ?? '#D93690' }},{{ $config['secondary_color'] ?? '#667eea' }}); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; margin-top:4px;">🤖</div>
-                        <div style="padding:14px 18px; border-radius:18px 18px 18px 4px; background:white; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
-                            <div class="typing-indicator">
-                                <span></span><span></span><span></span>
-                            </div>
+                {{-- Burbuja streaming (visible mientras dura sendMessage) --}}
+                <div wire:loading wire:target="sendMessage"
+                     x-data="{ streaming: false }"
+                     x-init="
+                         var el = $el.querySelector('[wire\\:stream]');
+                         if (el) {
+                             new MutationObserver(function() { streaming = el.textContent.length > 0; })
+                                 .observe(el, { childList: true, characterData: true, subtree: true });
+                         }
+                     "
+                     style="display:flex; justify-content:flex-start; gap:8px;">
+                    <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,{{ $config['primary_color'] ?? '#D93690' }},{{ $config['secondary_color'] ?? '#667eea' }}); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; margin-top:4px;">🤖</div>
+                    <div style="max-width:75%; padding:12px 16px; border-radius:18px 18px 18px 4px; background:white; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+                        <div class="typing-indicator" x-show="!streaming">
+                            <span></span><span></span><span></span>
                         </div>
+                        <p wire:stream="streamingMessage" style="margin:0; font-size:14px; line-height:1.6; white-space:pre-wrap;"></p>
                     </div>
-                @endif
+                </div>
             </div>
 
             {{-- Input --}}

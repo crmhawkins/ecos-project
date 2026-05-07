@@ -378,6 +378,74 @@ class AiAssistantService
     }
 
     /**
+     * Procesar mensaje con streaming (chunks en tiempo real via callback)
+     */
+    public function processMessageStreaming($userMessage, $sessionId, $pageUrl, callable $onChunk): array
+    {
+        try {
+            $context      = $this->getPageContext($pageUrl);
+            $coursesInfo  = $this->getCoursesInfo($userMessage);
+            $systemPrompt = $this->buildSystemPrompt($context, $coursesInfo);
+            $history      = $this->getConversationHistory($sessionId);
+            $messages     = $this->prepareMessages($systemPrompt, $history, $userMessage);
+            $prompt       = $this->buildPromptForHawkins($messages);
+
+            $modelo    = $this->config->ai_model ?: 'qwen3-vl:8b-instruct';
+            $ollamaUrl = env('OLLAMA_BASE_URL', 'http://217.160.39.79:11434') . '/api/generate';
+
+            $fullResponse = '';
+
+            $response = Http::withOptions(['stream' => true])
+                ->timeout(120)
+                ->post($ollamaUrl, [
+                    'model'   => $modelo,
+                    'prompt'  => $prompt,
+                    'stream'  => true,
+                    'options' => ['num_predict' => 300, 'temperature' => 0.6],
+                ]);
+
+            if (!$response->successful()) {
+                Log::error('Ollama streaming falló: HTTP ' . $response->status());
+                $errMsg = 'Lo siento, no he podido conectar con el asistente en este momento.';
+                $onChunk($errMsg);
+                $fullResponse = $errMsg;
+            } else {
+                $body   = $response->getBody();
+                $buffer = '';
+                while (!$body->eof()) {
+                    $char = $body->read(1);
+                    if ($char === '') break;
+                    $buffer .= $char;
+                    if (str_ends_with($buffer, "\n")) {
+                        $line   = trim($buffer);
+                        $buffer = '';
+                        if (empty($line)) continue;
+                        $data = json_decode($line, true);
+                        if (isset($data['response']) && $data['response'] !== '') {
+                            $fullResponse .= $data['response'];
+                            $onChunk($data['response']);
+                        }
+                        if ($data['done'] ?? false) break;
+                    }
+                }
+            }
+
+            $this->saveConversation($sessionId, $userMessage, $fullResponse, $pageUrl);
+
+            return [
+                'message' => $fullResponse,
+                'links'   => $this->getRelevantLinks($userMessage),
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Error en AiAssistantService streaming: ' . $e->getMessage());
+            $errMsg = 'Lo siento, ha ocurrido un error. Por favor, inténtalo de nuevo más tarde.';
+            $onChunk($errMsg);
+            return ['message' => $errMsg, 'links' => []];
+        }
+    }
+
+    /**
      * Guardar conversación
      */
     protected function saveConversation($sessionId, $userMessage, $assistantResponse, $pageUrl)
