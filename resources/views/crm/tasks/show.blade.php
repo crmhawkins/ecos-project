@@ -3,9 +3,10 @@
 @section('titulo', 'Detalles de la Tarea')
 
 @section('content')
-<div class="container-fluid">
+<div class="container py-4">
+    <div style="background: white; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); border: 1px solid #f0f0f0; overflow: hidden; margin-bottom: 20px;">
     <!-- Header -->
-    <div style="background: linear-gradient(135deg, #D93690 0%, #8B5CF6 100%); color: white; padding: 40px 0;">
+    <div style="background: linear-gradient(135deg, #D93690 0%, #8B5CF6 100%); color: white; padding: 32px 40px;">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-8">
@@ -146,6 +147,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </div>
 @endsection
