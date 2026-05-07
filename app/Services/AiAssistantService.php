@@ -48,18 +48,10 @@ class AiAssistantService
             $this->config = $fallback;
         }
         $this->apiKey = config('services.openai.api_key', env('OPENAI_API_KEY'));
-        $hawkins = config('services.hawkins_ai', []);
-        $this->hawkinsBaseUrl = rtrim($hawkins['base_url'] ?? '', '/');
-        $this->hawkinsApiKey = $hawkins['api_key'] ?? '';
-        $this->useHawkinsAi = $this->hawkinsBaseUrl !== '' && $this->hawkinsApiKey !== '';
-        if ($this->useHawkinsAi) {
-            Log::channel('single')->debug('AiAssistant: usando Hawkins AI', ['base_url' => $this->hawkinsBaseUrl]);
-        } else {
-            Log::channel('single')->warning('AiAssistant: Hawkins no configurada (base_url o api_key vacío). Se usará OpenAI o mensaje de fallo.', [
-                'base_url_set' => $this->hawkinsBaseUrl !== '',
-                'api_key_set' => $this->hawkinsApiKey !== '',
-            ]);
-        }
+        $this->hawkinsBaseUrl = env('OLLAMA_BASE_URL', 'http://217.160.39.79:11434');
+        $this->hawkinsApiKey = '';
+        $this->useHawkinsAi = true;
+        Log::channel('single')->debug('AiAssistant: usando Ollama', ['url' => $this->hawkinsBaseUrl]);
     }
 
     /**
@@ -240,49 +232,35 @@ class AiAssistantService
     }
 
     /**
-     * Llamar a la API Hawkins (IA local)
-     * POST /chat/chat con {"prompt":"", "modelo":""}, header x-api-key
+     * Llamar a Ollama directamente (217.160.39.79:11434)
      */
     protected function callHawkinsAI(array $messages): string
     {
         $prompt = $this->buildPromptForHawkins($messages);
-        $url = $this->hawkinsBaseUrl . '/chat/chat';
-        $modelo = $this->config->ai_model ?: 'gpt-oss:120b-cloud';
+        $modelo = $this->config->ai_model ?: 'qwen3:latest';
+        $ollamaUrl = env('OLLAMA_BASE_URL', 'http://217.160.39.79:11434') . '/api/generate';
         $mensajeAmigable = 'Lo siento, no he podido conectar con el asistente en este momento. Por favor, inténtalo de nuevo más tarde.';
 
         try {
-            $response = Http::withHeaders([
-                'x-api-key' => $this->hawkinsApiKey,
-                'Content-Type' => 'application/json',
-            ])->timeout(120)->post($url, [
+            $response = Http::timeout(120)->post($ollamaUrl, [
+                'model'  => $modelo,
                 'prompt' => $prompt,
-                'modelo' => $modelo,
+                'stream' => false,
             ]);
 
             if (!$response->successful()) {
-                Log::error('Hawkins AI falló: HTTP ' . $response->status() . '. URL: ' . $url . '. Respuesta: ' . $response->body());
+                Log::error('Ollama falló: HTTP ' . $response->status() . ' — ' . $response->body());
                 return $mensajeAmigable;
             }
 
             $data = $response->json();
-            if (!empty($data['respuesta'])) {
-                return (string) $data['respuesta'];
-            }
-            $fallback = $data['metadata']['message']['content'] ?? null;
-            if ($fallback) {
-                return (string) $fallback;
-            }
-            if (!empty($data['success'])) {
-                Log::warning('Hawkins AI: success=true pero sin campo respuesta ni metadata.message.content');
-                return $mensajeAmigable;
-            }
-            Log::warning('Hawkins AI: respuesta sin contenido válido', ['keys' => $data ? array_keys($data) : [], 'body' => $response->body()]);
-            return $mensajeAmigable;
+            return (string) ($data['response'] ?? $mensajeAmigable);
+
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
-            Log::error('Hawkins AI falló: no se pudo conectar (timeout o red). ' . $e->getMessage());
+            Log::error('Ollama: timeout o sin conexión. ' . $e->getMessage());
             return $mensajeAmigable;
         } catch (\Throwable $e) {
-            Log::error('Hawkins AI falló: excepción. ' . $e->getMessage(), ['exception' => get_class($e)]);
+            Log::error('Ollama: excepción. ' . $e->getMessage());
             return $mensajeAmigable;
         }
     }
