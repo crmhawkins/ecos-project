@@ -110,30 +110,6 @@
             <!-- Sidebar: estadísticas + acciones -->
             <div style="display: flex; flex-direction: column; gap: 20px;">
 
-                <!-- Estadísticas -->
-                <div style="background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #f0f0f0; overflow: hidden;">
-                    <div style="padding: 18px 24px; border-bottom: 1px solid #f0f0f0;">
-                        <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: #111827;">Estadísticas</h3>
-                    </div>
-                    <div style="padding: 24px; display: flex; flex-direction: column; gap: 14px;">
-                        @foreach([
-                            ['empleados',        'fas fa-users',          'Empleados',         '#D93690'],
-                            ['estudiantes',      'fas fa-user-graduate',  'Estudiantes',       '#8B5CF6'],
-                            ['cursos_activos',   'fas fa-graduation-cap', 'Cursos Activos',    '#10b981'],
-                            ['aulas_disponibles','fas fa-chalkboard',     'Aulas Disponibles', '#3b82f6'],
-                        ] as [$name, $icon, $label, $color])
-                        <div>
-                            <label style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
-                                <i class="{{ $icon }}" style="color: {{ $color }};"></i> {{ $label }}
-                            </label>
-                            <input type="number" name="{{ $name }}" min="0" class="form-input"
-                                   value="{{ old($name, $empresa[$name]) }}">
-                            @error($name)<div style="color:#ef4444;font-size:0.8rem;margin-top:4px;">{{ $message }}</div>@enderror
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-
                 <!-- Nota stats automáticas -->
                 <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px;">
                     <div style="display: flex; align-items: center; gap: 8px; color: #16a34a; font-weight: 700; font-size: 0.85rem; margin-bottom: 8px;">
