@@ -408,7 +408,7 @@ Route::prefix('crm')->group(function () {
         //Holidays(Vacaciones Admin)
         Route::get('/holidays/index', [AdminHolidaysController::class, 'index'])->name('holiday.admin.index');
         Route::get('/holidays/admin-create', [AdminHolidaysController::class, 'create'])->name('holiday.admin.create');
-        Route::post('/holidays/store', [AdminHolidaysController::class, 'store'])->name('holiday.admin.store');
+        Route::post('/holidays/admin-store', [AdminHolidaysController::class, 'store'])->name('holiday.admin.store');
         Route::get('/holidays/destroy', [AdminHolidaysController::class, 'destroy'])->name('holiday.admin.destroy');
         Route::get('/holidays/admin-edit/{id}', [AdminHolidaysController::class, 'edit'])->name('holiday.admin.edit');
         Route::post('/holidays/admin-update', [AdminHolidaysController::class, 'update'])->name('holiday.admin.update');

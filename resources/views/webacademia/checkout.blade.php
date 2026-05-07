@@ -34,7 +34,8 @@
 							<h2>Make Your Checkout Here</h2>
 							<p>Please register in order to checkout more quickly</p>
 							<!-- Form -->
-							<form class="form" method="post" action="#">
+							<form class="form" method="post" action="{{ route('checkout') }}">
+								@csrf
 								<div class="row">
 									<div class="col-lg-6 col-md-6 col-12">
 										<div class="form-group">

@@ -79,7 +79,7 @@
 					<div class="comment_form">
 						<h3 class="blog_head_title">Add a Comment</h3>
 						<div class="contact comment-box">
-							<form id="contact-form" method="post" action="{{ route('webacademia.handleContactForm') }}" enctype="multipart/form-data">
+							<form id="contact-form" method="post" action="{{ route('webacademia.contact.form') }}" enctype="multipart/form-data">
 								@csrf
 								<div class="row">
 									<div class="form-group col-md-6">
