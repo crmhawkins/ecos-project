@@ -134,6 +134,14 @@
                     </div>
                 </div>
 
+                <!-- Nota stats automáticas -->
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px;">
+                    <div style="display: flex; align-items: center; gap: 8px; color: #16a34a; font-weight: 700; font-size: 0.85rem; margin-bottom: 8px;">
+                        <i class="fas fa-chart-bar"></i> Estadísticas automáticas
+                    </div>
+                    <p style="margin: 0; color: #15803d; font-size: 0.8rem; line-height: 1.5;">Usuarios, alumnos, cursos y aulas se calculan en tiempo real desde la base de datos. No requieren edición manual.</p>
+                </div>
+
                 <!-- Acciones -->
                 <div style="background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #f0f0f0; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
                     <button type="submit" style="width:100%; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg,#D93690,#8B5CF6); color: white; border: none; cursor: pointer;">
