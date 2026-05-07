@@ -137,6 +137,8 @@
     box-shadow: 0 8px 25px rgba(217, 54, 144, 0.3);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    cursor: pointer;
+    display: inline-block;
 }
 
 .btn_one:hover {

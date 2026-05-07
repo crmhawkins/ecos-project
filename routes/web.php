@@ -161,6 +161,10 @@ Route::get('/index_3', function () {
 });
 
 
+Route::get('/aviso-legal', function () { return view('webacademia.legal.aviso-legal'); })->name('webacademia.aviso-legal');
+Route::get('/politica-privacidad', function () { return view('webacademia.legal.politica-privacidad'); })->name('webacademia.politica-privacidad');
+Route::get('/politica-cookies', function () { return view('webacademia.legal.politica-cookies'); })->name('webacademia.politica-cookies');
+
 Route::get('/weblogin', function () { return view('webacademia.login');});
 Route::post('/weblogin', [WebController::class, 'login'])->name('webacademia.login');
 

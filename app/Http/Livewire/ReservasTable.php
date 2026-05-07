@@ -29,7 +29,11 @@ class ReservasTable extends Component
     protected function actualizarServicios()
     {
         $query = Reservas::when($this->buscar, function ($query) {
-                    $query->where('curso', 'like', '%' . $this->buscar . '%');
+                    $query->where(function ($q) {
+                        $q->where('titulo', 'like', '%' . $this->buscar . '%')
+                          ->orWhere('curso', 'like', '%' . $this->buscar . '%')
+                          ->orWhere('solicitante', 'like', '%' . $this->buscar . '%');
+                    });
                 });
 
         $query->orderBy($this->sortColumn, $this->sortDirection);

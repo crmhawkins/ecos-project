@@ -22,7 +22,7 @@ class Authenticate extends Middleware
         }
 
         // Para rutas de la web academia
-        if ($request->is('weblogin') || $request->is('webregister') || $request->is('perfil') || $request->is('carrito/*')) {
+        if ($request->is('weblogin') || $request->is('webregister') || $request->is('perfil') || $request->is('carrito') || $request->is('carrito/*')) {
             return url('/weblogin');
         }
 

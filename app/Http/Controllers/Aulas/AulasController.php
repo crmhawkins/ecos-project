@@ -63,11 +63,6 @@ class AulasController extends Controller
             'type.in' => 'El tipo de aula no es válido',
         ]);
 
-        // Procesar el equipamiento (convertir array a JSON)
-        if (isset($data['equipment'])) {
-            $data['equipment'] = json_encode($data['equipment']);
-        }
-
         // Mapear los campos del formulario a los campos del modelo
         $aulaData = [
             'name' => $data['name'],
@@ -133,11 +128,6 @@ class AulasController extends Controller
             'status.in' => 'El estado debe ser: disponible, ocupada o mantenimiento',
             'type.in' => 'El tipo de aula no es válido',
         ]);
-
-        // Procesar el equipamiento (convertir array a JSON)
-        if (isset($data['equipment'])) {
-            $data['equipment'] = json_encode($data['equipment']);
-        }
 
         // Mapear los campos del formulario a los campos del modelo
         $aulaData = [

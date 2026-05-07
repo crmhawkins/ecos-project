@@ -422,13 +422,13 @@
                                 <td class="qty" data-title="Qty">
                                     <div class="input-group">
                                         <div class="button minus">
-                                            <button type="button" class="btn btn-primary btn-number" onclick="updateQuantity({{ $item->id }}, {{ $item->cantidad - 1 }})">
+                                            <button type="button" class="btn btn-primary btn-number" onclick="updateQuantity({{ $item->curso_id }}, {{ $item->cantidad - 1 }})">
                                                 <i class="ti-minus"></i>
                                             </button>
                                         </div>
                                         <input type="text" name="quantity" class="input-number" data-min="1" data-max="10" value="{{ $item->cantidad }}" readonly>
                                         <div class="button plus">
-                                            <button type="button" class="btn btn-primary btn-number" onclick="updateQuantity({{ $item->id }}, {{ $item->cantidad + 1 }})">
+                                            <button type="button" class="btn btn-primary btn-number" onclick="updateQuantity({{ $item->curso_id }}, {{ $item->cantidad + 1 }})">
                                                 <i class="ti-plus"></i>
                                             </button>
                                         </div>
@@ -522,24 +522,34 @@
 </div>
 <!--/ End Shopping Cart -->
 
+<form id="qty-form" method="POST" style="display:none;">
+    @csrf
+    <input type="hidden" name="cantidad" id="qty-value">
+</form>
+<form id="remove-form" method="POST" style="display:none;">
+    @csrf
+</form>
+
 <script>
-function updateQuantity(itemId, newQuantity) {
+function updateQuantity(cursoId, newQuantity) {
     if (newQuantity < 1) {
         if (confirm('¿Deseas eliminar este curso del carrito?')) {
-            // Eliminar item
-            window.location.href = `/carrito/eliminar/${itemId}`;
+            var form = document.getElementById('remove-form');
+            form.action = '/carrito/eliminar/' + cursoId;
+            form.submit();
         }
         return;
     }
-    
+
     if (newQuantity > 10) {
         alert('Máximo 10 unidades por curso');
         return;
     }
-    
-    // Aquí podrías implementar AJAX para actualizar la cantidad
-    // Por ahora, recargamos la página
-    window.location.reload();
+
+    var form = document.getElementById('qty-form');
+    form.action = '/carrito/actualizar/' + cursoId;
+    document.getElementById('qty-value').value = newQuantity;
+    form.submit();
 }
 </script>
 

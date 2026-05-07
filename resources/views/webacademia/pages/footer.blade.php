@@ -78,9 +78,9 @@
                 <div class="col-md-6 text-md-end">
                     <div class="footer_menu">
                         <ul class="list-inline mb-0">
-                            <li class="list-inline-item"><a href="#">Aviso legal</a></li>
-                            <li class="list-inline-item"><a href="#">Política de privacidad</a></li>
-                            <li class="list-inline-item"><a href="#">Política de cookies</a></li>
+                            <li class="list-inline-item"><a href="{{ route('webacademia.aviso-legal') }}">Aviso legal</a></li>
+                            <li class="list-inline-item"><a href="{{ route('webacademia.politica-privacidad') }}">Política de privacidad</a></li>
+                            <li class="list-inline-item"><a href="{{ route('webacademia.politica-cookies') }}">Política de cookies</a></li>
                         </ul>
                     </div>
                 </div>

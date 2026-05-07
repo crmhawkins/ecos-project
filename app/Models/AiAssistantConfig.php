@@ -34,7 +34,7 @@ class AiAssistantConfig extends Model
      */
     public static function getActiveConfig()
     {
-        return self::where('is_active', true)->first() ?? self::createDefault();
+        return self::first() ?? self::createDefault();
     }
 
     /**
