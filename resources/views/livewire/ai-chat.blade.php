@@ -192,8 +192,7 @@
 
                 {{-- Burbuja streaming (controlada por Alpine store, no wire:loading) --}}
                 <div x-data x-show="$store.ecosChat.sending" x-cloak
-                     class="ecos-streaming-bubble"
-                     style="display:flex; justify-content:flex-start; gap:8px;">
+                     class="ecos-streaming-bubble">
                     <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,{{ $config['primary_color'] ?? '#D93690' }},{{ $config['secondary_color'] ?? '#667eea' }}); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; margin-top:4px;">🤖</div>
                     <div class="ecos-stream-wrap" style="max-width:75%; padding:12px 16px; border-radius:18px 18px 18px 4px; background:white; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
                         <div class="typing-indicator ecos-stream-dots">
@@ -255,6 +254,7 @@
 
 <style>
 [x-cloak] { display: none !important; }
+.ecos-streaming-bubble { display: flex; justify-content: flex-start; gap: 8px; }
 @keyframes chatSlideIn {
     from { opacity:0; transform: translateY(20px) scale(0.95); }
     to   { opacity:1; transform: translateY(0) scale(1); }
