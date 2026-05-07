@@ -843,6 +843,20 @@ Route::prefix('crm')->group(function () {
         Route::put('/update', [App\Http\Controllers\Empresa\EmpresaController::class, 'update'])->name('update');
     });
 
+    // Portal Clientes
+    Route::prefix('portal')->name('portal.')->group(function () {
+        Route::get('/login', [App\Http\Controllers\Portal\PortalClientesController::class, 'login'])->name('login');
+        Route::post('/login', [App\Http\Controllers\Portal\PortalClientesController::class, 'loginPost'])->name('loginPost');
+        Route::get('/dashboard', [App\Http\Controllers\Portal\PortalClientesController::class, 'dashboard'])->name('dashboard');
+        Route::get('/presupuestos', [App\Http\Controllers\Portal\PortalClientesController::class, 'presupuestos'])->name('presupuestos');
+        Route::get('/facturas', [App\Http\Controllers\Portal\PortalClientesController::class, 'facturas'])->name('facturas');
+        Route::get('/change-pin', [App\Http\Controllers\Portal\PortalClientesController::class, 'changePin'])->name('changePin');
+        Route::post('/set-pin', [App\Http\Controllers\Portal\PortalClientesController::class, 'setPin'])->name('setPin');
+        Route::get('/presupuesto/{id}', [App\Http\Controllers\Portal\PortalClientesController::class, 'showBudget'])->name('showBudget');
+        Route::get('/factura/{id}', [App\Http\Controllers\Portal\PortalClientesController::class, 'showInvoice'])->name('showInvoice');
+        Route::get('/tareas', [App\Http\Controllers\Portal\PortalClientesController::class, 'tareasActivas'])->name('tareasActivas');
+    });
+
     // User Profile Management (GESTIÓN DE PERFIL DE USUARIO)
     Route::prefix('user')->name('user.')->group(function () {
         Route::get('/profile', [App\Http\Controllers\User\ProfileController::class, 'index'])->name('profile');

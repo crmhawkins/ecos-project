@@ -17,7 +17,7 @@
                     <p class="mb-0 mt-2" style="opacity: 0.9;">Detalles de la tarea</p>
                 </div>
                 <div class="col-md-4 text-end">
-                    <a href="{{ route('tarea.index') }}" class="btn btn-light me-2">
+                    <a href="{{ route('tareas.index') }}" class="btn btn-light me-2">
                         <i class="fas fa-arrow-left"></i>
                         Volver a Tareas
                     </a>
