@@ -1,206 +1,160 @@
 @extends('crm.layouts.clean_app')
 
-@section('titulo', 'Editar Información de la Empresa')
+@section('titulo', 'Editar Empresa')
 
 @section('content')
-<div class="container-fluid">
-    <!-- Header -->
-    <div style="background: linear-gradient(135deg, #D93690 0%, #8B5CF6 100%); color: white; padding: 40px 0;">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="mb-0">
-                        <i class="fas fa-edit"></i>
-                        Editar Información de la Empresa
-                    </h1>
-                    <p class="mb-0 mt-2" style="opacity: 0.9;">Actualiza la información corporativa de tu empresa</p>
-                </div>
-                <div class="col-md-4 text-end">
-                    <a href="{{ route('empresa.index') }}" class="btn btn-light">
-                        <i class="fas fa-arrow-left"></i>
-                        Volver
-                    </a>
-                </div>
-            </div>
-        </div>
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #9ca3af;">
+        <a href="{{ route('dashboard') }}" style="color: #9ca3af; text-decoration: none;">Dashboard</a>
+        <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+        <a href="{{ route('empresa.index') }}" style="color: #9ca3af; text-decoration: none;">Empresa</a>
+        <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+        <span style="color: #111827; font-weight: 600;">Editar</span>
     </div>
 
-    <div class="container mt-4">
-        <!-- Mensajes de éxito/error -->
-        @if(session('success'))
-            <div class="alert alert-success" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
-                <i class="fas fa-check-circle"></i>
-                {{ session('success') }}
-            </div>
-        @endif
+    @if(session('success'))
+        <div style="background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.2); padding: 14px 20px; border-radius: 10px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
+        </div>
+    @endif
 
-        @if($errors->any())
-            <div class="alert alert-danger" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
-                <i class="fas fa-exclamation-triangle"></i>
-                <strong>Error:</strong>
-                <ul style="margin: 8px 0 0 0; padding-left: 20px;">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+    @if($errors->any())
+        <div style="background: rgba(239,68,68,0.08); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); padding: 14px 20px; border-radius: 10px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 8px;">
+                <i class="fas fa-exclamation-triangle"></i> Revisa estos campos:
             </div>
-        @endif
+            <ul style="margin: 0; padding-left: 20px;">
+                @foreach($errors->all() as $error)
+                    <li style="font-size: 0.9rem;">{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-        <!-- Formulario -->
-        <div style="background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e5e7eb; overflow: hidden;">
-            <div style="background: #f8fafc; padding: 20px 24px; border-bottom: 1px solid #e5e7eb;">
-                <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: #111827; display: flex; align-items: center; gap: 8px;">
-                    <i class="fas fa-building"></i> Información Corporativa
-                </h3>
-            </div>
-            
-            <form method="POST" action="{{ route('empresa.update') }}" style="padding: 24px;">
-                @csrf
-                @method('PUT')
-                
-                <!-- Información básica -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 32px;">
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label for="nombre" style="font-weight: 600; color: #111827; font-size: 0.9rem;">Nombre de la Empresa *</label>
-                        <input type="text" id="nombre" name="nombre" 
-                               style="padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: white;"
-                               value="{{ old('nombre', $empresa['nombre']) }}" required>
-                        @error('nombre')
-                            <div style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ $message }}</div>
-                        @enderror
+    <form method="POST" action="{{ route('empresa.update') }}">
+        @csrf @method('PUT')
+
+        <div style="display: grid; grid-template-columns: 1fr 280px; gap: 20px; align-items: start;">
+
+            <!-- Columna principal -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+
+                <!-- Información corporativa -->
+                <div style="background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #f0f0f0; overflow: hidden;">
+                    <div style="padding: 18px 24px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg,#D93690,#8B5CF6); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.85rem;">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: #111827;">Información Corporativa</h3>
                     </div>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label for="cif" style="font-weight: 600; color: #111827; font-size: 0.9rem;">CIF *</label>
-                        <input type="text" id="cif" name="cif" 
-                               style="padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: white;"
-                               value="{{ old('cif', $empresa['cif']) }}" required>
-                        @error('cif')
-                            <div style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label for="sector" style="font-weight: 600; color: #111827; font-size: 0.9rem;">Sector *</label>
-                        <input type="text" id="sector" name="sector" 
-                               style="padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: white;"
-                               value="{{ old('sector', $empresa['sector']) }}" required>
-                        @error('sector')
-                            <div style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ $message }}</div>
-                        @enderror
+                    <div style="padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Nombre *</label>
+                            <input type="text" name="nombre" class="form-input" value="{{ old('nombre', $empresa['nombre']) }}" required>
+                            @error('nombre')<div style="color:#ef4444;font-size:0.8rem;margin-top:4px;">{{ $message }}</div>@enderror
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">CIF *</label>
+                            <input type="text" name="cif" class="form-input" value="{{ old('cif', $empresa['cif']) }}" required>
+                            @error('cif')<div style="color:#ef4444;font-size:0.8rem;margin-top:4px;">{{ $message }}</div>@enderror
+                        </div>
+                        <div style="grid-column: span 2;">
+                            <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Sector *</label>
+                            <input type="text" name="sector" class="form-input" value="{{ old('sector', $empresa['sector']) }}" required>
+                            @error('sector')<div style="color:#ef4444;font-size:0.8rem;margin-top:4px;">{{ $message }}</div>@enderror
+                        </div>
+                        <div style="grid-column: span 2;">
+                            <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Descripción *</label>
+                            <textarea name="descripcion" rows="4" class="form-input" style="resize: vertical;" required>{{ old('descripcion', $empresa['descripcion']) }}</textarea>
+                            @error('descripcion')<div style="color:#ef4444;font-size:0.8rem;margin-top:4px;">{{ $message }}</div>@enderror
+                        </div>
                     </div>
                 </div>
 
-                <!-- Descripción -->
-                <div style="margin-bottom: 32px;">
-                    <label for="descripcion" style="font-weight: 600; color: #111827; font-size: 0.9rem; margin-bottom: 8px; display: block;">Descripción de la Empresa *</label>
-                    <textarea id="descripcion" name="descripcion" rows="4" 
-                              style="width: 100%; padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: white; resize: vertical;"
-                              required>{{ old('descripcion', $empresa['descripcion']) }}</textarea>
-                    @error('descripcion')
-                        <div style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ $message }}</div>
-                    @enderror
+                <!-- Contacto -->
+                <div style="background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #f0f0f0; overflow: hidden;">
+                    <div style="padding: 18px 24px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 32px; height: 32px; border-radius: 8px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 0.85rem;">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: #111827;">Contacto y Ubicación</h3>
+                    </div>
+                    <div style="padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div style="grid-column: span 2;">
+                            <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Dirección *</label>
+                            <input type="text" name="direccion" class="form-input" value="{{ old('direccion', $empresa['direccion']) }}" required>
+                            @error('direccion')<div style="color:#ef4444;font-size:0.8rem;margin-top:4px;">{{ $message }}</div>@enderror
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Ciudad *</label>
+                            <input type="text" name="ciudad" class="form-input" value="{{ old('ciudad', $empresa['ciudad']) }}" required>
+                            @error('ciudad')<div style="color:#ef4444;font-size:0.8rem;margin-top:4px;">{{ $message }}</div>@enderror
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Teléfono *</label>
+                            <input type="text" name="telefono" class="form-input" value="{{ old('telefono', $empresa['telefono']) }}" required>
+                            @error('telefono')<div style="color:#ef4444;font-size:0.8rem;margin-top:4px;">{{ $message }}</div>@enderror
+                        </div>
+                        <div style="grid-column: span 2;">
+                            <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Email *</label>
+                            <input type="email" name="email" class="form-input" value="{{ old('email', $empresa['email']) }}" required>
+                            @error('email')<div style="color:#ef4444;font-size:0.8rem;margin-top:4px;">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Información de contacto -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 32px;">
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label for="direccion" style="font-weight: 600; color: #111827; font-size: 0.9rem;">Dirección *</label>
-                        <input type="text" id="direccion" name="direccion" 
-                               style="padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: white;"
-                               value="{{ old('direccion', $empresa['direccion']) }}" required>
-                        @error('direccion')
-                            <div style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label for="ciudad" style="font-weight: 600; color: #111827; font-size: 0.9rem;">Ciudad *</label>
-                        <input type="text" id="ciudad" name="ciudad" 
-                               style="padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: white;"
-                               value="{{ old('ciudad', $empresa['ciudad']) }}" required>
-                        @error('ciudad')
-                            <div style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label for="telefono" style="font-weight: 600; color: #111827; font-size: 0.9rem;">Teléfono *</label>
-                        <input type="text" id="telefono" name="telefono" 
-                               style="padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: white;"
-                               value="{{ old('telefono', $empresa['telefono']) }}" required>
-                        @error('telefono')
-                            <div style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label for="email" style="font-weight: 600; color: #111827; font-size: 0.9rem;">Email *</label>
-                        <input type="email" id="email" name="email" 
-                               style="padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: white;"
-                               value="{{ old('email', $empresa['email']) }}" required>
-                        @error('email')
-                            <div style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
+            </div>
+
+            <!-- Sidebar: estadísticas + acciones -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
 
                 <!-- Estadísticas -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px;">
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label for="empleados" style="font-weight: 600; color: #111827; font-size: 0.9rem;">Empleados</label>
-                        <input type="number" id="empleados" name="empleados" min="0" 
-                               style="padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: white;"
-                               value="{{ old('empleados', $empresa['empleados']) }}">
-                        @error('empleados')
-                            <div style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ $message }}</div>
-                        @enderror
+                <div style="background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #f0f0f0; overflow: hidden;">
+                    <div style="padding: 18px 24px; border-bottom: 1px solid #f0f0f0;">
+                        <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: #111827;">Estadísticas</h3>
                     </div>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label for="estudiantes" style="font-weight: 600; color: #111827; font-size: 0.9rem;">Estudiantes</label>
-                        <input type="number" id="estudiantes" name="estudiantes" min="0" 
-                               style="padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: white;"
-                               value="{{ old('estudiantes', $empresa['estudiantes']) }}">
-                        @error('estudiantes')
-                            <div style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label for="cursos_activos" style="font-weight: 600; color: #111827; font-size: 0.9rem;">Cursos Activos</label>
-                        <input type="number" id="cursos_activos" name="cursos_activos" min="0" 
-                               style="padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: white;"
-                               value="{{ old('cursos_activos', $empresa['cursos_activos']) }}">
-                        @error('cursos_activos')
-                            <div style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label for="aulas_disponibles" style="font-weight: 600; color: #111827; font-size: 0.9rem;">Aulas Disponibles</label>
-                        <input type="number" id="aulas_disponibles" name="aulas_disponibles" min="0" 
-                               style="padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: white;"
-                               value="{{ old('aulas_disponibles', $empresa['aulas_disponibles']) }}">
-                        @error('aulas_disponibles')
-                            <div style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ $message }}</div>
-                        @enderror
+                    <div style="padding: 24px; display: flex; flex-direction: column; gap: 14px;">
+                        @foreach([
+                            ['empleados',        'fas fa-users',          'Empleados',         '#D93690'],
+                            ['estudiantes',      'fas fa-user-graduate',  'Estudiantes',       '#8B5CF6'],
+                            ['cursos_activos',   'fas fa-graduation-cap', 'Cursos Activos',    '#10b981'],
+                            ['aulas_disponibles','fas fa-chalkboard',     'Aulas Disponibles', '#3b82f6'],
+                        ] as [$name, $icon, $label, $color])
+                        <div>
+                            <label style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+                                <i class="{{ $icon }}" style="color: {{ $color }};"></i> {{ $label }}
+                            </label>
+                            <input type="number" name="{{ $name }}" min="0" class="form-input"
+                                   value="{{ old($name, $empresa[$name]) }}">
+                            @error($name)<div style="color:#ef4444;font-size:0.8rem;margin-top:4px;">{{ $message }}</div>@enderror
+                        </div>
+                        @endforeach
                     </div>
                 </div>
 
-                <!-- Botones de acción -->
-                <div style="display: flex; gap: 12px; justify-content: flex-end; padding: 20px 0; border-top: 1px solid #e5e7eb;">
-                    <a href="{{ route('empresa.index') }}" style="padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: none; cursor: pointer; font-size: 0.9rem; background: #6b7280; color: white;">
-                        <i class="fas fa-times"></i>
-                        Cancelar
-                    </a>
-                    <button type="submit" style="padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: none; cursor: pointer; font-size: 0.9rem; background: #D93690; color: white;">
-                        <i class="fas fa-save"></i>
-                        Guardar Cambios
+                <!-- Acciones -->
+                <div style="background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #f0f0f0; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+                    <button type="submit" style="width:100%; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg,#D93690,#8B5CF6); color: white; border: none; cursor: pointer;">
+                        <i class="fas fa-save"></i> Guardar Cambios
                     </button>
+                    <a href="{{ route('empresa.index') }}" style="width:100%; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #e5e7eb; color: #6b7280; background: white; text-decoration: none; box-sizing: border-box;">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
                 </div>
-            </form>
+
+            </div>
         </div>
-    </div>
+    </form>
 </div>
+
+<style>
+.form-input {
+    width: 100%; padding: 11px 14px; border: 1px solid #e5e7eb; border-radius: 8px;
+    font-size: 0.9rem; color: #111827; background: white; transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+.form-input:focus { outline: none; border-color: #8B5CF6; box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
+</style>
 @endsection
