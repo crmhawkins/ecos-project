@@ -86,7 +86,7 @@
                           style="display: flex; gap: 10px; align-items: center;">
                         <input type="text"
                                x-ref="msgInput"
-                               wire:model.defer="newMessage"
+                               wire:model="newMessage"
                                placeholder="Escribe tu mensaje..."
                                style="flex: 1; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 25px; outline: none; font-size: 14px;"
                                onfocus="this.style.borderColor='#D93690'"
@@ -140,8 +140,7 @@ window.aiChatSubmit = function (wire, inputEl) {
         container.appendChild(typingWrap);
         container.scrollTop = container.scrollHeight;
     }
-    wire.set('newMessage', text);
-    wire.call('sendMessage');
+    wire.call('sendMessage', text);
     el.value = '';
 };
 document.addEventListener('livewire:load', function () {
