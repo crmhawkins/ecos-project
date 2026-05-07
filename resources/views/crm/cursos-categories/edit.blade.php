@@ -284,7 +284,7 @@
         
         <div class="form-container">
             <div class="form-header-gradient">
-                <h1><i class="fas fa-edit"></i> Editar Categoría: {{ $categoria->nombre }}</h1>
+                <h1><i class="fas fa-edit"></i> Editar Categoría: {{ $categoria->name }}</h1>
                 <a href="{{ route('cursosCategoria.index') }}" class="btn-back">
                     <i class="fas fa-arrow-left"></i> Volver al Listado
                 </a>
@@ -310,8 +310,8 @@
                 
                 <div class="form-group">
                     <label for="nombre">Nombre de la Categoría <span style="color: red;">*</span></label>
-                    <input type="text" name="nombre" id="nombre" class="form-control" 
-                           value="{{ old('nombre', $categoria->nombre) }}" placeholder="Nombre de la categoría" required>
+                    <input type="text" name="name" id="nombre" class="form-control"
+                           value="{{ old('name', $categoria->name) }}" placeholder="Nombre de la categoría" required>
                 </div>
 
                 <div class="form-group">

@@ -261,8 +261,8 @@
                 
                 <div class="form-group">
                     <label for="nombre">Nombre de la Categoría <span style="color: red;">*</span></label>
-                    <input type="text" name="nombre" id="nombre" class="form-control" 
-                           value="{{ old('nombre') }}" placeholder="Nombre de la categoría" required>
+                    <input type="text" name="name" id="nombre" class="form-control"
+                           value="{{ old('name') }}" placeholder="Nombre de la categoría" required>
                 </div>
 
                 <div class="form-group">

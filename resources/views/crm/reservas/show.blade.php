@@ -552,7 +552,7 @@
                         <div class="stat-item">
                             <div class="stat-number">
                                 @if($reserva->fecha_inicio && $reserva->fecha_fin)
-                                    {{ $reserva->fecha_inicio->diffInDays($reserva->fecha_fin) + 1 }}
+                                    {{ \Carbon\Carbon::parse($reserva->fecha_inicio)->diffInDays(\Carbon\Carbon::parse($reserva->fecha_fin)) + 1 }}
                                 @else
                                     1
                                 @endif
@@ -563,9 +563,13 @@
                             <div class="stat-number">
                                 @if($reserva->hora_inicio && $reserva->hora_fin)
                                     @php
-                                        $inicio = \Carbon\Carbon::createFromFormat('H:i:s', $reserva->hora_inicio);
-                                        $fin = \Carbon\Carbon::createFromFormat('H:i:s', $reserva->hora_fin);
-                                        $horas = $fin->diffInHours($inicio);
+                                        try {
+                                            $inicio = \Carbon\Carbon::parse($reserva->hora_inicio);
+                                            $fin = \Carbon\Carbon::parse($reserva->hora_fin);
+                                            $horas = $fin->diffInHours($inicio);
+                                        } catch (\Throwable $e) {
+                                            $horas = 0;
+                                        }
                                     @endphp
                                     {{ $horas }}h
                                 @else
