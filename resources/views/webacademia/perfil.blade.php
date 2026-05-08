@@ -456,11 +456,7 @@
                 <div class="perfil-card">
                     <h4>🎓 Mis cursos comprados</h4>
                     
-                    @php
-                        $cursosComprados = auth('alumno')->user()->cursos()->with('category')->get();
-                    @endphp
-                    
-                    @forelse($cursosComprados as $curso)
+                    @forelse($cursosInscritos as $curso)
                         <div class="curso-item">
                             <div class="curso-title">{{ $curso->name ?? $curso->title }}</div>
                             
@@ -508,19 +504,19 @@
                     <div class="row text-center">
                         <div class="col-md-3 mb-4">
                             <div style="background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); color: white; padding: 30px 20px; border-radius: 15px; box-shadow: 0 8px 25px rgba(66, 153, 225, 0.3);">
-                                <div style="font-size: 36px; font-weight: 800; margin-bottom: 10px;">{{ $cursosComprados->count() }}</div>
+                                <div style="font-size: 36px; font-weight: 800; margin-bottom: 10px;">{{ $cursosInscritos->count() }}</div>
                                 <div style="font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px;">Cursos Comprados</div>
                             </div>
                         </div>
                         <div class="col-md-3 mb-4">
                             <div style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; padding: 30px 20px; border-radius: 15px; box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);">
-                                <div style="font-size: 36px; font-weight: 800; margin-bottom: 10px;">{{ $cursosComprados->where('pivot.estado', 'activo')->count() }}</div>
+                                <div style="font-size: 36px; font-weight: 800; margin-bottom: 10px;">{{ $cursosInscritos->where('pivot.estado', 'activo')->count() }}</div>
                                 <div style="font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5;">Cursos Activos</div>
                             </div>
                         </div>
                         <div class="col-md-3 mb-4">
                             <div style="background: linear-gradient(135deg, #D93690 0%, #ff6b9d 100%); color: white; padding: 30px 20px; border-radius: 15px; box-shadow: 0 8px 25px rgba(217, 54, 144, 0.3);">
-                                <div style="font-size: 36px; font-weight: 800; margin-bottom: 10px;">{{ $cursosComprados->sum('lecciones') ?: '0' }}</div>
+                                <div style="font-size: 36px; font-weight: 800; margin-bottom: 10px;">{{ $cursosInscritos->sum('lecciones') ?: '0' }}</div>
                                 <div style="font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5;">Lecciones Totales</div>
                             </div>
                         </div>

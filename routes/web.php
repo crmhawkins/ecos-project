@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Alert\AlertController;
 use App\Http\Controllers\Archivos\FileController;
@@ -190,7 +191,11 @@ Route::post('/webregister', [WebController::class, 'register'])->name('webacadem
 Route::post('/weblogout', [WebController::class, 'logout'])->name('webacademia.logout');
 
 Route::middleware(['auth:alumno'])->group(function () {
-    Route::get('/perfil',function () { return view('webacademia.perfil');})->name('webacademia.perfil');
+    Route::get('/perfil', function () {
+        $alumno = Auth::guard('alumno')->user();
+        $cursosInscritos = $alumno->cursos()->with('category')->withPivot('estado', 'created_at')->orderByPivot('created_at', 'desc')->get();
+        return view('webacademia.perfil', compact('cursosInscritos'));
+    })->name('webacademia.perfil');
     Route::put('/perfil', [WebController::class, 'updatePerfil'])->name('webacademia.perfil.update');
     
     Route::prefix('carrito')->name('carrito.')->group(function () {

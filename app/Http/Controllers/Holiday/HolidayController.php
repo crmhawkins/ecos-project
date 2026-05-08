@@ -167,25 +167,22 @@ class HolidayController extends Controller
               );
             }
         }
-        //****** BUG *****
-        // No deja por ejemplo si el usuario tiene el dia 25 y 27 el 26 estando libre
-
-
         // Que no tenga vacaciones ya pedidas ese día o periodo
         foreach($holidaysPetitions as $holidaysPetition ){
-            // Desde
-            $petitionFromToTime = strtotime($holidaysPetition->from);
-            $petitionFromDateTime = new \DateTime();
-            $petitionFromDateTime->setTimestamp($petitionFromToTime);
-            // Hasta
-            $petitionToToTime = strtotime($holidaysPetition->to);
-            $petitionToDateTime = new \DateTime();
-            $petitionToDateTime->setTimestamp($petitionToToTime);
-            $dataToDateTime->modify('-1 day');
-            // Comprobar si están en medio las fechas de ya disponibles
-            $dateFromDateTimeIsBetween = $dataFromDateTime >= $petitionFromDateTime && $dataFromDateTime <= $petitionToDateTime ;
-            $dateToDateTimeIsBetween = $dataToDateTime >= $petitionFromDateTime && $dataToDateTime <= $petitionToDateTime;
+            $petitionFromDateTime = new \DateTime($holidaysPetition->from);
+            $petitionToDateTime   = new \DateTime($holidaysPetition->to);
 
+            // Solapamiento: nuevo rango se superpone con petición existente
+            $dateFromIsBetween = $dataFromDateTime >= $petitionFromDateTime && $dataFromDateTime <= $petitionToDateTime;
+            $dateToIsBetween   = $dataToDateTime   >= $petitionFromDateTime && $dataToDateTime   <= $petitionToDateTime;
+            $rangeCoversAll    = $dataFromDateTime <= $petitionFromDateTime && $dataToDateTime   >= $petitionToDateTime;
+
+            if ($dateFromIsBetween || $dateToIsBetween || $rangeCoversAll) {
+                return redirect()->back()->with('toast', [
+                    'icon'    => 'error',
+                    'mensaje' => 'Ya tienes vacaciones solicitadas en ese período.',
+                ]);
+            }
         }
 
         // Que la/s fecha/s introducidas sean mayor o igual que la actual
