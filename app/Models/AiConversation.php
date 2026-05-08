@@ -23,11 +23,14 @@ class AiConversation extends Model
     /**
      * Obtener conversaciones por sesión
      */
-    public static function getBySession($sessionId)
+    public static function getBySession($sessionId, $limit = 10)
     {
         return self::where('session_id', $sessionId)
-                   ->orderBy('created_at', 'asc')
-                   ->get();
+                   ->orderBy('created_at', 'desc')
+                   ->limit($limit)
+                   ->get()
+                   ->reverse()
+                   ->values();
     }
 
     /**

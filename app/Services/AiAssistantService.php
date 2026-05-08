@@ -162,6 +162,7 @@ class AiAssistantService
         $basePrompt = $this->config->system_prompt;
 
         $prompt = $basePrompt . "\n\n";
+        $prompt .= "Fecha actual: " . now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') . "\n\n";
         $prompt .= "Reglas importantes de estilo de respuesta:\n";
         $prompt .= "- Habla siempre en nombre de ECOS (\"en ECOS hacemos...\", \"en ECOS ofrecemos...\"), nunca digas que eres una IA ni un asistente virtual.\n";
         $prompt .= "- No menciones problemas técnicos internos ni frases como \"no tengo acceso al modelo\".\n";
@@ -275,17 +276,16 @@ class AiAssistantService
      */
     protected function callHawkinsAI(array $messages): string
     {
-        $prompt = $this->buildPromptForHawkins($messages);
         $modelo = $this->config->ai_model ?: 'qwen3:latest';
-        $ollamaUrl = env('OLLAMA_BASE_URL', 'http://217.160.39.79:11434') . '/api/generate';
+        $ollamaUrl = env('OLLAMA_BASE_URL', 'http://217.160.39.79:11434') . '/api/chat';
         $mensajeAmigable = 'Lo siento, no he podido conectar con el asistente en este momento. Por favor, inténtalo de nuevo más tarde.';
 
         try {
             $response = Http::timeout(120)->post($ollamaUrl, [
-                'model'   => $modelo,
-                'prompt'  => $prompt,
-                'stream'  => false,
-                'options' => ['num_predict' => 300, 'temperature' => 0.6],
+                'model'    => $modelo,
+                'messages' => $messages,
+                'stream'   => false,
+                'options'  => ['num_predict' => 300, 'temperature' => 0.6],
             ]);
 
             if (!$response->successful()) {
@@ -294,7 +294,7 @@ class AiAssistantService
             }
 
             $data = $response->json();
-            $responseText = (string) ($data['response'] ?? $mensajeAmigable);
+            $responseText = (string) ($data['message']['content'] ?? $mensajeAmigable);
             return $this->filterThinkingTokens($responseText);
 
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
@@ -306,25 +306,7 @@ class AiAssistantService
         }
     }
 
-    /**
-     * Construir un único prompt para Hawkins a partir de mensajes (system + historial + user)
-     */
-    protected function buildPromptForHawkins(array $messages): string
-    {
-        $parts = [];
-        foreach ($messages as $m) {
-            $role = $m['role'] ?? '';
-            $content = $m['content'] ?? '';
-            if ($role === 'system') {
-                $parts[] = "Instrucciones del sistema:\n" . $content;
-            } elseif ($role === 'user') {
-                $parts[] = "Usuario: " . $content;
-            } elseif ($role === 'assistant') {
-                $parts[] = "Asistente: " . $content;
-            }
-        }
-        return implode("\n\n", $parts);
-    }
+
 
     /**
      * Llamar a la API de OpenAI (solo si no se usa Hawkins)
@@ -407,21 +389,20 @@ class AiAssistantService
             $coursesInfo  = $this->getCoursesInfo($userMessage);
             $systemPrompt = $this->buildSystemPrompt($context, $coursesInfo);
             $history      = $this->getConversationHistory($sessionId);
-            $messages     = $this->prepareMessages($systemPrompt, $history, $userMessage);
-            $prompt       = $this->buildPromptForHawkins($messages);
+            $messages  = $this->prepareMessages($systemPrompt, $history, $userMessage);
 
             $modelo    = $this->config->ai_model ?: 'qwen3:latest';
-            $ollamaUrl = env('OLLAMA_BASE_URL', 'http://217.160.39.79:11434') . '/api/generate';
+            $ollamaUrl = env('OLLAMA_BASE_URL', 'http://217.160.39.79:11434') . '/api/chat';
 
             $fullResponse = '';
 
             $response = Http::withOptions(['stream' => true])
                 ->timeout(120)
                 ->post($ollamaUrl, [
-                    'model'   => $modelo,
-                    'prompt'  => $prompt,
-                    'stream'  => true,
-                    'options' => ['num_predict' => 300, 'temperature' => 0.6],
+                    'model'    => $modelo,
+                    'messages' => $messages,
+                    'stream'   => true,
+                    'options'  => ['num_predict' => 300, 'temperature' => 0.6],
                 ]);
 
             if (!$response->successful()) {
@@ -443,9 +424,10 @@ class AiAssistantService
                         $line = trim($line);
                         if (empty($line)) continue;
                         $data = json_decode($line, true);
-                        if (isset($data['response']) && $data['response'] !== '') {
-                            $fullResponse .= $data['response'];
-                            $onChunk($data['response']);
+                        $token = $data['message']['content'] ?? '';
+                        if ($token !== '') {
+                            $fullResponse .= $token;
+                            $onChunk($token);
                         }
                         if ($data['done'] ?? false) break 2;
                     }
