@@ -14,6 +14,7 @@ use App\Models\Users\UserDepartament;
 use App\Models\Users\UserPosition;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -192,6 +193,12 @@ class UserController extends Controller
             'admin_user_department_id.exists' => 'El departamento debe ser valido y es requerido para continuar',
             'admin_user_position_id.exists' => 'La posicion debe ser valido y es requerido para continuar',
         ]);
+
+        $authUser = Auth::user();
+        // Solo admin (departamento 1) puede editar a otros usuarios
+        if ((int)$authUser->id !== (int)$id && (int)$authUser->admin_user_department_id !== 1) {
+            abort(403, 'No tienes permiso para editar este usuario.');
+        }
 
         $user = User::findOrFail($id); // Buscar el usuario existente
 

@@ -32,16 +32,18 @@ class BackupController extends Controller
         $filename = 'backup_' . date('Y-m-d_H-i-s') . '.sql';
 
         $command = sprintf(
-            'mysqldump --host=%s --port=%s --user=%s --password=%s %s',
+            'mysqldump --host=%s --port=%s --user=%s %s',
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
-            escapeshellarg($password),
             escapeshellarg($database)
         );
 
-        return response()->stream(function () use ($command) {
+        return response()->stream(function () use ($command, $password) {
+            // MYSQL_PWD evita exponer la contraseña en argumentos de proceso
+            putenv('MYSQL_PWD=' . $password);
             passthru($command);
+            putenv('MYSQL_PWD=');
         }, 200, [
             'Content-Type'        => 'application/octet-stream',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',

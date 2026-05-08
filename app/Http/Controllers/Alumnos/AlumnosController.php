@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Alumnos;
 
 use App\Http\Controllers\Controller;
 use App\Models\Alumnos\Alumno;
+use App\Modules\Moodle\Services\MoodleUserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AlumnosController extends Controller
 {
@@ -148,12 +150,24 @@ class AlumnosController extends Controller
      */
     public function syncMoodle(Alumno $alumno)
     {
-        // Aquí iría la lógica para sincronizar con Moodle
-        // Por ahora solo simulamos la sincronización
-        
-        $alumno->update(['moodle_id' => rand(1000, 9999)]);
+        try {
+            $userService = app(MoodleUserService::class);
+            $moodleUserId = $userService->createOrUpdateUser([
+                'username'  => $alumno->username,
+                'firstname' => $alumno->name,
+                'lastname'  => $alumno->surname,
+                'email'     => $alumno->email,
+            ]);
 
-        return redirect()->back()
-                        ->with('success', 'Alumno sincronizado con Moodle exitosamente.');
+            if ($moodleUserId) {
+                $alumno->update(['moodle_id' => $moodleUserId]);
+                return redirect()->back()->with('success', 'Alumno sincronizado con Moodle exitosamente.');
+            }
+
+            return redirect()->back()->with('error', 'Moodle no devolvió un ID válido.');
+        } catch (\Exception $e) {
+            Log::error('syncMoodle alumno ' . $alumno->id . ': ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al sincronizar con Moodle: ' . $e->getMessage());
+        }
     }
 }
