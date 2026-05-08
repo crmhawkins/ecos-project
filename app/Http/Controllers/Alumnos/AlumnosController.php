@@ -85,8 +85,6 @@ class AlumnosController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $validated['password'] = Hash::make($validated['password']);
-
         Alumno::create($validated);
 
         return redirect()->route('crm.alumnos.index')
@@ -124,9 +122,7 @@ class AlumnosController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
-        if (!empty($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        } else {
+        if (empty($validated['password'])) {
             unset($validated['password']);
         }
 

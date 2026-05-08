@@ -1,7 +1,7 @@
 {
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"git rebase --abort && git pull origin main --no-rebase && git log --oneline -3\",\"description\":\"Abortar rebase y hacer merge normal\"}",
-  "error": "Exit code 1\nFrom https://github.com/crmhawkins/ecos-project\n * branch            main       -> FETCH_HEAD\nAuto-merging app/Http/Controllers/Alumnos/AlumnosController.php\nAuto-merging app/Http/Controllers/Web/WebController.php\nAuto-merging app/Http/Livewire/CursosCategoriesTable.php\nAuto-merging app/Http/Livewire/CursosTable.php\nCONFLICT (content): Merge conflict in app/Http/Livewire/CursosTable.php\nAuto-merging app/Http/Middleware/Authenticate.php\nCONFLICT (content): Merge conflict in app/Http/M...",
-  "timestamp": "2026-05-07T15:23:57.298Z",
-  "retry_count": 3
+  "tool_name": "Read",
+  "tool_input_preview": "{\"file_path\":\"C:\\\\Users\\\\Dani-Mefle\\\\Documents\\\\GitHub\\\\ecos-project\\\\resources\\\\views\\\\webacademia\\\\pages\\\\index.blade.php\"}",
+  "error": "File content (33724 tokens) exceeds maximum allowed tokens (25000). Use offset and limit parameters to read specific portions of the file, or search for specific content instead of reading the whole file.",
+  "timestamp": "2026-05-08T08:41:36.189Z",
+  "retry_count": 1
 }

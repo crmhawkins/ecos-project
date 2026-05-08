@@ -929,6 +929,9 @@ body.modal-open {
     </div>
 </div>
 
+<!-- SweetAlert2 para mejores alertas -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 // Función mejorada para seleccionar método de pago
 function selectPayment(method) {
@@ -1097,9 +1100,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.style.paddingRight = '';
 });
 </script>
-
-<!-- SweetAlert2 para mejores alertas -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <!-- Script para limpiar modales inmediatamente -->
 <script>

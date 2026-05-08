@@ -411,26 +411,63 @@ class AiAssistantService
                 $onChunk($errMsg);
                 $fullResponse = $errMsg;
             } else {
-                $body   = $response->getBody();
-                $buffer = '';
+                $body          = $response->getBody();
+                $buffer        = '';
+                $inThink       = false;
+                $pendingOutput = '';
+
                 while (!$body->eof()) {
                     $chunk = $body->read(4096);
                     if ($chunk === '') break;
                     $buffer .= $chunk;
-                    $lines = explode("\n", $buffer);
-                    // El último elemento puede estar incompleto: lo guardamos para la siguiente iteración.
+                    $lines  = explode("\n", $buffer);
                     $buffer = array_pop($lines);
                     foreach ($lines as $line) {
                         $line = trim($line);
                         if (empty($line)) continue;
-                        $data = json_decode($line, true);
+                        $data  = json_decode($line, true);
                         $token = $data['message']['content'] ?? '';
                         if ($token !== '') {
-                            $fullResponse .= $token;
-                            $onChunk($token);
+                            $fullResponse  .= $token;
+                            $pendingOutput .= $token;
+
+                            // Strip <think>...</think> from pending output before forwarding
+                            while (true) {
+                                if (!$inThink) {
+                                    $pos = strpos($pendingOutput, '<think>');
+                                    if ($pos === false) {
+                                        // Safe to emit everything except last 6 chars (partial tag guard)
+                                        $safeLen = max(0, strlen($pendingOutput) - 6);
+                                        if ($safeLen > 0) {
+                                            $onChunk(substr($pendingOutput, 0, $safeLen));
+                                            $pendingOutput = substr($pendingOutput, $safeLen);
+                                        }
+                                        break;
+                                    }
+                                    if ($pos > 0) {
+                                        $onChunk(substr($pendingOutput, 0, $pos));
+                                    }
+                                    $pendingOutput = substr($pendingOutput, $pos + 7);
+                                    $inThink       = true;
+                                } else {
+                                    $pos = strpos($pendingOutput, '</think>');
+                                    if ($pos === false) {
+                                        $discardLen    = max(0, strlen($pendingOutput) - 8);
+                                        $pendingOutput = substr($pendingOutput, $discardLen);
+                                        break;
+                                    }
+                                    $pendingOutput = substr($pendingOutput, $pos + 8);
+                                    $inThink       = false;
+                                }
+                            }
                         }
                         if ($data['done'] ?? false) break 2;
                     }
+                }
+
+                // Flush any remaining safe output
+                if (!$inThink && $pendingOutput !== '') {
+                    $onChunk($pendingOutput);
                 }
             }
 
