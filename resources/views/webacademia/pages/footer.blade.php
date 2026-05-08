@@ -4,7 +4,7 @@
 			<div class="row">
 				<div class="col-lg-3 col-sm-6 col-xs-12">
 					<div class="single_footer">
-						<a href="index"><img src="assets/images/all-img/logo2.png" alt=""></a>
+						<a href="{{ url('/') }}"><img src="assets/images/all-img/logo2.png" alt="ECOS Formación"></a>
                         <p>Centro de formación con más de 28 años de experiencia. Formación para el empleo, oposiciones y certificados de profesionalidad en Ceuta, Estepona y Melilla.</p>
 					</div>
 				</div><!--- END COL -->
