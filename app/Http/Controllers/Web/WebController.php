@@ -449,13 +449,13 @@ class WebController extends Controller
             foreach ($carrito as $item) {
                 try {
                     // Matricular en el curso de Moodle
-                    if ($item->curso->moodle_course_id) {
+                    if ($item->curso->moodle_id) {
                         $enrollmentService->enrollUser(
                             $moodleUserId,
-                            $item->curso->moodle_course_id,
+                            $item->curso->moodle_id,
                             5 // Rol de estudiante
                         );
-                        $enrolledCourses[] = $item->curso->title;
+                        $enrolledCourses[] = $item->curso->name;
                     }
 
                     // Registrar la compra en la base de datos
@@ -471,7 +471,7 @@ class WebController extends Controller
 
                 } catch (\Exception $e) {
                     Log::error("Error al matricular usuario {$user->id} en curso {$item->curso->id}: " . $e->getMessage());
-                    $failedEnrollments[] = $item->curso->title;
+                    $failedEnrollments[] = $item->curso->name;
                 }
             }
 

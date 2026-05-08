@@ -836,9 +836,11 @@ class AdminController extends Controller
 
             // Filtros básicos por campo directo
             if ($search) {
-                $query->where("certificate_id", "like", "%{$search}%")
-                    ->orWhere("user_id", "like", "%{$search}%")
-                    ->orWhere("course_id", "like", "%{$search}%");
+                $query->where(function ($q) use ($search) {
+                    $q->where("certificate_id", "like", "%{$search}%")
+                      ->orWhere("user_id", "like", "%{$search}%")
+                      ->orWhere("course_id", "like", "%{$search}%");
+                });
             }
 
             if ($selectedCourseId) {
@@ -943,9 +945,9 @@ class AdminController extends Controller
 
         $request->merge([
             'cache_enabled' => $request->has('cache_enabled') ? 1 : 0,
-            'auto_create_users' => $request->has('cache_enabled') ? 1 : 0,
-            'auto_update_users' => $request->has('cache_enabled') ? 1 : 0,
-            'auto_enroll' => $request->has('cache_enabled') ? 1 : 0,
+            'auto_create_users' => $request->has('auto_create_users') ? 1 : 0,
+            'auto_update_users' => $request->has('auto_update_users') ? 1 : 0,
+            'auto_enroll' => $request->has('auto_enroll') ? 1 : 0,
         ]);
         $validated = $request->validate([
             "url" => "required|url",
@@ -1018,16 +1020,23 @@ class AdminController extends Controller
         try {
             $ok = $this->apiService->testConnection();
             if ($ok) {
-                $siteInfo = $ok ? $this->apiService->getSiteInfo() : null;
+                $siteInfo = $this->apiService->getSiteInfo();
                 return response()->json([
                     'success' => true,
                     'message' => 'Conexión exitosa con Moodle.',
                     'site' => $siteInfo
                 ]);
             }
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo conectar con Moodle.'
+            ], 503);
         } catch (Exception $e) {
-            Log::error("Admin Dashboard Error: {" . $e->getMessage() . "}");
-            return view("moodle::admin.dashboard", ["connectionStatus" => false, "error" => "Error al conectar con Moodle: " . $e->getMessage()]);
+            Log::error("Admin testConnection Error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
         }
     }
 

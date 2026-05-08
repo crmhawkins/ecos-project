@@ -190,6 +190,27 @@ class AiAssistantService
             $prompt .= "Contexto de navegación actual: {$context}\n";
         }
 
+        // Si no hubo coincidencias, incluir igualmente los cursos destacados
+        // para que la IA siempre tenga contexto de productos de ECOS.
+        if (!$coursesInfo) {
+            try {
+                $topCourses = \App\Models\Cursos\Cursos::where('inactive', 0)
+                    ->where('published', 1)
+                    ->whereNotNull('moodle_id')
+                    ->orderBy('created_at', 'desc')
+                    ->limit(5)
+                    ->get();
+                if ($topCourses->count() > 0) {
+                    $coursesInfo = "Algunos cursos destacados disponibles:\n";
+                    foreach ($topCourses as $c) {
+                        $coursesInfo .= "- {$c->name}" . ($c->price ? " ({$c->price}€)" : '') . "\n";
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Silencioso si la BD no está disponible
+            }
+        }
+
         if ($coursesInfo) {
             $prompt .= "Cursos disponibles que coinciden con la consulta:\n{$coursesInfo}\n";
         }
@@ -273,7 +294,8 @@ class AiAssistantService
             }
 
             $data = $response->json();
-            return (string) ($data['response'] ?? $mensajeAmigable);
+            $responseText = (string) ($data['response'] ?? $mensajeAmigable);
+            return $this->filterThinkingTokens($responseText);
 
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             Log::error('Ollama: timeout o sin conexión. ' . $e->getMessage());
@@ -334,47 +356,45 @@ class AiAssistantService
     }
 
     /**
-     * Listar modelos disponibles en la API Hawkins (GET /chat/models)
+     * Listar modelos disponibles en Ollama (GET /api/tags)
      */
     public function getAvailableModels(): array
     {
         if (!$this->useHawkinsAi) {
             return [];
         }
-        $url = $this->hawkinsBaseUrl . '/chat/models';
+        $url = rtrim(env('OLLAMA_BASE_URL', 'http://217.160.39.79:11434'), '/') . '/api/tags';
         try {
             $response = Http::withHeaders([
-                'x-api-key' => $this->hawkinsApiKey,
                 'Accept' => 'application/json',
             ])->timeout(10)->get($url);
 
             if (!$response->successful()) {
-                Log::warning('Hawkins AI models request failed', ['status' => $response->status()]);
+                Log::warning('Ollama models request failed', ['status' => $response->status()]);
                 return [];
             }
 
             $data = $response->json();
-            if (is_array($data) && isset($data['models']) && is_array($data['models'])) {
-                return array_values($data['models']);
+            if (isset($data['models']) && is_array($data['models'])) {
+                return array_values(array_map(fn($m) => $m['name'] ?? (string) $m, $data['models']));
             }
-            if (is_array($data) && isset($data['data']) && is_array($data['data'])) {
-                $list = [];
-                foreach ($data['data'] as $item) {
-                    $list[] = is_string($item) ? $item : ($item['id'] ?? $item['name'] ?? (string) $item);
-                }
-                return $list;
-            }
-            if (is_array($data) && array_is_list($data)) {
-                $list = [];
-                foreach ($data as $item) {
-                    $list[] = is_string($item) ? $item : ($item['id'] ?? $item['name'] ?? (string) $item);
-                }
-                return $list;
-            }
+            return [];
         } catch (\Throwable $e) {
-            Log::warning('Hawkins AI getAvailableModels error: ' . $e->getMessage());
+            Log::warning('Ollama getAvailableModels error: ' . $e->getMessage());
         }
         return [];
+    }
+
+    /**
+     * Filtrar bloques <think>...</think> emitidos por modelos como qwen3.
+     */
+    private function filterThinkingTokens(string $text): string
+    {
+        // Eliminar bloques <think>...</think> completos (multiline)
+        $text = preg_replace('/<think>[\s\S]*?<\/think>/i', '', $text);
+        // Eliminar <think> sin cerrar al inicio si queda
+        $text = preg_replace('/^<think>[\s\S]*/i', '', $text);
+        return trim($text);
     }
 
     /**
@@ -390,7 +410,7 @@ class AiAssistantService
             $messages     = $this->prepareMessages($systemPrompt, $history, $userMessage);
             $prompt       = $this->buildPromptForHawkins($messages);
 
-            $modelo    = $this->config->ai_model ?: 'qwen3-vl:8b-instruct';
+            $modelo    = $this->config->ai_model ?: 'qwen3:latest';
             $ollamaUrl = env('OLLAMA_BASE_URL', 'http://217.160.39.79:11434') . '/api/generate';
 
             $fullResponse = '';
@@ -413,22 +433,27 @@ class AiAssistantService
                 $body   = $response->getBody();
                 $buffer = '';
                 while (!$body->eof()) {
-                    $char = $body->read(1);
-                    if ($char === '') break;
-                    $buffer .= $char;
-                    if (str_ends_with($buffer, "\n")) {
-                        $line   = trim($buffer);
-                        $buffer = '';
+                    $chunk = $body->read(4096);
+                    if ($chunk === '') break;
+                    $buffer .= $chunk;
+                    $lines = explode("\n", $buffer);
+                    // El último elemento puede estar incompleto: lo guardamos para la siguiente iteración.
+                    $buffer = array_pop($lines);
+                    foreach ($lines as $line) {
+                        $line = trim($line);
                         if (empty($line)) continue;
                         $data = json_decode($line, true);
                         if (isset($data['response']) && $data['response'] !== '') {
                             $fullResponse .= $data['response'];
                             $onChunk($data['response']);
                         }
-                        if ($data['done'] ?? false) break;
+                        if ($data['done'] ?? false) break 2;
                     }
                 }
             }
+
+            // Filtrar bloques <think> antes de guardar la conversación
+            $fullResponse = $this->filterThinkingTokens($fullResponse);
 
             $this->saveConversation($sessionId, $userMessage, $fullResponse, $pageUrl);
 
@@ -476,7 +501,7 @@ class AiAssistantService
             str_contains($msg, 'seguridad') || str_contains($msg, 'vigilant')              => 'seguridad',
             str_contains($msg, 'certificado') || str_contains($msg, 'profesionalidad')     => 'certificados',
             str_contains($msg, 'campus') || str_contains($msg, 'online') || str_contains($msg, 'moodle') || str_contains($msg, 'virtual') => 'campus',
-            str_contains($msg, 'inscri') || str_contains($msg, 'matric') || str_contains($msg, 'precio') || str_contains($msg, 'coste') => 'inscripcion',
+            str_contains($msg, 'inscri') || str_contains($msg, 'matric') || str_contains($msg, 'precio') || str_contains($msg, 'coste') || str_contains($msg, 'cuánto') || str_contains($msg, 'cuanto') || str_contains($msg, 'pagar') => 'inscripcion',
             str_contains($msg, 'curso') || str_contains($msg, 'formaci')                   => 'courses',
             str_contains($msg, 'contacto') || str_contains($msg, 'tel') || str_contains($msg, 'email') || str_contains($msg, 'sede') || str_contains($msg, 'direcci') || str_contains($msg, 'horario') || str_contains($msg, 'donde estai') => 'contact',
             default                                                                        => 'general',
