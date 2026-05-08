@@ -4,7 +4,7 @@
             <!-- Logo -->
             <div class="col-6 col-md-3 col-lg-2">
                 <div class="site-logo">
-                    <a href="{{ url('index') }}">
+                    <a href="{{ url('/') }}">
                         <img src="/assets/images/all-img/logo.png" alt="logo" id="ima3" />
                     </a>
                 </div>

@@ -870,7 +870,7 @@ Route::prefix('crm')->group(function () {
 });
 
 // Rutas del Asistente de IA
-Route::prefix('api/ai-assistant')->group(function () {
+Route::prefix('api/ai-assistant')->middleware('throttle:30,1')->group(function () {
     Route::post('/send-message', [AiAssistantController::class, 'sendMessage'])->name('ai.send-message');
     Route::get('/config', [AiAssistantController::class, 'getConfig'])->name('ai.config');
     Route::get('/models', [AiAssistantController::class, 'getModels'])->name('ai.models');

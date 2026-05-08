@@ -155,9 +155,6 @@ class DashboardController extends Controller
                 $budgets = Budget::where('admin_user_id',$id)->get();
                 $projects = Project::where('admin_user_id',$id)->get();
                 $tareas = Task::where('gestor_id',$id)->get();
-                $ingresos = 0;
-                $gastos = 0;
-                $gastosAsociados = 0;
 
 
                 return view('crm.dashboards.dashboard', compact(
@@ -472,8 +469,9 @@ class DashboardController extends Controller
         }
     }
     public function parseFlexibleTime($time) {
-        list($hours, $minutes, $seconds) = explode(':', $time);
-        return ($hours * 60) + $minutes + ($seconds / 60); // Convert to total minutes
+        if (!$time || !str_contains($time, ':')) return 0;
+        list($hours, $minutes, $seconds) = array_pad(explode(':', $time), 3, 0);
+        return ($hours * 60) + $minutes + ($seconds / 60);
     }
 
     public function tiempoProducidoMes($id)

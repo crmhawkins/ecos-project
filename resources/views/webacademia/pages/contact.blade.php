@@ -71,7 +71,8 @@
             <div class="col-lg-8">
                 <div style="background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%); border-radius: 20px; padding: 50px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
                     <h2 style="color: #D93690; font-weight: 700; margin-bottom: 30px; text-align: center; font-size: 2rem;">Envíanos tu mensaje</h2>
-                    <form class="form" name="enq" method="post" action="contact.php" onsubmit="return validation();">
+                    <form class="form" name="enq" method="post" action="{{ route('webacademia.contact.form') }}">
+                        @csrf
                         <div class="row">
                             <div style="margin-bottom: 25px;" class="col-md-6">
                                 <label for="name" style="color: #333; font-weight: 600; margin-bottom: 8px; display: block;">Nombre</label>
