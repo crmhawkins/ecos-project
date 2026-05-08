@@ -352,11 +352,9 @@ main {
             </div>
             <div class="col-lg-4">
                 <div class="course-image">
-                    @if($curso->image && file_exists(storage_path('app/public/' . $curso->image)))
-                        <img src="{{ asset('storage/' . $curso->image) }}" alt="{{ $curso->title ?? $curso->name }}">
-                    @else
-                        <img src="{{ asset('assets/images/default-course.svg') }}" alt="Curso por defecto">
-                    @endif
+                    <img src="{{ $curso->image ? asset('storage/' . $curso->image) : asset('assets/images/default-course.svg') }}"
+                         alt="{{ $curso->title ?? $curso->name }}"
+                         onerror="this.src='{{ asset('assets/images/default-course.svg') }}'">
                 </div>
             </div>
         </div>
@@ -559,11 +557,9 @@ main {
                 <div class="col-lg-4 col-md-6 col-sm-12 d-flex">
                     <div class="course-card w-100">
                         <div class="course-image-container" style="position: relative; overflow: hidden;">
-                            @if($cursoRelacionado->image && file_exists(storage_path('app/public/' . $cursoRelacionado->image)))
-                                <img src="{{ asset('storage/' . $cursoRelacionado->image) }}" alt="{{ $cursoRelacionado->title ?? $cursoRelacionado->name }}">
-                            @else
-                                <img src="{{ asset('assets/images/default-course.svg') }}" alt="Curso por defecto">
-                            @endif
+                            <img src="{{ $cursoRelacionado->image ? asset('storage/' . $cursoRelacionado->image) : asset('assets/images/default-course.svg') }}"
+                                 alt="{{ $cursoRelacionado->title ?? $cursoRelacionado->name }}"
+                                 onerror="this.src='{{ asset('assets/images/default-course.svg') }}'">
                             
                             @if($cursoRelacionado->certificado)
                                 <div style="position: absolute; top: 15px; right: 15px;">

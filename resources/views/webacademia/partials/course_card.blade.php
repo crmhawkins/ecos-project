@@ -6,11 +6,10 @@
      data-course-category="{{ $curso->category->name ?? 'General' }}">
     <div class="course-card" style="border-radius: 15px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.1); width: 100%; display: flex; flex-direction: column; background: #fff; transition: all 0.3s ease;">
         <div class="course-img" style="height: 220px; overflow: hidden; position: relative;">
-            @if($curso->image && file_exists(storage_path('app/public/' . $curso->image)))
-                <img src="{{ asset('storage/' . $curso->image) }}" alt="{{ $curso->name }}" style="width: 100%; height: 100%; object-fit: cover;">
-            @else
-                <img src="{{ asset('assets/images/default-course.svg') }}" alt="Curso por defecto" style="width: 100%; height: 100%; object-fit: cover;">
-            @endif
+            <img src="{{ $curso->image ? asset('storage/' . $curso->image) : asset('assets/images/default-course.svg') }}"
+                 alt="{{ $curso->name }}"
+                 style="width: 100%; height: 100%; object-fit: cover;"
+                 onerror="this.src='{{ asset('assets/images/default-course.svg') }}'">
             
             <!-- Precio (siempre desde la BD para mantener consistencia) -->
             <div class="course-price" style="position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.95); color: #333; padding: 8px 15px; border-radius: 20px; font-weight: 600; font-size: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
