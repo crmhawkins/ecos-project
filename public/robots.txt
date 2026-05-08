@@ -1,2 +1,6 @@
 User-agent: *
-Disallow:
+Disallow: /crm/
+Disallow: /api/
+Disallow: /storage/
+Disallow: /builder/
+Sitemap: https://ecos.hawkins.es/sitemap.xml
