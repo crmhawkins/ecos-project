@@ -1,6 +1,7 @@
 @extends('webacademia.layouts.web_layout')
 
-@section('title', 'Blog')
+@section('title', 'Noticias y Blog')
+@section('description', 'Últimas noticias, convocatorias y artículos sobre formación, oposiciones y empleo de Grupo ECOS.')
 
 @section('css')
 <style>

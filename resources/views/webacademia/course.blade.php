@@ -1,6 +1,7 @@
 @extends('webacademia.layouts.web_layout')
 
-@section('title', 'Course')
+@section('title', 'Cursos de Formación')
+@section('description', 'Explora nuestra oferta de cursos: formación para el empleo, oposiciones y certificados de profesionalidad en Ceuta, Estepona y Melilla.')
 
 @section('css')
 

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Default Title') - Grupo Ecos</title>
+    <title>@yield('title', 'Centro de Formación ECOS') - Grupo Ecos</title>
+    <meta name="description" content="@yield('description', 'Centro de formación con más de 28 años de experiencia. Cursos de empleo, oposiciones y certificados de profesionalidad en Ceuta, Estepona y Melilla.')">
     <!-- Latest Bootstrap min CSS -->
     <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}">
     <!-- Google Font -->

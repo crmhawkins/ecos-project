@@ -1,6 +1,7 @@
 @extends('webacademia.layouts.web_layout')
 
-@section('title', 'Contact')
+@section('title', 'Contacto')
+@section('description', 'Contacta con Grupo ECOS. Estamos en Ceuta, Estepona y Melilla. Infórmate sobre nuestros cursos de formación y oposiciones.')
 
 @section('css')
 @endsection
