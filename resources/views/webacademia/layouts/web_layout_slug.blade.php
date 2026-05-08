@@ -12,7 +12,8 @@
     @if (View::exists($seoView))
         @include($seoView)
     @endif
-    <title>Grupo Ecos</title>
+    <title>@yield('title', 'Centro de Formación ECOS') - Grupo Ecos</title>
+    <meta name="description" content="@yield('description', 'Centro de formación con más de 28 años de experiencia. Cursos de empleo, oposiciones y certificados de profesionalidad en Ceuta, Estepona y Melilla.')">
     <!-- Latest Bootstrap min CSS -->
     <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}">
     <!-- Google Font -->
