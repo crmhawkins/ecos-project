@@ -137,6 +137,12 @@
                         </div>
                     @endif
 
+                    @if(session('warning'))
+                        <div class="alert alert-warning mt-3">
+                            <i class="fa fa-exclamation-triangle"></i> {{ session('warning') }}
+                        </div>
+                    @endif
+
                     <div class="next-steps">
                         <h4 class="mb-4">¿Qué sigue ahora?</h4>
                         

@@ -204,7 +204,10 @@ Route::middleware(['auth:alumno'])->group(function () {
         return view('webacademia.perfil', compact('cursosInscritos'));
     })->name('webacademia.perfil');
     Route::put('/perfil', [WebController::class, 'updatePerfil'])->name('webacademia.perfil.update');
-    
+    Route::get('/pago-exitoso', function () {
+        return view('webacademia.pago_exitoso');
+    })->name('webacademia.pago_exitoso');
+
     Route::prefix('carrito')->name('carrito.')->group(function () {
         Route::get('/', [WebController::class, 'verCarrito'])->name('ver');
         Route::post('/agregar/{id}', [WebController::class, 'agregarAlCarrito'])->name('agregar');

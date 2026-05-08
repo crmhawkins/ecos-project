@@ -402,7 +402,7 @@ class WebController extends Controller
             'nombre' => 'required|string|max:255',
             'apellidos' => 'required|string|max:255',
             'email' => 'required|email',
-            'telefono' => 'required|string',
+            'telefono' => ['required', 'regex:/^[+]?[0-9\s\-]{9,20}$/'],
             'metodo_pago' => 'required|in:stripe,paypal,transferencia',
             'acepto_terminos' => 'required|accepted',
         ]);
@@ -458,8 +458,8 @@ class WebController extends Controller
                         $enrolledCourses[] = $item->curso->name;
                     }
 
-                    // Registrar la compra en la base de datos
-                    DB::table('alumnos_cursos')->insert([
+                    // Registrar la compra en la base de datos (ignora duplicados por UNIQUE constraint)
+                    DB::table('alumnos_cursos')->insertOrIgnore([
                         'alumno_id' => $user->id,
                         'curso_id' => $item->curso->id,
                         'fecha_compra' => now(),
@@ -478,15 +478,12 @@ class WebController extends Controller
             // Limpiar carrito después del pago exitoso
             ShoppingCartItem::where('alumno_id', $user->id)->delete();
 
-            $message = 'Compra completada exitosamente.';
-            if (!empty($enrolledCourses)) {
-                $message .= ' Te has matriculado en: ' . implode(', ', $enrolledCourses);
-            }
+            $sessionData = ['enrolled_courses' => $enrolledCourses];
             if (!empty($failedEnrollments)) {
-                $message .= ' Hubo problemas con la matriculación en: ' . implode(', ', $failedEnrollments);
+                $sessionData['warning'] = 'Hubo problemas con la matriculación en: ' . implode(', ', $failedEnrollments);
             }
 
-            return redirect()->route('webacademia.perfil')->with('success', $message);
+            return redirect()->route('webacademia.pago_exitoso')->with($sessionData);
 
         } catch (\Exception $e) {
             Log::error("Error en procesarPago: " . $e->getMessage());

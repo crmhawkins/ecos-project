@@ -77,14 +77,16 @@ class CrmActivityMeetingController extends Controller
         $arrayMeetings = array();
 
         if(Auth::user()->admin_user_department_id == 1){
-            $meetings = CrmActivitiesMeetingsXUsers::orderBy('id', 'DESC')->get();
+            $meetings = CrmActivitiesMeetingsXUsers::with('meeting')->orderBy('id', 'DESC')->get();
         }
         else{
-            $meetings = CrmActivitiesMeetingsXUsers::where('admin_user_id', Auth::user()->id)->orderBy('id', 'DESC')->get();
+            $meetings = CrmActivitiesMeetingsXUsers::with('meeting')->where('admin_user_id', Auth::user()->id)->orderBy('id', 'DESC')->get();
         }
 
         foreach ($meetings as $meeting) {
-            $arrayMeetings[] = $meeting->meeting;
+            if ($meeting->meeting) {
+                $arrayMeetings[] = $meeting->meeting;
+            }
         }
 
         return view('crm.crm_activities.meeting.index', compact('arrayMeetings'));
