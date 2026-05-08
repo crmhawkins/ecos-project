@@ -124,6 +124,13 @@ Route::get('/', function () {
     return view('webacademia.index');
 });
 
+Route::get('/sitemap.xml', function () {
+    $cursos = \App\Models\Cursos\Cursos::where('inactive', 0)->where('published', 1)->select('id', 'updated_at')->get();
+    $posts  = \App\Models\Blog\BlogPost::published()->select('slug', 'updated_at')->get();
+    return response()->view('webacademia.sitemap', compact('cursos', 'posts'))
+        ->header('Content-Type', 'application/xml');
+})->name('sitemap');
+
 
 Route::get('/blog_single', function () {
     return view('webacademia.blog_single');
