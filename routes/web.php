@@ -101,7 +101,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Envío de formularios del builder desde páginas públicas
-Route::post('/builder/form-submit', [BuilderController::class, 'handleFormSubmit'])->name('builder.form.submit');
+Route::post('/builder/form-submit', [BuilderController::class, 'handleFormSubmit'])->middleware('throttle:10,1')->name('builder.form.submit');
 
 
 
@@ -190,10 +190,10 @@ Route::get('/index_3', function () {
 
 
 Route::get('/weblogin', function () { return view('webacademia.login');});
-Route::post('/weblogin', [WebController::class, 'login'])->name('webacademia.login');
+Route::post('/weblogin', [WebController::class, 'login'])->middleware('throttle:5,1')->name('webacademia.login');
 
 Route::get('/webregister', function () { return view('webacademia.register');});
-Route::post('/webregister', [WebController::class, 'register'])->name('webacademia.register');
+Route::post('/webregister', [WebController::class, 'register'])->middleware('throttle:3,1')->name('webacademia.register');
 
 Route::post('/weblogout', [WebController::class, 'logout'])->name('webacademia.logout');
 

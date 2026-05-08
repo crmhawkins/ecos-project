@@ -11,6 +11,7 @@ use App\Models\Tasks\LogTasks;
 use App\Models\Tasks\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class PortalClientesController extends Controller
 {
@@ -25,26 +26,40 @@ class PortalClientesController extends Controller
     }
 
     public function loginPost(Request $request){
-        $pin =  $request->pin;
+        $pin     = $request->pin;
         $usuario = $request->usuario;
-        $part = explode('#',$usuario);
-        if(empty($part['1'])){
+        $part    = explode('#', $usuario);
+        if (empty($part[1])) {
             return redirect()->back()->with('toast', [
-                'icon' => 'error',
-                'mensaje' => 'El usuario no existe'
+                'icon'    => 'error',
+                'mensaje' => 'El usuario no existe',
             ]);
         }
-        $cliente = Client::where('pin', $pin)->where('id',$part[1])->first();
+
+        $cliente = Client::where('id', $part[1])->first();
 
         if ($cliente) {
-            session(['cliente' => $cliente]);
-            return redirect()->route('portal.dashboard');
-        }else{
-            return redirect()->back()->with('toast', [
-                'icon' => 'error',
-                'mensaje' => 'El pin no es correcto'
-            ]);
+            $pinValido = false;
+            if (Hash::check($pin, $cliente->pin)) {
+                $pinValido = true;
+            } elseif ($pin === $cliente->pin) {
+                // PIN en texto plano (legado) — re-hash automático
+                $cliente->pin = Hash::make($pin);
+                $cliente->save();
+                $pinValido = true;
+            }
+
+            if ($pinValido) {
+                $request->session()->regenerate();
+                session(['cliente' => $cliente]);
+                return redirect()->route('portal.dashboard');
+            }
         }
+
+        return redirect()->back()->with('toast', [
+            'icon'    => 'error',
+            'mensaje' => 'El pin no es correcto',
+        ]);
     }
 
     public function dashboard(Request $request){
@@ -58,7 +73,7 @@ class PortalClientesController extends Controller
     public function presupuestos(Request $request){
         $cliente = session('cliente');
         if ($cliente) {
-            $presupuestos = Budget::where('client_id',$cliente->id)->WhereYear('created_at','2024')->WhereMonth('created_at','12')->get();
+            $presupuestos = Budget::where('client_id', $cliente->id)->get();
             return view('crm.portal.presupuestos',compact('cliente','presupuestos'));
         }
         return view('crm.portal.login');
@@ -66,7 +81,7 @@ class PortalClientesController extends Controller
     public function facturas(Request $request){
         $cliente = session('cliente');
         if ($cliente) {
-            $facturas = Invoice::where('client_id',$cliente->id)->WhereYear('created_at','2024')->WhereMonth('created_at','12')->get();
+            $facturas = Invoice::where('client_id', $cliente->id)->get();
 
             return view('crm.portal.facturas',compact('cliente','facturas'));
         }
@@ -167,8 +182,8 @@ class PortalClientesController extends Controller
                 'pin.size' => 'El PIN debe tener exactamente 6 dígitos.'
             ]);
 
-            // Guardar el nuevo PIN
-            $cliente->pin = $request->pin;
+            // Guardar el nuevo PIN (hasheado)
+            $cliente->pin = Hash::make($request->pin);
             $cliente->save();
 
             // Redirigir con mensaje de éxito

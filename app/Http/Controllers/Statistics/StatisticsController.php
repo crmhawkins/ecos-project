@@ -25,7 +25,7 @@ class StatisticsController extends Controller
 
     public function mesFiltro($fecha_inicio, $fecha_fin,$dateRange)
     {
-        ini_set('memory_limit', '9024M');
+        ini_set('memory_limit', '512M');
 
         $anio = $fecha_inicio->year;
         $dataBudgets = $this->proyectosActivos();
